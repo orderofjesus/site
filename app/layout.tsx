@@ -20,7 +20,8 @@ const dmSans = DM_Sans({
 
 export const metadata: Metadata = {
   title: "Melchizedek Order of Jesus | Church",
-  description: "A Christ-centered community dedicated to knowing Jesus and making Him known.",
+  description:
+    "A Christ-centered community dedicated to knowing Jesus and making Him known.",
 };
 
 export default function RootLayout({
