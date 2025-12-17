@@ -29,13 +29,13 @@ const garamond = EB_Garamond({
 });
 
 const menuItems = [
-  { icon: Home, label: "Home", href: "#" },
-  { icon: Info, label: "About", href: "#about" },
-  { icon: BookOpen, label: "Sermons", href: "#sermons" },
-  { icon: Calendar, label: "Events", href: "#events" },
-  { icon: Users, label: "Ministries", href: "#ministries" },
-  { icon: Heart, label: "Give", href: "#give" },
-  { icon: Phone, label: "Contact", href: "#connect" },
+  { icon: Home, label: "Home", href: "/" },
+  { icon: Info, label: "About", href: "/#about" },
+  { icon: BookOpen, label: "Sermons", href: "/sermons" },
+  { icon: Calendar, label: "Events", href: "/#events" },
+  { icon: Users, label: "Ministries", href: "/#ministries" },
+  { icon: Heart, label: "Give", href: "/#give" },
+  { icon: Phone, label: "Contact", href: "/#connect" },
 ];
 
 export function MobileMenu() {

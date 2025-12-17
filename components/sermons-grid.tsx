@@ -4,6 +4,7 @@ import React from "react";
 import { DM_Sans, EB_Garamond } from "next/font/google";
 import { motion } from "framer-motion";
 import { ChevronRight, Play, Calendar } from "lucide-react";
+import Link from "next/link";
 
 const dmSans = DM_Sans({ subsets: ["latin"] });
 const garamond = EB_Garamond({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
@@ -41,10 +42,10 @@ export function SermonsGrid({ sermons }: SermonsGridProps) {
               Recent Sermons
             </h2>
           </div>
-          <button className="hidden md:flex items-center gap-2 text-sm font-semibold hover:gap-3 transition-all">
+          <Link href="/sermons" className="hidden md:flex items-center gap-2 text-sm font-semibold hover:gap-3 transition-all">
             View All Sermons
             <ChevronRight className="w-4 h-4" />
-          </button>
+          </Link>
         </motion.div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -102,10 +103,10 @@ export function SermonsGrid({ sermons }: SermonsGridProps) {
           transition={{ duration: 0.6 }}
           className="mt-12 text-center md:hidden"
         >
-          <button className="inline-flex items-center gap-2 px-8 py-4 text-sm font-semibold bg-black dark:bg-white text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90 transition-all">
+          <Link href="/sermons" className="inline-flex items-center gap-2 px-8 py-4 text-sm font-semibold bg-black dark:bg-white text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90 transition-all">
             View All Sermons
             <ChevronRight className="w-4 h-4" />
-          </button>
+          </Link>
         </motion.div>
       </div>
     </section>

@@ -76,11 +76,33 @@ export function Header() {
           </div>
 
           <nav className="hidden items-center gap-8 lg:flex">
-            {["About", "Sermons", "Ministries", "Events", "Connect"].map(
+            <Link
+              href="/#about"
+              className={cn(
+                "text-sm font-medium transition-colors hover:opacity-80",
+                scrolled
+                  ? "text-black dark:text-white"
+                  : "text-white"
+              )}
+            >
+              About
+            </Link>
+            <Link
+              href="/sermons"
+              className={cn(
+                "text-sm font-medium transition-colors hover:opacity-80",
+                scrolled
+                  ? "text-black dark:text-white"
+                  : "text-white"
+              )}
+            >
+              Sermons
+            </Link>
+            {["Ministries", "Events", "Connect"].map(
               (item) => (
                 <Link
                   key={item}
-                  href={`#${item.toLowerCase()}`}
+                  href={`/#${item.toLowerCase()}`}
                   className={cn(
                     "text-sm font-medium transition-colors hover:opacity-80",
                     scrolled

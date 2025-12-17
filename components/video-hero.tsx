@@ -34,7 +34,7 @@ export function VideoHero() {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   // Duplicate slides for seamless infinite loop
-  const duplicatedSlides = [...heroSlides, ...heroSlides];
+  // const duplicatedSlides = [...heroSlides, ...heroSlides];
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,
@@ -43,33 +43,33 @@ export function VideoHero() {
   });
 
   // Auto-play slides with seamless infinite loop
-  useEffect(() => {
-    if (!emblaApi) return;
+  // useEffect(() => {
+  //   if (!emblaApi) return;
 
-    const autoplayInterval = setInterval(() => {
-      const currentIndex = emblaApi.selectedScrollSnap();
-      const totalSlides = duplicatedSlides.length;
+  //   const autoplayInterval = setInterval(() => {
+  //     const currentIndex = emblaApi.selectedScrollSnap();
+  //     const totalSlides = duplicatedSlides.length;
 
-      // If we're at the last duplicated slide, jump to the original last slide
-      if (currentIndex === totalSlides - 1) {
-        emblaApi.scrollNext();
-        setTimeout(() => {
-          emblaApi.scrollTo(heroSlides.length, false); // Jump to first duplicate without animation
-        }, 600); // Wait for transition to complete
-      } else if (
-        currentIndex >= heroSlides.length - 1 &&
-        currentIndex < totalSlides - 1
-      ) {
-        // We're in the duplicated section, continue normally
-        emblaApi.scrollNext();
-      } else {
-        // Normal progression
-        emblaApi.scrollNext();
-      }
-    }, 8000);
+  //     // If we're at the last duplicated slide, jump to the original last slide
+  //     if (currentIndex === totalSlides - 1) {
+  //       emblaApi.scrollNext();
+  //       setTimeout(() => {
+  //         emblaApi.scrollTo(heroSlides.length, false); // Jump to first duplicate without animation
+  //       }, 600); // Wait for transition to complete
+  //     } else if (
+  //       currentIndex >= heroSlides.length - 1 &&
+  //       currentIndex < totalSlides - 1
+  //     ) {
+  //       // We're in the duplicated section, continue normally
+  //       emblaApi.scrollNext();
+  //     } else {
+  //       // Normal progression
+  //       emblaApi.scrollNext();
+  //     }
+  //   }, 8000);
 
-    return () => clearInterval(autoplayInterval);
-  }, [emblaApi, duplicatedSlides.length]);
+  //   return () => clearInterval(autoplayInterval);
+  // }, [emblaApi, duplicatedSlides.length]);
 
   // Track selected slide
   const onSelect = useCallback(() => {
@@ -102,11 +102,11 @@ export function VideoHero() {
   );
 
   return (
-    <section className="w-full bg-black">
-      <section className="relative mx-auto min-h-screen max-w-440">
+    <section className="w-full">
+      <section className="relative mx-auto min-h-screen max-w-440 bg-black">
         <div ref={emblaRef} className="h-full overflow-hidden">
-          <div className="flex h-full min-h-[90vh] transition-transform duration-500 ease-out will-change-transform">
-            {duplicatedSlides.map((slide, index) => (
+          <div className="flex h-full min-h-screen transition-transform duration-500 ease-out will-change-transform">
+            {heroSlides.map((slide, index) => (
               <div
                 key={`${slide.id}-${index}`}
                 className="relative flex-[0_0_100%] items-center justify-center overflow-hidden"
