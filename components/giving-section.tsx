@@ -1,15 +1,9 @@
 "use client";
 
 import React from "react";
-import { DM_Sans, EB_Garamond } from "next/font/google";
 import { motion } from "framer-motion";
 import { Heart, HandHeart, Church, Users } from "lucide-react";
-
-const dmSans = DM_Sans({ subsets: ["latin"] });
-const garamond = EB_Garamond({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
+import { hellix, larken } from "@/lib/fonts";
 
 const givingImpacts = [
   {
@@ -51,7 +45,7 @@ export function GivingSection() {
               Partner With Us
             </p>
             <h2
-              className={`${garamond.className} mb-8 text-5xl font-bold md:text-6xl`}
+              className={`${larken.className} mb-8 text-5xl font-bold md:text-6xl`}
             >
               Give to Advance
               <br />
@@ -78,7 +72,7 @@ export function GivingSection() {
                   </div>
                   <div>
                     <h3
-                      className={`${garamond.className} mb-2 text-xl font-bold`}
+                      className={`${larken.className} mb-2 text-xl font-bold`}
                     >
                       {impact.title}
                     </h3>
@@ -130,7 +124,7 @@ export function GivingSection() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p
-                      className={`${garamond.className} mb-1 text-3xl font-bold`}
+                      className={`${larken.className} mb-1 text-3xl font-bold`}
                     >
                       2,500+
                     </p>
@@ -140,7 +134,7 @@ export function GivingSection() {
                   </div>
                   <div>
                     <p
-                      className={`${garamond.className} mb-1 text-3xl font-bold`}
+                      className={`${larken.className} mb-1 text-3xl font-bold`}
                     >
                       15
                     </p>
@@ -150,7 +144,7 @@ export function GivingSection() {
                   </div>
                   <div>
                     <p
-                      className={`${garamond.className} mb-1 text-3xl font-bold`}
+                      className={`${larken.className} mb-1 text-3xl font-bold`}
                     >
                       $1.2M
                     </p>
@@ -160,7 +154,7 @@ export function GivingSection() {
                   </div>
                   <div>
                     <p
-                      className={`${garamond.className} mb-1 text-3xl font-bold`}
+                      className={`${larken.className} mb-1 text-3xl font-bold`}
                     >
                       100%
                     </p>
@@ -181,7 +175,7 @@ export function GivingSection() {
               className="mt-8 border-l-4 border-black bg-neutral-50 p-6 dark:border-white dark:bg-neutral-800"
             >
               <p
-                className={`${garamond.className} mb-2 text-lg text-black/90 italic dark:text-white/90`}
+                className={`${larken.className} mb-2 text-lg text-black/90 italic dark:text-white/90`}
               >
                 &quot;Each of you should give what you have decided in your
                 heart to give, not reluctantly or under compulsion, for God

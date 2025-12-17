@@ -1,17 +1,11 @@
 "use client";
 
-import { DM_Sans, EB_Garamond } from "next/font/google";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { motion } from "framer-motion";
 import { Play, Calendar, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-const dmSans = DM_Sans({ subsets: ["latin"] });
-const garamond = EB_Garamond({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
+import { hellix, larken } from "@/lib/fonts";
 
 const sermons = [
   {
@@ -109,7 +103,7 @@ export default function SermonsPage() {
 
   return (
     <div
-      className={`${dmSans.className} min-h-screen bg-neutral-50 text-black transition-colors duration-300 dark:bg-[#0a0a0a] dark:text-white`}
+      className={`${hellix.className} min-h-screen bg-neutral-50 text-black transition-colors duration-300 dark:bg-[#0a0a0a] dark:text-white`}
     >
       <Header />
       
@@ -125,7 +119,7 @@ export default function SermonsPage() {
             <p className="text-xs tracking-[0.4em] uppercase text-black/60 dark:text-white/60 mb-4">
               Teaching Archive
             </p>
-            <h1 className={`${garamond.className} text-5xl md:text-7xl font-bold mb-6`}>
+            <h1 className={`${larken.className} text-5xl md:text-7xl font-bold mb-6`}>
               Sermons
             </h1>
             <p className="text-lg text-black/70 dark:text-white/70 max-w-2xl mx-auto">
@@ -164,7 +158,7 @@ export default function SermonsPage() {
                     {latestSermon.speaker}
                   </p>
                   <h3
-                    className={`${garamond.className} text-4xl lg:text-5xl font-bold mb-4`}
+                    className={`${larken.className} text-4xl lg:text-5xl font-bold mb-4`}
                   >
                     {latestSermon.title}
                   </h3>
@@ -195,7 +189,7 @@ export default function SermonsPage() {
 
           {/* Previous Sermons Grid */}
           <div className="mb-16">
-            <h2 className={`${garamond.className} text-3xl font-bold mb-8`}>
+            <h2 className={`${larken.className} text-3xl font-bold mb-8`}>
               Previous Sermons
             </h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -223,7 +217,7 @@ export default function SermonsPage() {
                       {sermon.speaker}
                     </p>
                     <h3
-                      className={`${garamond.className} text-2xl font-bold mb-3`}
+                      className={`${larken.className} text-2xl font-bold mb-3`}
                     >
                       {sermon.title}
                     </h3>

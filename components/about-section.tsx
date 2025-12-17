@@ -1,15 +1,9 @@
 "use client";
 
 import React from "react";
-import { DM_Sans, EB_Garamond } from "next/font/google";
 import { motion } from "framer-motion";
 import { Heart, Users, MapPin } from "lucide-react";
-
-const dmSans = DM_Sans({ subsets: ["latin"] });
-const garamond = EB_Garamond({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
+import { hellix, larken } from "@/lib/fonts";
 
 const features = [
   {
@@ -47,7 +41,7 @@ export function AboutSection() {
               Our Mission
             </p>
             <h2
-              className={`${garamond.className} mb-8 text-5xl font-bold md:text-6xl`}
+              className={`${larken.className} mb-8 text-5xl font-bold md:text-6xl`}
             >
               Know Jesus,
               <br />
@@ -73,7 +67,7 @@ export function AboutSection() {
                   </div>
                   <div>
                     <h3
-                      className={`${garamond.className} mb-2 text-xl font-bold`}
+                      className={`${larken.className} mb-2 text-xl font-bold`}
                     >
                       {item.title}
                     </h3>
@@ -102,7 +96,7 @@ export function AboutSection() {
             </div>
             <div className="absolute -bottom-8 -left-8 flex h-48 w-48 items-center justify-center bg-black text-white transition-colors duration-300 dark:bg-white dark:text-black">
               <div className="text-center">
-                <p className={`${garamond.className} mb-2 text-5xl font-bold`}>
+                <p className={`${larken.className} mb-2 text-5xl font-bold`}>
                   25+
                 </p>
                 <p className="text-xs tracking-[0.3em] uppercase">

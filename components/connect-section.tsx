@@ -1,11 +1,8 @@
 "use client";
 
 import React from "react";
-import { DM_Sans, EB_Garamond } from "next/font/google";
 import { motion } from "framer-motion";
-
-const dmSans = DM_Sans({ subsets: ["latin"] });
-const garamond = EB_Garamond({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
+import { hellix, larken } from "@/lib/fonts";
 
 export function ConnectSection() {
   return (
@@ -20,7 +17,7 @@ export function ConnectSection() {
           <p className="text-xs tracking-[0.4em] uppercase text-white/60 mb-6">
             Take the Next Step
           </p>
-          <h2 className={`${garamond.className} text-5xl md:text-7xl font-bold mb-8`}>
+          <h2 className={`${larken.className} text-5xl md:text-7xl font-bold mb-8`}>
             Join Our Community
           </h2>
           <p className="text-xl text-white/80 mb-12 max-w-2xl mx-auto leading-relaxed">

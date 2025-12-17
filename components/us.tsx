@@ -25,7 +25,7 @@ function Us() {
               Welcome home
             </p>
             <h1
-              className={`${garamond.className} text-4xl leading-[1.1] font-semibold md:text-5xl`}
+              className={`${larken.className} text-4xl leading-[1.1] font-semibold md:text-5xl`}
             >
               You belong here. Find Jesus, find family.
             </h1>

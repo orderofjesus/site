@@ -1,12 +1,9 @@
 "use client";
 
 import React from "react";
-import { DM_Sans, EB_Garamond } from "next/font/google";
 import { motion } from "framer-motion";
 import { SermonCarousel } from "@/components/sermon-carousel";
-
-const dmSans = DM_Sans({ subsets: ["latin"] });
-const garamond = EB_Garamond({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
+import { hellix, larken } from "@/lib/fonts";
 
 interface FeaturedSermon {
   id: number;
@@ -34,7 +31,7 @@ export function FeaturedCarouselSection({ sermons }: FeaturedCarouselSectionProp
           <p className="text-xs tracking-[0.4em] uppercase text-white/60 mb-4">
             Featured Messages
           </p>
-          <h2 className={`${garamond.className} text-5xl md:text-6xl font-bold`}>
+          <h2 className={`${larken.className} text-5xl md:text-6xl font-bold`}>
             Transforming Messages
           </h2>
         </motion.div>

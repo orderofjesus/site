@@ -3,14 +3,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { ChevronLeft, ChevronRight, Play } from "lucide-react";
-import { DM_Sans, EB_Garamond } from "next/font/google";
 import { motion } from "framer-motion";
-
-const dmSans = DM_Sans({ subsets: ["latin"] });
-const garamond = EB_Garamond({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
+import { hellix, larken } from "@/lib/fonts";
 
 interface Sermon {
   id: number;
@@ -96,7 +90,7 @@ export function SermonCarousel({ sermons }: SermonCarouselProps) {
                     {sermon.speaker}
                   </p>
                   <h3
-                    className={`${garamond.className} mb-2 text-2xl font-bold text-white dark:text-white`}
+                    className={`${larken.className} mb-2 text-2xl font-bold text-white dark:text-white`}
                   >
                     {sermon.title}
                   </h3>

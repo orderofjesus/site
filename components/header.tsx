@@ -1,16 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { EB_Garamond } from "next/font/google";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { MobileMenu } from "@/components/mobile-menu";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-
-const garamond = EB_Garamond({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
+import { larken } from "@/lib/fonts";
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -46,14 +41,14 @@ export function Header() {
                     : "bg-white text-black"
                 )}
               >
-                <span className={`${garamond.className} text-xl font-bold`}>
+                <span className={`${larken.className} text-xl font-bold`}>
                   M
                 </span>
               </div>
               <div className="hidden sm:block">
                 <p
                   className={cn(
-                    `${garamond.className} text-lg font-bold leading-none transition-colors duration-300`,
+                    `${larken.className} text-lg font-bold leading-none transition-colors duration-300`,
                     scrolled
                       ? "text-black dark:text-white"
                       : "text-white"

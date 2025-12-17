@@ -1,13 +1,10 @@
 "use client";
 
 import React from "react";
-import { DM_Sans, EB_Garamond } from "next/font/google";
 import { motion } from "framer-motion";
 import { ChevronRight, Play, Calendar } from "lucide-react";
 import Link from "next/link";
-
-const dmSans = DM_Sans({ subsets: ["latin"] });
-const garamond = EB_Garamond({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
+import { hellix, larken } from "@/lib/fonts";
 
 interface Sermon {
   id: number;
@@ -38,7 +35,7 @@ export function SermonsGrid({ sermons }: SermonsGridProps) {
             <p className="text-xs tracking-[0.4em] uppercase text-black/60 dark:text-white/60 mb-4">
               Teaching Archive
             </p>
-            <h2 className={`${garamond.className} text-5xl md:text-6xl font-bold`}>
+            <h2 className={`${larken.className} text-5xl md:text-6xl font-bold`}>
               Recent Sermons
             </h2>
           </div>
@@ -77,7 +74,7 @@ export function SermonsGrid({ sermons }: SermonsGridProps) {
                   {sermon.speaker}
                 </p>
                 <h3
-                  className={`${garamond.className} text-2xl font-bold mb-3 group-hover:underline`}
+                  className={`${larken.className} text-2xl font-bold mb-3 group-hover:underline`}
                 >
                   {sermon.title}
                 </h3>

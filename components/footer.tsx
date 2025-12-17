@@ -1,10 +1,7 @@
 "use client";
 
 import React from "react";
-import { DM_Sans, EB_Garamond } from "next/font/google";
-
-const dmSans = DM_Sans({ subsets: ["latin"] });
-const garamond = EB_Garamond({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
+import { hellix, larken } from "@/lib/fonts";
 
 export function Footer() {
   return (
@@ -14,10 +11,10 @@ export function Footer() {
           <div className="md:col-span-2">
             <div className="flex items-center gap-4 mb-6">
               <div className="flex h-12 w-12 items-center justify-center bg-black dark:bg-white text-white dark:text-black transition-colors duration-300">
-                <span className={`${garamond.className} text-2xl font-bold`}>M</span>
+                <span className={`${larken.className} text-2xl font-bold`}>M</span>
               </div>
               <div>
-                <p className={`${garamond.className} text-xl font-bold leading-none`}>
+                <p className={`${larken.className} text-xl font-bold leading-none`}>
                   Melchizedek
                 </p>
                 <p className="text-[10px] tracking-[0.3em] uppercase text-black/60 dark:text-white/60">

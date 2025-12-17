@@ -11,7 +11,6 @@ import {
   Heart,
   Phone,
 } from "lucide-react";
-import { DM_Sans, EB_Garamond } from "next/font/google";
 import {
   Sheet,
   SheetContent,
@@ -21,12 +20,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import Link from "next/link";
-
-const dmSans = DM_Sans({ subsets: ["latin"] });
-const garamond = EB_Garamond({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
+import { hellix, larken } from "@/lib/fonts";
 
 const menuItems = [
   { icon: Home, label: "Home", href: "/" },
@@ -59,13 +53,13 @@ export function MobileMenu() {
           <SheetHeader className="border-b border-black/10 p-6 dark:border-white/10">
             <div className="flex items-center gap-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-black text-white dark:bg-white dark:text-black">
-                <span className={`${garamond.className} text-2xl font-bold`}>
+                <span className={`${larken.className} text-2xl font-bold`}>
                   M
                 </span>
               </div>
               <div>
                 <p
-                  className={`${garamond.className} text-xl font-bold leading-none`}
+                  className={`${larken.className} text-xl font-bold leading-none`}
                 >
                   Melchizedek
                 </p>

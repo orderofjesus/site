@@ -1,10 +1,5 @@
-import { EB_Garamond } from "next/font/google";
 import React from "react";
-
-const garamond = EB_Garamond({
-  subsets: ["latin"],
-  weight: ["400", "700"],
-});
+import { larken } from "@/lib/fonts";
 
 function Hero() {
   return (
@@ -20,7 +15,7 @@ function Hero() {
             Welcome home
           </p>
           <h1
-            className={`${garamond.className} text-4xl leading-[1.1] font-semibold md:text-5xl lg:text-6xl`}
+            className={`${larken.className} text-4xl leading-[1.1] font-semibold md:text-5xl lg:text-6xl`}
           >
             You belong here. Find Jesus, find family.
           </h1>

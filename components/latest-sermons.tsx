@@ -106,7 +106,7 @@ const LatestSermons = ({
     <section className="py-32">
       <div className="container mx-auto">
         <div className="mb-14 grid gap-5 text-center md:grid-cols-2 md:text-left">
-          <h1 className={`${garamond.className} text-5xl font-semibold`}>
+          <h1 className={`${larken.className} text-5xl font-semibold`}>
             {title}
           </h1>
           <p className="text-muted-foreground">{description}</p>
@@ -126,7 +126,7 @@ const LatestSermons = ({
               />
               <div>
                 <p className="mb-2 text-lg font-semibold">{breakout.title}</p>
-                <p className={`${garamond.className} text-muted-foreground`}>
+                <p className={`${larken.className} text-muted-foreground`}>
                   {breakout.description}
                 </p>
               </div>

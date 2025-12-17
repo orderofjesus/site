@@ -2,14 +2,9 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { ChevronRight, Play } from "lucide-react";
-import { EB_Garamond } from "next/font/google";
 import { motion, AnimatePresence } from "framer-motion";
 import useEmblaCarousel from "embla-carousel-react";
-
-const garamond = EB_Garamond({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
+import { larken } from "@/lib/fonts";
 
 const heroSlides = [
   {
@@ -150,7 +145,7 @@ export function VideoHero() {
                               initial={{ opacity: 0, y: 20 }}
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ duration: 0.6, delay: 0.3 }}
-                              className={`${garamond.className} mb-8 text-6xl leading-[1.05] font-bold text-white md:text-7xl lg:text-8xl`}
+                              className={`${larken.className} mb-8 text-6xl leading-[1.05] font-bold text-white md:text-7xl lg:text-8xl`}
                             >
                               {slide.title.split(" ")[0]}
                               <br />

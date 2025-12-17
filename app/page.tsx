@@ -1,6 +1,5 @@
 "use client";
 
-import { DM_Sans } from "next/font/google";
 import { VideoHero } from "@/components/video-hero";
 import { Header } from "@/components/header";
 import { ServiceTimes } from "@/components/service-times";
@@ -10,8 +9,7 @@ import { GivingSection } from "@/components/giving-section";
 import { SermonsGrid } from "@/components/sermons-grid";
 import { ConnectSection } from "@/components/connect-section";
 import { Footer } from "@/components/footer";
-
-const dmSans = DM_Sans({ subsets: ["latin"] });
+import { hellix } from "@/lib/fonts";
 
 const sermons = [
   {
@@ -106,14 +104,14 @@ const featuredSermons = [
 export default function Home() {
   return (
     <div
-      className={`${dmSans.className} dark:bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(96, 94, 214, 0.76),rgba(25, 52, 75, 0.98))] min-h-screen bg-neutral-50 text-black transition-colors duration-300 dark:bg-[#0a0a0a] dark:text-white`}
+      className={`${hellix.className} dark:bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(96, 94, 214, 0.76),rgba(25, 52, 75, 0.98))] min-h-screen bg-neutral-50 text-black transition-colors duration-300 dark:bg-[#0a0a0a] dark:text-white`}
     >
       <Header />
       <div className="bg-neutral-50 pb-24 dark:bg-black">
         {" "}
         <VideoHero />
       </div>
-      {/* <ServiceTimes /> */}
+      <ServiceTimes />
       <FeaturedCarouselSection sermons={featuredSermons} />
       <AboutSection />
       <GivingSection />
