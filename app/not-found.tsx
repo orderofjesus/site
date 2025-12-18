@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
-import { geistMono, larken, hellix } from "@/lib/fonts";
+import { larken, hellix } from "@/lib/fonts";
 import { Home, Search, ArrowLeft } from "lucide-react";
 
 export default function NotFound() {
@@ -19,7 +19,7 @@ export default function NotFound() {
           {/* 404 Number */}
           <div className="mb-8">
             <h1
-              className={`${geistMono.className} text-[120px] leading-none font-bold tracking-tight text-black/10 sm:text-[180px] dark:text-white/10`}
+              className={`${larken.className} text-[120px] leading-none font-bold tracking-tight text-black/10 sm:text-[180px] dark:text-white/10`}
             >
               404
             </h1>
