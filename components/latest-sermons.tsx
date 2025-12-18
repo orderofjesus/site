@@ -9,6 +9,7 @@ const garamond = EB_Garamond({
 });
 
 import { Button } from "@/components/ui/button";
+import { larken } from "@/lib/fonts";
 
 interface About3Props {
   title?: string;

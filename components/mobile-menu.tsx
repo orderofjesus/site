@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Menu,
   Home,
@@ -20,7 +20,9 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import Link from "next/link";
-import { hellix, larken } from "@/lib/fonts";
+import { larken } from "@/lib/fonts";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 const menuItems = [
   { icon: Home, label: "Home", href: "/" },
@@ -33,14 +35,43 @@ const menuItems = [
 ];
 
 export function MobileMenu() {
+  const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
+
+  const hasLightBackground = pathname !== "/";
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Determine button colors based on scroll state and page background
+  const getButtonColors = () => {
+    if (scrolled) {
+      return "border-black/20 bg-black/5 text-black hover:bg-black hover:text-white dark:border-white/20 dark:bg-white/5 dark:text-white dark:hover:bg-white dark:hover:text-black";
+    }
+    return hasLightBackground
+      ? "border-black/20 bg-black/5 text-black hover:bg-black hover:text-white dark:border-white/20 dark:bg-white/5 dark:text-white dark:hover:bg-white dark:hover:text-black"
+      : "border-white/30 bg-white/10 text-white backdrop-blur-sm hover:bg-white hover:text-black";
+  };
+
   return (
     <Sheet modal={false}>
       <SheetTrigger asChild>
         <button
-          className="flex h-10 w-10 items-center justify-center rounded-lg border border-black transition-colors duration-200 hover:bg-black hover:text-white dark:border-white dark:hover:bg-white dark:hover:text-black"
+          className={cn(
+            "group relative flex h-11 w-11 flex-col items-center justify-center gap-[5px] rounded-xl transition-all duration-300 ease-out",
+            getButtonColors()
+          )}
           aria-label="Toggle menu"
         >
-          <Menu className="h-5 w-5" />
+          <span className="h-[2px] w-5 rounded-full bg-current transition-all duration-300 ease-out group-hover:w-6" />
+          <span className="h-[2px] w-5 rounded-full bg-current transition-all duration-300 ease-out group-hover:w-4" />
+          <span className="h-[2px] w-5 rounded-full bg-current transition-all duration-300 ease-out group-hover:w-6" />
         </button>
       </SheetTrigger>
       <SheetContent
@@ -59,11 +90,11 @@ export function MobileMenu() {
               </div>
               <div>
                 <p
-                  className={`${larken.className} text-xl font-bold leading-none`}
+                  className={`${larken.className} text-xl leading-none font-bold`}
                 >
                   Melchizedek
                 </p>
-                <p className="text-[10px] uppercase tracking-[0.3em] text-black/60 dark:text-white/60">
+                <p className="text-[10px] tracking-[0.3em] text-black/60 uppercase dark:text-white/60">
                   Order of Jesus
                 </p>
               </div>

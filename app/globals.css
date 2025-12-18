@@ -126,3 +126,92 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes ambient-glow {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1) translate(0%, 0%);
+  }
+  33% {
+    opacity: 0.8;
+    transform: scale(1.2) translate(8%, -8%);
+  }
+  66% {
+    opacity: 0.7;
+    transform: scale(1.1) translate(-5%, 5%);
+  }
+}
+
+.ambient-glow-bg {
+  position: relative;
+  overflow: hidden;
+}
+
+.ambient-glow-bg::before,
+.ambient-glow-bg::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  animation: ambient-glow 15s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -10;
+}
+
+.ambient-glow-bg::before {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgb(69, 194, 12) 0%, transparent 70%);
+  top: -15%;
+  left: 5%;
+  animation-delay: 0s;
+}
+
+.ambient-glow-bg::after {
+  width: 700px;
+  height: 700px;
+  background: radial-gradient(
+    circle,
+    rgba(167, 139, 250, 0.28) 0%,
+    transparent 100%
+  );
+  bottom: -20%;
+  right: 5%;
+  animation-delay: 5s;
+  animation-duration: 18s;
+}
+
+.dark .ambient-glow-bg::before {
+  background: radial-gradient(
+    circle,
+    rgba(96, 165, 250, 0.18) 0%,
+    transparent 70%
+  );
+}
+
+.dark .ambient-glow-bg::after {
+  background: radial-gradient(
+    circle,
+    rgba(139, 92, 246, 0.15) 0%,
+    transparent 70%
+  );
+}
+
+.background-animate {
+  background-size: 400%;
+
+  -webkit-animation: gradientBG 3s ease infinite;
+  -moz-animation: gradientBG 3s ease infinite;
+  animation: gradientBG 3s ease infinite;
+}
+
+@keyframes gradientBG {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}

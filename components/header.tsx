@@ -6,9 +6,15 @@ import { MobileMenu } from "@/components/mobile-menu";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { larken } from "@/lib/fonts";
+import { usePathname } from "next/navigation";
+import { HandCoins } from "lucide-react";
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
+
+  // Determine if the page has a light background initially
+  const hasLightBackground = pathname !== "/";
 
   useEffect(() => {
     const handleScroll = () => {
@@ -19,13 +25,48 @@ export function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Determine text colors based on scroll state and page background
+  const getTextColor = () => {
+    if (scrolled) {
+      return "text-black dark:text-white";
+    }
+    return hasLightBackground ? "text-black dark:text-white" : "text-white";
+  };
+
+  const getSubtitleColor = () => {
+    if (scrolled) {
+      return "text-black/60 dark:text-white/60";
+    }
+    return hasLightBackground
+      ? "text-black/60 dark:text-white/60"
+      : "text-white/80";
+  };
+
+  const getLogoColors = () => {
+    if (scrolled) {
+      return "bg-black text-white dark:bg-white dark:text-black";
+    }
+    return hasLightBackground
+      ? "bg-black text-white dark:bg-white dark:text-black"
+      : "bg-white text-black";
+  };
+
+  const getButtonColors = () => {
+    if (scrolled) {
+      return "bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90";
+    }
+    return hasLightBackground
+      ? "bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+      : "border border-white bg-white text-black hover:bg-black hover:text-white";
+  };
+
   return (
     <header
       className={cn(
-        "fixed left-0 right-0 top-0 z-50 transition-all duration-300 ease-in-out",
+        "fixed top-0 right-0 left-0 z-50 transition-all duration-300 ease-in-out",
         scrolled
           ? "border-b border-black/5 bg-white/80 py-4 backdrop-blur-md dark:border-white/5 dark:bg-neutral-900/80"
-          : "border-transparent bg-transparent py-6"
+          : "border-transparent bg-transparent py-6",
       )}
     >
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
@@ -36,9 +77,7 @@ export function Header() {
               <div
                 className={cn(
                   "flex h-10 w-10 items-center justify-center rounded-lg transition-colors duration-300",
-                  scrolled
-                    ? "bg-black text-white dark:bg-white dark:text-black"
-                    : "bg-white text-black"
+                  getLogoColors(),
                 )}
               >
                 <span className={`${larken.className} text-xl font-bold`}>
@@ -48,20 +87,16 @@ export function Header() {
               <div className="hidden sm:block">
                 <p
                   className={cn(
-                    `${larken.className} text-lg font-bold leading-none transition-colors duration-300`,
-                    scrolled
-                      ? "text-black dark:text-white"
-                      : "text-white"
+                    `${larken.className} text-lg leading-none font-bold transition-colors duration-300`,
+                    getTextColor(),
                   )}
                 >
                   Melchizedek
                 </p>
                 <p
                   className={cn(
-                    "text-[10px] uppercase tracking-[0.3em] transition-colors duration-300",
-                    scrolled
-                      ? "text-black/60 dark:text-white/60"
-                      : "text-white/80"
+                    "text-[10px] tracking-[0.3em] uppercase transition-colors duration-300",
+                    getSubtitleColor(),
                   )}
                 >
                   Order of Jesus
@@ -75,9 +110,7 @@ export function Header() {
               href="/#about"
               className={cn(
                 "text-sm font-medium transition-colors hover:opacity-80",
-                scrolled
-                  ? "text-black dark:text-white"
-                  : "text-white"
+                getTextColor(),
               )}
             >
               About
@@ -86,51 +119,44 @@ export function Header() {
               href="/sermons"
               className={cn(
                 "text-sm font-medium transition-colors hover:opacity-80",
-                scrolled
-                  ? "text-black dark:text-white"
-                  : "text-white"
+                getTextColor(),
               )}
             >
               Sermons
             </Link>
-            {["Ministries", "Events", "Connect"].map(
-              (item) => (
-                <Link
-                  key={item}
-                  href={`/#${item.toLowerCase()}`}
-                  className={cn(
-                    "text-sm font-medium transition-colors hover:opacity-80",
-                    scrolled
-                      ? "text-black dark:text-white"
-                      : "text-white"
-                  )}
-                >
-                  {item}
-                </Link>
-              )
-            )}
+            {["Ministries", "Events", "Connect"].map((item) => (
+              <Link
+                key={item}
+                href={`/#${item.toLowerCase()}`}
+                className={cn(
+                  "text-sm font-medium transition-colors hover:opacity-80",
+                  getTextColor(),
+                )}
+              >
+                {item}
+              </Link>
+            ))}
           </nav>
 
           <div className="flex items-center gap-3">
             <ThemeToggle />
-            <button
+            {/* <button
               className={cn(
-                "hidden rounded-full px-6 py-2.5 text-sm font-semibold transition-all duration-300 md:block",
+                "hidden px-6 py-2.5 text-sm font-semibold transition-all duration-300 md:block",
                 scrolled
                   ? "border border-black text-black hover:bg-black hover:text-white dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-black"
-                  : "bg-white text-black hover:bg-white/90"
+                  : "bg-white text-black hover:bg-white/90",
               )}
             >
               Plan a Visit
-            </button>
+            </button> */}
             <button
               className={cn(
-                "hidden rounded-full px-6 py-2.5 text-sm font-semibold transition-all duration-300 sm:block",
-                scrolled
-                  ? "bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
-                  : "border border-white text-white hover:bg-white hover:text-black"
+                "hidden gap-x-4 px-6 py-2.5 text-sm font-semibold transition-all duration-300 sm:flex sm:items-center",
+                getButtonColors(),
               )}
             >
+              <HandCoins className="h-4 w-4" />
               Give
             </button>
           </div>

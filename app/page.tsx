@@ -2,7 +2,7 @@
 
 import { VideoHero } from "@/components/video-hero";
 import { Header } from "@/components/header";
-import { ServiceTimes } from "@/components/service-times";
+import { ConnectOptions } from "@/components/connect-options";
 import { FeaturedCarouselSection } from "@/components/featured-carousel-section";
 import { AboutSection } from "@/components/about-section";
 import { GivingSection } from "@/components/giving-section";
@@ -107,11 +107,13 @@ export default function Home() {
       className={`${hellix.className} dark:bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(96, 94, 214, 0.76),rgba(25, 52, 75, 0.98))] min-h-screen bg-neutral-50 text-black transition-colors duration-300 dark:bg-[#0a0a0a] dark:text-white`}
     >
       <Header />
+      {/* <div className="background-animate bg-linear-to-r from-neutral-50 via-zinc-500 to-gray-500 pb-24">
+        <VideoHero />
+      </div> */}
       <div className="bg-neutral-50 pb-24 dark:bg-black">
-        {" "}
         <VideoHero />
       </div>
-      <ServiceTimes />
+      <ConnectOptions />
       <FeaturedCarouselSection sermons={featuredSermons} />
       <AboutSection />
       <GivingSection />
