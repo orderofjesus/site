@@ -120,10 +120,10 @@ export default function SermonsPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="mb-16 text-center"
+            className="mt-16 mb-24 text-center"
           >
             <p className="mb-4 text-xs tracking-[0.4em] text-black/60 uppercase dark:text-white/60">
-              Teaching Archive
+              Discover
             </p>
             <h1
               className={`${larken.className} mb-6 text-5xl font-bold md:text-7xl`}

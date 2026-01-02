@@ -5,7 +5,7 @@ import { Header } from "@/components/header";
 import { ConnectOptions } from "@/components/connect-options";
 import { FeaturedCarouselSection } from "@/components/featured-carousel-section";
 import { AboutSection } from "@/components/about-section";
-import { GivingSection } from "@/components/giving-section";
+import { PartnerSection } from "@/components/partner-section";
 import { SermonsGrid } from "@/components/sermons-grid";
 import { ConnectSection } from "@/components/connect-section";
 import { Footer } from "@/components/footer";
@@ -116,7 +116,7 @@ export default function Home() {
       <ConnectOptions />
       <FeaturedCarouselSection sermons={featuredSermons} />
       <AboutSection />
-      <GivingSection />
+      <PartnerSection />
       <SermonsGrid sermons={sermons} />
       <ConnectSection />
       <Footer />

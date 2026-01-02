@@ -1,96 +1,136 @@
 "use client";
 
 import React from "react";
-import { hellix, larken } from "@/lib/fonts";
+import Link from "next/link";
+import { larken } from "@/lib/fonts";
 
 export function Footer() {
   return (
-    <footer className="bg-white dark:bg-neutral-900 border-t border-black/10 dark:border-white/10 py-16 transition-colors duration-300">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="grid md:grid-cols-4 gap-12 mb-12">
-          <div className="md:col-span-2">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="flex h-12 w-12 items-center justify-center bg-black dark:bg-white text-white dark:text-black transition-colors duration-300">
-                <span className={`${larken.className} text-2xl font-bold`}>M</span>
+    <footer className="bg-white dark:bg-neutral-950 border-t border-neutral-200 dark:border-neutral-800 transition-colors duration-300">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8 py-12 lg:py-16">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-8 lg:gap-12">
+          {/* Brand Section */}
+          <div className="col-span-2 md:col-span-2">
+            <Link href="/" className="inline-flex items-center gap-3 mb-4 group">
+              <div className="flex h-10 w-10 items-center justify-center bg-black dark:bg-white text-white dark:text-black transition-colors duration-300">
+                <span className={`${larken.className} text-xl font-bold`}>M</span>
               </div>
               <div>
-                <p className={`${larken.className} text-xl font-bold leading-none`}>
+                <p className={`${larken.className} text-lg font-bold leading-tight text-black dark:text-white`}>
                   Melchizedek
                 </p>
-                <p className="text-[10px] tracking-[0.3em] uppercase text-black/60 dark:text-white/60">
+                <p className="text-[9px] tracking-[0.25em] uppercase text-neutral-500 dark:text-neutral-400">
                   Order of Jesus
                 </p>
               </div>
-            </div>
-            <p className="text-black/70 dark:text-white/70 max-w-sm mb-6">
-              A Christ-centered community dedicated to knowing Jesus and making Him known in
-              our city and beyond.
+            </Link>
+            <p className="text-sm text-neutral-600 dark:text-neutral-400 max-w-xs leading-relaxed">
+              A Christ-centered community dedicated to knowing Jesus and making Him known.
             </p>
           </div>
 
-          <div>
-            <h3 className="font-bold mb-4">Connect</h3>
-            <ul className="space-y-2 text-sm text-black/70 dark:text-white/70">
+          {/* Navigation */}
+          <div className="col-span-1">
+            <h3 className="text-sm font-semibold text-black dark:text-white mb-4">Navigate</h3>
+            <ul className="space-y-3">
               <li>
-                <a href="#" className="hover:text-black dark:hover:text-white transition-colors">
-                  About Us
-                </a>
+                <Link href="/" className="text-sm text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors">
+                  Home
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-black dark:hover:text-white transition-colors">
-                  Beliefs
-                </a>
+                <Link href="/about" className="text-sm text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors">
+                  About
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-black dark:hover:text-white transition-colors">
-                  Leadership
-                </a>
+                <Link href="/sermons" className="text-sm text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors">
+                  Sermons
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-black dark:hover:text-white transition-colors">
+                <Link href="/#partner" className="text-sm text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors">
+                  Partner
+                </Link>
+              </li>
+              <li>
+                <Link href="/#connect" className="text-sm text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors">
                   Contact
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
 
-          <div>
-            <h3 className="font-bold mb-4">Ministries</h3>
-            <ul className="space-y-2 text-sm text-black/70 dark:text-white/70">
+          {/* Mentorship & Schools */}
+          <div className="col-span-1">
+            <h3 className="text-sm font-semibold text-black dark:text-white mb-4">Mentorship</h3>
+            <ul className="space-y-3 mb-6">
               <li>
-                <a href="#" className="hover:text-black dark:hover:text-white transition-colors">
-                  Kids Ministry
-                </a>
+                <Link href="/mentorship/one-on-one" className="text-sm text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors">
+                  One on One
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-black dark:hover:text-white transition-colors">
-                  Youth Ministry
-                </a>
+                <Link href="/mentorship/elijah-network" className="text-sm text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors">
+                  Elijah Network
+                </Link>
+              </li>
+            </ul>
+            <h3 className="text-sm font-semibold text-black dark:text-white mb-4">Schools</h3>
+            <ul className="space-y-3">
+              <li>
+                <Link href="/schools/mystical-masterclass" className="text-sm text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors">
+                  Mystical Masterclass
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-black dark:hover:text-white transition-colors">
-                  Small Groups
-                </a>
+                <Link href="/schools/open-scroll" className="text-sm text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors">
+                  Open Scroll
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Events */}
+          <div className="col-span-1">
+            <h3 className="text-sm font-semibold text-black dark:text-white mb-4">Events</h3>
+            <ul className="space-y-3">
+              <li>
+                <Link href="/events/healing" className="text-sm text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors">
+                  Healing
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-black dark:hover:text-white transition-colors">
-                  Outreach
-                </a>
+                <Link href="/events/elijah-conference" className="text-sm text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors">
+                  Elijah Conference
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Legal */}
+          <div className="col-span-1">
+            <h3 className="text-sm font-semibold text-black dark:text-white mb-4">Legal</h3>
+            <ul className="space-y-3">
+              <li>
+                <Link href="/privacy" className="text-sm text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/terms" className="text-sm text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors">
+                  Terms of Service
+                </Link>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="pt-8 border-t border-black/10 dark:border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-black/60 dark:text-white/60">
-          <p>© {new Date().getFullYear()} Melchizedek Order of Jesus. All rights reserved.</p>
-          <div className="flex gap-6">
-            <a href="#" className="hover:text-black dark:hover:text-white transition-colors">
-              Privacy Policy
-            </a>
-            <a href="#" className="hover:text-black dark:hover:text-white transition-colors">
-              Terms of Service
-            </a>
-          </div>
+        {/* Bottom Bar */}
+        <div className="mt-12 pt-8 border-t border-neutral-200 dark:border-neutral-800">
+          <p className="text-sm text-center text-neutral-500 dark:text-neutral-400">
+            © {new Date().getFullYear()} Melchizedek Order of Jesus. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>

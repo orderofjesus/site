@@ -54,10 +54,10 @@ const featuredProjects = [
   // },
 ];
 
-export function GivingSection() {
+export function PartnerSection() {
   return (
     <section
-      id="give"
+      id="partner"
       className="relative overflow-hidden bg-white py-32 transition-colors duration-300 dark:bg-neutral-900"
     >
       {/* Background Pattern */}

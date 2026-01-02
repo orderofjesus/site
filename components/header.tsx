@@ -9,6 +9,34 @@ import { larken } from "@/lib/fonts";
 import { usePathname } from "next/navigation";
 import { HandCoins } from "lucide-react";
 
+const links = [
+  {
+    id: "1",
+    title: "Mentorship",
+    href: "/mentorship",
+  },
+  {
+    id: "2",
+    title: "Events",
+    href: "/events",
+  },
+  {
+    id: "3",
+    title: "Schools",
+    href: "/schools",
+  },
+  {
+    id: "4",
+    title: "Sermons",
+    href: "/sermons",
+  },
+  {
+    id: "5",
+    title: "About",
+    href: "/about",
+  },
+];
+
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
@@ -106,34 +134,16 @@ export function Header() {
           </div>
 
           <nav className="hidden items-center gap-8 lg:flex">
-            <Link
-              href="/#about"
-              className={cn(
-                "text-sm font-medium transition-colors hover:opacity-80",
-                getTextColor(),
-              )}
-            >
-              About
-            </Link>
-            <Link
-              href="/sermons"
-              className={cn(
-                "text-sm font-medium transition-colors hover:opacity-80",
-                getTextColor(),
-              )}
-            >
-              Sermons
-            </Link>
-            {["Ministries", "Events", "Connect"].map((item) => (
+            {links.map((item) => (
               <Link
-                key={item}
-                href={`/#${item.toLowerCase()}`}
+                key={item.id}
+                href={`${item.href}`}
                 className={cn(
                   "text-sm font-medium transition-colors hover:opacity-80",
                   getTextColor(),
                 )}
               >
-                {item}
+                {item.title}
               </Link>
             ))}
           </nav>
