@@ -2,23 +2,23 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
-import { ChevronLeft, ChevronRight, Play } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
-import { hellix, larken } from "@/lib/fonts";
+import { larken } from "@/lib/fonts";
 
-interface Sermon {
+interface Project {
   id: number;
   title: string;
-  subtitle: string;
-  speaker: string;
+  eyebrow: string;
+  description: string;
   image: string;
 }
 
-interface SermonCarouselProps {
-  sermons: Sermon[];
+interface ProjectCarouselProps {
+  projects: Project[];
 }
 
-export function SermonCarousel({ sermons }: SermonCarouselProps) {
+export function ProjectCarousel({ projects }: ProjectCarouselProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "start" });
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [scrollSnaps, setScrollSnaps] = useState<number[]>([]);
@@ -71,37 +71,32 @@ export function SermonCarousel({ sermons }: SermonCarouselProps) {
     <div className="relative">
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex gap-8">
-          {sermons.map((sermon, index) => (
+          {projects.map((project, index) => (
             <motion.div
-              key={sermon.id}
+              key={project.id}
               className="min-w-0 flex-[0_0_100%] lg:flex-[0_0_calc(33.333%-1.333rem)]"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
             >
-              <div className="group relative overflow-hidden border border-white/10 bg-white/5 transition-all duration-500 hover:border-white dark:border-white/10 dark:bg-white/5 dark:hover:border-white">
+              <div className="group relative overflow-hidden border-2 border-black/10 bg-white transition-all duration-500 hover:border-black hover:shadow-2xl dark:border-white/10 dark:bg-neutral-800 dark:hover:border-white">
                 <div className="relative h-80 overflow-hidden">
                   <img
-                    src={sermon.image}
-                    alt={sermon.title}
+                    src={project.image}
+                    alt={project.title}
                     className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
-                  <button className="absolute top-1/2 left-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center bg-white text-black transition-transform duration-300 group-hover:scale-110 dark:bg-white dark:text-black">
-                    <Play className="ml-1 h-6 w-6" fill="currentColor" />
-                  </button>
                 </div>
                 <div className="p-8">
-                  <p className="mb-3 text-xs tracking-[0.3em]">
-                    {sermon.speaker}
+                  <p className="mb-3 text-xs tracking-[0.3em] text-black/60 uppercase dark:text-white/60">
+                    {project.eyebrow}
                   </p>
-                  <h3
-                    className={`${larken.className} mb-2 text-2xl font-bold text-white dark:text-white`}
-                  >
-                    {sermon.title}
+                  <h3 className={`${larken.className} mb-3 text-2xl font-bold`}>
+                    {project.title}
                   </h3>
-                  <p className="text-white/70 dark:text-white/70">
-                    {sermon.subtitle}
+                  <p className="text-base leading-relaxed text-black/70 dark:text-white/70">
+                    {project.description}
                   </p>
                 </div>
               </div>
@@ -116,10 +111,10 @@ export function SermonCarousel({ sermons }: SermonCarouselProps) {
           <motion.button
             onClick={scrollPrev}
             disabled={!canScrollPrev}
-            className={`group relative flex h-14 w-14 items-center justify-center overflow-hidden border-2 text-white transition-all duration-300 ${
+            className={`group relative flex h-14 w-14 items-center justify-center overflow-hidden border-2 transition-all duration-300 ${
               canScrollPrev
-                ? "cursor-pointer border-white/30 hover:border-white"
-                : "cursor-not-allowed border-white/10 opacity-30"
+                ? "cursor-pointer border-black/30 hover:border-black dark:border-white/30 dark:hover:border-white"
+                : "cursor-not-allowed border-black/10 opacity-30 dark:border-white/10"
             }`}
             aria-label="Previous slide"
             whileHover={canScrollPrev ? { scale: 1.05 } : {}}
@@ -128,14 +123,14 @@ export function SermonCarousel({ sermons }: SermonCarouselProps) {
             {/* Hover background effect */}
             {canScrollPrev && (
               <motion.div
-                className="absolute inset-0 bg-white"
+                className="absolute inset-0 bg-black dark:bg-white"
                 initial={{ x: "-100%" }}
                 whileHover={{ x: 0 }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
               />
             )}
             <ChevronLeft
-              className={`relative z-10 h-6 w-6 transition-colors duration-300 ${canScrollPrev ? "group-hover:text-black" : ""}`}
+              className={`relative z-10 h-6 w-6 transition-colors duration-300 ${canScrollPrev ? "group-hover:text-white dark:group-hover:text-black" : ""}`}
               strokeWidth={2.5}
             />
           </motion.button>
@@ -148,8 +143,8 @@ export function SermonCarousel({ sermons }: SermonCarouselProps) {
                 onClick={() => scrollTo(index)}
                 className={`relative overflow-hidden rounded-full transition-all duration-300 ${
                   index === selectedIndex
-                    ? "h-2.5 w-10 bg-white"
-                    : "h-2.5 w-2.5 bg-white/30 hover:bg-white/60"
+                    ? "h-2.5 w-10 bg-black dark:bg-white"
+                    : "h-2.5 w-2.5 bg-black/30 hover:bg-black/60 dark:bg-white/30 dark:hover:bg-white/60"
                 }`}
                 aria-label={`Go to slide ${index + 1}`}
                 whileHover={{ scale: index === selectedIndex ? 1 : 1.2 }}
@@ -157,7 +152,7 @@ export function SermonCarousel({ sermons }: SermonCarouselProps) {
               >
                 {index === selectedIndex && (
                   <motion.div
-                    className="absolute inset-0 bg-white"
+                    className="absolute inset-0 bg-black dark:bg-white"
                     initial={{ scaleX: 0 }}
                     animate={{ scaleX: 1 }}
                     transition={{ duration: 0.5, ease: "easeOut" }}
@@ -171,10 +166,10 @@ export function SermonCarousel({ sermons }: SermonCarouselProps) {
           <motion.button
             onClick={scrollNext}
             disabled={!canScrollNext}
-            className={`group relative flex h-14 w-14 items-center justify-center overflow-hidden border-2 text-white transition-all duration-300 ${
+            className={`group relative flex h-14 w-14 items-center justify-center overflow-hidden border-2 transition-all duration-300 ${
               canScrollNext
-                ? "cursor-pointer border-white/30 hover:border-white"
-                : "cursor-not-allowed border-white/10 opacity-30"
+                ? "cursor-pointer border-black/30 hover:border-black dark:border-white/30 dark:hover:border-white"
+                : "cursor-not-allowed border-black/10 opacity-30 dark:border-white/10"
             }`}
             aria-label="Next slide"
             whileHover={canScrollNext ? { scale: 1.05 } : {}}
@@ -183,14 +178,14 @@ export function SermonCarousel({ sermons }: SermonCarouselProps) {
             {/* Hover background effect */}
             {canScrollNext && (
               <motion.div
-                className="absolute inset-0 bg-white"
+                className="absolute inset-0 bg-black dark:bg-white"
                 initial={{ x: "100%" }}
                 whileHover={{ x: 0 }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
               />
             )}
             <ChevronRight
-              className={`relative z-10 h-6 w-6 transition-colors duration-300 ${canScrollNext ? "group-hover:text-black" : ""}`}
+              className={`relative z-10 h-6 w-6 transition-colors duration-300 ${canScrollNext ? "group-hover:text-white dark:group-hover:text-black" : ""}`}
               strokeWidth={2.5}
             />
           </motion.button>

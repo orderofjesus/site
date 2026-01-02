@@ -167,11 +167,11 @@ export function VideoHero() {
                               transition={{ duration: 0.6, delay: 0.5 }}
                               className="flex flex-wrap gap-4"
                             >
-                              <button className="group flex items-center gap-2 rounded-full bg-white px-8 py-4 text-base font-semibold text-black transition-all duration-300 hover:bg-white/90">
+                              <button className="group flex items-center gap-2 bg-white px-8 py-4 text-base font-semibold text-black transition-all duration-300 hover:bg-white/90">
                                 Join Us This Sunday
                                 <ChevronRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                               </button>
-                              <button className="flex items-center gap-2 rounded-full border border-white px-8 py-4 text-base font-semibold text-white transition-all duration-300 hover:bg-white hover:text-black">
+                              <button className="flex items-center gap-2 border border-white px-8 py-4 text-base font-semibold text-white transition-all duration-300 hover:bg-white hover:text-black">
                                 <Play className="h-5 w-5" />
                                 Watch Live
                               </button>

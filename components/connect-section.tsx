@@ -21,7 +21,7 @@ export function ConnectSection() {
             Join Our Community
           </h2>
           <p className="text-xl text-white/80 mb-12 max-w-2xl mx-auto leading-relaxed">
-            Whether you're new to faith or have been walking with Jesus for years, there's a
+            Whether you&apos;re new to faith or have been walking with Jesus for years, there&apos;s a
             place for you here. Connect with us today.
           </p>
           <div className="flex flex-wrap justify-center gap-4">

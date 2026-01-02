@@ -13,13 +13,15 @@ interface FeaturedSermon {
   image: string;
 }
 
-interface FeaturedCarouselSectionProps {
+export interface FeaturedCarouselSectionProps {
   sermons: FeaturedSermon[];
 }
 
-export function FeaturedCarouselSection({ sermons }: FeaturedCarouselSectionProps) {
+export function FeaturedCarouselSection({
+  sermons,
+}: FeaturedCarouselSectionProps) {
   return (
-    <section className="py-32 bg-black dark:bg-neutral-950 text-white transition-colors duration-300">
+    <section className="bg-black py-32 text-white transition-colors duration-300 dark:bg-neutral-950">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -28,10 +30,10 @@ export function FeaturedCarouselSection({ sermons }: FeaturedCarouselSectionProp
           transition={{ duration: 0.6 }}
           className="mb-16"
         >
-          <p className="text-xs tracking-[0.4em] uppercase text-white/60 mb-4">
+          <p className="mb-4 text-xs tracking-[0.4em] text-white/60 uppercase">
             Featured Messages
           </p>
-          <h2 className={`${larken.className} text-5xl md:text-6xl font-bold`}>
+          <h2 className={`${larken.className} text-5xl font-bold md:text-6xl`}>
             Transforming Messages
           </h2>
         </motion.div>
