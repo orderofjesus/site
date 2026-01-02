@@ -37,12 +37,26 @@ const links = [
   },
 ];
 
+// Routes that have dark backgrounds initially (hero images, dark sections, etc.)
+const darkBackgroundRoutes = [
+  "/",
+  /^\/events\/\d+$/, // Matches /events/1, /events/2, etc.
+  /^\/schools\/\d+$/,
+  /^\/mentorship\/\d+$/,
+];
+
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
 
   // Determine if the page has a light background initially
-  const hasLightBackground = pathname !== "/";
+  const hasLightBackground = !darkBackgroundRoutes.some((route) => {
+    if (typeof route === "string") {
+      return pathname === route;
+    }
+    // Handle regex patterns
+    return route.test(pathname);
+  });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -97,7 +111,7 @@ export function Header() {
           : "border-transparent bg-transparent py-6",
       )}
     >
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+      <div className="mx-auto max-w-380 px-6 lg:px-8">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <MobileMenu />
