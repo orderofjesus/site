@@ -1,11 +1,10 @@
 "use client";
 
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
+import { PageWrapper } from "@/components/page-wrapper";
 import { motion } from "framer-motion";
 import { Play, Calendar, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { hellix, larken } from "@/lib/fonts";
+import { larken } from "@/lib/fonts";
 
 const sermons = [
   {
@@ -108,10 +107,7 @@ export default function SermonsPage() {
   const [latestSermon, ...otherSermons] = sermons;
 
   return (
-    <div
-      className={`${hellix.className} min-h-screen bg-neutral-50 text-black transition-colors duration-300 dark:bg-[#0a0a0a] dark:text-white`}
-    >
-      <Header />
+    <PageWrapper className="bg-neutral-50 dark:bg-[#0a0a0a]">
 
       {/* Hero Section */}
       <section className="px-6 pt-32 pb-16 lg:px-8">
@@ -254,8 +250,6 @@ export default function SermonsPage() {
           </div>
         </div>
       </section>
-
-      <Footer />
-    </div>
+    </PageWrapper>
   );
 }

@@ -1,11 +1,10 @@
 "use client";
 
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
+import { PageWrapper } from "@/components/page-wrapper";
 import { motion } from "framer-motion";
 import { Calendar, MapPin, Users, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { hellix, larken } from "@/lib/fonts";
+import { larken } from "@/lib/fonts";
 import Link from "next/link";
 
 const events = [
@@ -23,7 +22,7 @@ const events = [
     fullDescription:
       "This special healing service brings together believers from across the region for an evening dedicated to experiencing God's healing power. Through worship, corporate prayer, and individual ministry, we create an atmosphere where the Holy Spirit moves freely. Past services have seen countless testimonies of physical healing, emotional restoration, and spiritual breakthroughs.",
     image:
-      "https://images.unsplash.com/photo-1505455184862-554165e5f6ba?q=80&w=1169&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1530688957198-8570b1819eeb?q=80&w=2114&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   },
   {
     id: 2,
@@ -111,11 +110,7 @@ export default function EventsPage() {
   const [upcomingEvent, ...otherEvents] = events;
 
   return (
-    <div
-      className={`${hellix.className} min-h-screen bg-white text-black transition-colors duration-300 dark:bg-[#0a0a0a] dark:text-white`}
-    >
-      <Header />
-
+    <PageWrapper>
       {/* Hero Section with Distinctive Visual */}
       <section className="relative overflow-hidden px-6 pt-32 pb-20 lg:px-8">
         {/* Decorative Background Element */}
@@ -282,7 +277,7 @@ export default function EventsPage() {
                     </div>
 
                     <Link href={`/events/${event.id}`} className="block">
-                      <Button className="group/btn w-full bg-black font-semibold text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90">
+                      <Button className="group/btn w-full cursor-pointer bg-black font-semibold text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90">
                         Learn More
                         <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
                       </Button>
@@ -294,8 +289,6 @@ export default function EventsPage() {
           </div>
         </div>
       </section>
-
-      <Footer />
-    </div>
+    </PageWrapper>
   );
 }
