@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { geistSans, geistMono, larken, hellix } from "@/lib/fonts";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { ConvexClientProvider } from "@/lib/convex-provider";
 
 export const metadata: Metadata = {
   title: "Melchizedek Order of Jesus | Church",
@@ -19,14 +20,18 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${larken.variable} ${hellix.variable} font-hellix antialiased`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem
-          disableTransitionOnChange={false}
-        >
-          {children}
-        </ThemeProvider>
+        <ConvexClientProvider>
+          {/* <AuthProvider> */}
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem
+            disableTransitionOnChange={false}
+          >
+            {children}
+          </ThemeProvider>
+          {/* </AuthProvider> */}
+        </ConvexClientProvider>
       </body>
     </html>
   );

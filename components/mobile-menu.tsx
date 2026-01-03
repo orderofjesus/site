@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import Image from "next/image";
 import {
   ChevronDown,
   Home,
@@ -16,6 +17,7 @@ import {
   User,
   Settings,
   LogOut,
+  LogIn,
 } from "lucide-react";
 
 import {
@@ -25,6 +27,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@workos-inc/authkit-nextjs/components";
 
 const data = {
   navMain: [
@@ -39,6 +42,7 @@ const data = {
       title: "Mentorship",
       icon: Users,
       items: [
+        // { name: "Overview", url: "/mentorship" },
         { name: "One on One", url: "/mentorship/one-on-one" },
         { name: "Elijah Network", url: "/mentorship/elijah-network" },
       ],
@@ -55,12 +59,21 @@ const data = {
       title: "Events",
       icon: Calendar,
       items: [
-        { name: "Healing", url: "/events/healing" },
-        { name: "Elijah Conference", url: "/events/elijah-conference" },
+        { name: "All Events", url: "/events" },
+        { name: "Healing Services", url: "/events#healing" },
+        { name: "Conferences", url: "/events#conferences" },
       ],
     },
   ],
 };
+
+// Routes that have dark backgrounds initially (hero images, dark sections, etc.)
+const darkBackgroundRoutes = [
+  "/",
+  /^\/events\/[^/]+$/, // Matches /events/[id] with any ID format (including Convex IDs)
+  /^\/schools\/[^/]+$/,
+  /^\/mentorship\/[^/]+$/,
+];
 
 export function MobileMenu() {
   const [scrolled, setScrolled] = useState(false);
@@ -70,6 +83,9 @@ export function MobileMenu() {
     "Events",
   ]);
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, signOut, loading } = useAuth();
+  const isAuthenticated = !!user;
 
   const toggleSection = (title: string) => {
     setExpandedSections((prev) =>
@@ -77,7 +93,14 @@ export function MobileMenu() {
     );
   };
 
-  const hasLightBackground = pathname !== "/";
+  // Determine if the page has a light background initially
+  const hasLightBackground = !darkBackgroundRoutes.some((route) => {
+    if (typeof route === "string") {
+      return pathname === route;
+    }
+    // Handle regex patterns
+    return route.test(pathname);
+  });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -98,12 +121,15 @@ export function MobileMenu() {
       : "border-white/30 bg-white/10 text-white backdrop-blur-sm hover:bg-white hover:text-black";
   };
 
+  // console.log("Auth status: ", isAuthenticated);
+  // console.log("Auth user: ", user);
+
   return (
     <Sheet modal={false}>
       <SheetTrigger asChild>
         <button
           className={cn(
-            "group relative flex h-11 w-11 flex-col items-center justify-center gap-[5px] rounded-xl transition-all duration-300 ease-out",
+            "group relative flex h-11 w-11 cursor-pointer flex-col items-center justify-center gap-[5px] rounded-xl transition-all duration-300 ease-out",
             getButtonColors(),
           )}
           aria-label="Toggle menu"
@@ -194,34 +220,84 @@ export function MobileMenu() {
 
         {/* User Profile Section */}
         <div className="border-t border-neutral-200 p-3 dark:border-neutral-800">
-          <div className="mb-3 flex items-center gap-3 px-2">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-black text-xs font-semibold text-white dark:bg-white dark:text-black">
-              JD
+          {loading ? (
+            <div className="flex items-center justify-center py-4">
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-neutral-300 border-t-neutral-900 dark:border-neutral-600 dark:border-t-neutral-100" />
             </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-                John Doe
-              </p>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                john@example.com
-              </p>
-            </div>
-          </div>
+          ) : (
+            <>
+              {isAuthenticated ? (
+                <>
+                  <div className="mb-3 flex items-center gap-3 px-2">
+                    {user && user.profilePictureUrl ? (
+                      <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-lg">
+                        <Image
+                          src={user.profilePictureUrl}
+                          alt={user.firstName || "User"}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-black text-xs font-semibold text-white dark:bg-white dark:text-black">
+                        {user && user.firstName
+                          ? user.firstName
+                              .split(" ")
+                              .map((n: string) => n[0])
+                              .join("")
+                              .toUpperCase()
+                              .slice(0, 2)
+                          : "U"}
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                        {user?.firstName || "User"}
+                      </p>
+                      <p className="truncate text-xs text-neutral-500 dark:text-neutral-400">
+                        {user?.email}
+                      </p>
+                    </div>
+                  </div>
 
-          <div className="space-y-1">
-            <button className="flex w-full items-center gap-3 rounded-md px-2 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-900">
-              <User className="h-4 w-4" />
-              <span>My Profile</span>
-            </button>
-            <button className="flex w-full items-center gap-3 rounded-md px-2 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-900">
-              <Settings className="h-4 w-4" />
-              <span>Settings</span>
-            </button>
-            <button className="flex w-full items-center gap-3 rounded-md px-2 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-900">
-              <LogOut className="h-4 w-4" />
-              <span>Log out</span>
-            </button>
-          </div>
+                  <div className="space-y-1">
+                    <Link
+                      href="/profile"
+                      className="flex w-full items-center gap-3 rounded-md px-2 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-900"
+                    >
+                      <User className="h-4 w-4" />
+                      <span>My Profile</span>
+                    </Link>
+                    <Link
+                      href="/settings"
+                      className="flex w-full items-center gap-3 rounded-md px-2 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-900"
+                    >
+                      <Settings className="h-4 w-4" />
+                      <span>Settings</span>
+                    </Link>
+                    <button
+                      onClick={async () => {
+                        await signOut();
+                        router.push("/");
+                      }}
+                      className="flex w-full items-center gap-3 rounded-md px-2 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      <span>Log out</span>
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <Link
+                  href="/auth/login"
+                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-black px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+                >
+                  <LogIn className="h-4 w-4" />
+                  <span>Sign In</span>
+                </Link>
+              )}
+            </>
+          )}
         </div>
       </SheetContent>
     </Sheet>

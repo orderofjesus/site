@@ -66,6 +66,11 @@ export function Footer() {
             <h3 className="text-sm font-semibold text-black dark:text-white mb-4">Mentorship</h3>
             <ul className="space-y-3 mb-6">
               <li>
+                <Link href="/mentorship" className="text-sm text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors">
+                  Overview
+                </Link>
+              </li>
+              <li>
                 <Link href="/mentorship/one-on-one" className="text-sm text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors">
                   One on One
                 </Link>
@@ -96,13 +101,18 @@ export function Footer() {
             <h3 className="text-sm font-semibold text-black dark:text-white mb-4">Events</h3>
             <ul className="space-y-3">
               <li>
-                <Link href="/events/healing" className="text-sm text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors">
-                  Healing
+                <Link href="/events" className="text-sm text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors">
+                  All Events
                 </Link>
               </li>
               <li>
-                <Link href="/events/elijah-conference" className="text-sm text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors">
-                  Elijah Conference
+                <Link href="/events#healing" className="text-sm text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors">
+                  Healing Services
+                </Link>
+              </li>
+              <li>
+                <Link href="/events#conferences" className="text-sm text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors">
+                  Conferences
                 </Link>
               </li>
             </ul>

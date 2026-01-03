@@ -7,7 +7,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { larken } from "@/lib/fonts";
 import { usePathname } from "next/navigation";
-import { HandCoins } from "lucide-react";
+import { HandCoins, Handshake } from "lucide-react";
 
 const links = [
   {
@@ -30,19 +30,19 @@ const links = [
     title: "Sermons",
     href: "/sermons",
   },
-  {
-    id: "5",
-    title: "About",
-    href: "/about",
-  },
+  // {
+  //   id: "5",
+  //   title: "About",
+  //   href: "/about",
+  // },
 ];
 
 // Routes that have dark backgrounds initially (hero images, dark sections, etc.)
 const darkBackgroundRoutes = [
   "/",
-  /^\/events\/\d+$/, // Matches /events/1, /events/2, etc.
-  /^\/schools\/\d+$/,
-  /^\/mentorship\/\d+$/,
+  /^\/events\/[^/]+$/, // Matches /events/[id] with any ID format (including Convex IDs)
+  /^\/schools\/[^/]+$/,
+  /^\/mentorship\/[^/]+$/,
 ];
 
 export function Header() {
@@ -164,24 +164,15 @@ export function Header() {
 
           <div className="flex items-center gap-3">
             <ThemeToggle />
-            {/* <button
-              className={cn(
-                "hidden px-6 py-2.5 text-sm font-semibold transition-all duration-300 md:block",
-                scrolled
-                  ? "border border-black text-black hover:bg-black hover:text-white dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-black"
-                  : "bg-white text-black hover:bg-white/90",
-              )}
-            >
-              Plan a Visit
-            </button> */}
+
             <button
               className={cn(
                 "hidden gap-x-4 px-6 py-2.5 text-sm font-semibold transition-all duration-300 sm:flex sm:items-center",
                 getButtonColors(),
               )}
             >
-              <HandCoins className="h-4 w-4" />
-              Give
+              <Handshake className="h-[20px] w-[20px]" />
+              Become a partner
             </button>
           </div>
         </div>
