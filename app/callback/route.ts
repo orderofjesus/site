@@ -1,16 +1,27 @@
+import { verifyAndParseState } from "@/lib/oauthstate";
 import { handleAuth } from "@workos-inc/authkit-nextjs";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 // redirect to page where user was before authentication
 export const GET = (request: NextRequest) => {
   const searchParams = request.nextUrl.searchParams;
-  const redirect =
-    searchParams.get("redirect") == null ? "/" : searchParams.get("redirect");
+  const redirectUri =
+    searchParams.get("returnTo") == null ? "/" : searchParams.get("returnTo");
 
-  console.log("searchParams", searchParams);
-  console.log("redirect", redirect);
+  // const code = request.nextUrl.searchParams.get("code");
+  // if (!code) {
+  //   return NextResponse.redirect(new URL(`/login?error=missing_code`, process.env.APP_URL));
+  // }
+
+  const state = request.nextUrl.searchParams.get("state") ?? "";
+
+  const parsed = verifyAndParseState(state, process.env.WORKOS_STATE_SECRET!);
+  const parsedRedirectUri = parsed?.returnTo ?? "/";
+
+  console.log("searchParams on callback", searchParams);
+  console.log("returnTo on callback", redirectUri);
 
   return handleAuth({
-    returnPathname: redirect as string,
+    returnPathname: parsedRedirectUri as string,
   })(request);
 };

@@ -808,7 +808,7 @@ export default function EventDetailPage({
                   </Authenticated>
 
                   <Unauthenticated>
-                    <Link href={`/auth/login?redirect=/events/${id}`}>
+                    <Link href={`/auth/login?returnTo=/events/${id}`}>
                       <Button
                         type="submit"
                         size="lg"
