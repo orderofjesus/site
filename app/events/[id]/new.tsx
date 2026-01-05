@@ -440,7 +440,7 @@ export default function EventDetailPage({
                       </p>
                       <Button
                         onClick={() =>
-                          router.push(`/sign-in?redirect=/events/${id}`)
+                          router.push(`/auth/login?redirect=/events/${id}`)
                         }
                         className="w-full bg-black py-6 font-semibold text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
                       >

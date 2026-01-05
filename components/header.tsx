@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { larken } from "@/lib/fonts";
 import { usePathname } from "next/navigation";
 import { HandCoins, Handshake } from "lucide-react";
-// import { AuthButton } from "@/components/auth-button";
+import { AuthButton } from "@/components/auth-button";
 
 const links = [
   {
@@ -164,18 +164,17 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-3">
-            <ThemeToggle />
-            {/* <AuthButton /> */}
-
             <button
               className={cn(
-                "hidden gap-x-4 px-6 py-2.5 text-sm font-semibold transition-all duration-300 sm:flex sm:items-center",
+                "hidden gap-x-2 px-4 py-2.5 text-sm font-semibold transition-all duration-300 sm:flex sm:items-center",
                 getButtonColors(),
               )}
             >
               <Handshake className="h-[20px] w-[20px]" />
-              Become a partner
+              Partner with us
             </button>
+            <AuthButton />
+            <ThemeToggle />
           </div>
         </div>
       </div>

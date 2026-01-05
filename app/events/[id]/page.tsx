@@ -625,18 +625,20 @@ export default function EventDetailPage({
                                 {(() => {
                                   const priceString =
                                     selectedTicketType === "couple"
-                                      ? event.pricing.discounted || event.pricing.regular
+                                      ? event.pricing.discounted ||
+                                        event.pricing.regular
                                       : event.pricing.regular;
                                   if (!priceString) return "N/A";
-                                  
+
                                   const match = priceString.match(/[\d,]+/);
                                   if (!match) return priceString;
-                                  
+
                                   const basePrice = parseFloat(
                                     match[0].replace(/,/g, ""),
                                   );
-                                  const total = basePrice * formData.numberOfPeople;
-                                  
+                                  const total =
+                                    basePrice * formData.numberOfPeople;
+
                                   return priceString.replace(
                                     /[\d,]+/,
                                     total.toLocaleString(),
@@ -646,9 +648,13 @@ export default function EventDetailPage({
                             </div>
                             <p className="mt-1 text-xs text-black/60 dark:text-white/60">
                               {formData.numberOfPeople}{" "}
-                              {formData.numberOfPeople > 1 ? "people" : "person"} ×{" "}
+                              {formData.numberOfPeople > 1
+                                ? "people"
+                                : "person"}{" "}
+                              ×{" "}
                               {selectedTicketType === "couple"
-                                ? event.pricing.discounted || event.pricing.regular
+                                ? event.pricing.discounted ||
+                                  event.pricing.regular
                                 : event.pricing.regular}
                             </p>
                           </div>
@@ -802,7 +808,7 @@ export default function EventDetailPage({
                   </Authenticated>
 
                   <Unauthenticated>
-                    <Link href={"/auth/login"}>
+                    <Link href={`/auth/login?redirect=/events/${id}`}>
                       <Button
                         type="submit"
                         size="lg"
