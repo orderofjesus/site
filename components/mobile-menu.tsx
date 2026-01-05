@@ -277,8 +277,11 @@ export function MobileMenu() {
                     </Link>
                     <button
                       onClick={async () => {
-                        await signOut();
-                        router.push("/");
+                        await signOut({
+                          returnTo: "/",
+                        }).then(() => {
+                          router.refresh();
+                        });
                       }}
                       className="flex w-full items-center gap-3 rounded-md px-2 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
                     >

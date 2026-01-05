@@ -15,7 +15,7 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <button className="relative h-11 w-11 flex items-center justify-center">
+      <button className="relative flex h-8 w-8 items-center justify-center">
         <div className="h-5 w-5" />
       </button>
     );
@@ -26,7 +26,7 @@ export function ThemeToggle() {
   return (
     <motion.button
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="relative h-11 w-11 rounded-full overflow-hidden flex items-center justify-center group"
+      className="group relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full"
       aria-label="Toggle theme"
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.95 }}
@@ -41,7 +41,7 @@ export function ThemeToggle() {
         transition={{ duration: 0.4, ease: "easeInOut" }}
         style={{ borderRadius: "50%" }}
       />
-      
+
       {/* Icon container with rotation and flip */}
       <div className="relative z-10 flex items-center justify-center">
         <AnimatePresence mode="wait">
@@ -63,7 +63,10 @@ export function ThemeToggle() {
               exit={{ rotate: -180, opacity: 0, scale: 0.3 }}
               transition={{ duration: 0.4, ease: "easeInOut" }}
             >
-              <Moon className="h-[18px] w-[18px] text-white fill-white" strokeWidth={2.5} />
+              <Moon
+                className="h-[18px] w-[18px] fill-white text-white"
+                strokeWidth={2.5}
+              />
             </motion.div>
           )}
         </AnimatePresence>
@@ -71,7 +74,7 @@ export function ThemeToggle() {
 
       {/* Hover effect - subtle pulsing ring */}
       <motion.div
-        className="absolute inset-0 border-2 border-black dark:border-white rounded-full opacity-0"
+        className="absolute inset-0 rounded-full border-2 border-black opacity-0 dark:border-white"
         whileHover={{
           scale: [1, 1.15, 1.15],
           opacity: [0, 0.3, 0],
