@@ -26,6 +26,9 @@ export default function EventsPage() {
   // Fetch user's registrations to show registration status
   const myRegistrations = useQuery(
     api.eventRegistrations.getActiveRegistrations,
+    {
+      userEmail: user?.email as string,
+    },
   );
 
   // Create a Set of registered event IDs for quick lookup

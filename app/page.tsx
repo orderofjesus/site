@@ -10,10 +10,6 @@ import { SermonsGrid } from "@/components/sermons-grid";
 import { ConnectSection } from "@/components/connect-section";
 import { Footer } from "@/components/footer";
 import { hellix } from "@/lib/fonts";
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@workos-inc/authkit-nextjs/components";
-
-import { Authenticated, Unauthenticated, useConvexAuth } from "convex/react";
 
 const sermons = [
   {
@@ -106,8 +102,6 @@ const featuredSermons = [
 ];
 
 export default function Home() {
-  const { user, signOut } = useAuth();
-
   return (
     <div
       className={`${hellix.className} dark:bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(96, 94, 214, 0.76),rgba(25, 52, 75, 0.98))] min-h-screen bg-neutral-50 text-black transition-colors duration-300 dark:bg-[#0a0a0a] dark:text-white`}
@@ -120,10 +114,6 @@ export default function Home() {
         <VideoHero />
       </div>
       <ConnectOptions />
-      <Authenticated>You are signed in</Authenticated>
-      <Unauthenticated>
-        <p>Please sign in to view data</p>
-      </Unauthenticated>
       <FeaturedCarouselSection sermons={featuredSermons} />
       <AboutSection />
       <PartnerSection />

@@ -3,6 +3,7 @@ import { geistSans, geistMono, larken, hellix } from "@/lib/fonts";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ConvexClientProvider } from "@/lib/convex-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Melchizedek Order of Jesus | Church",
@@ -29,6 +30,7 @@ export default function RootLayout({
             disableTransitionOnChange={false}
           >
             {children}
+            <Toaster />
           </ThemeProvider>
           {/* </AuthProvider> */}
         </ConvexClientProvider>

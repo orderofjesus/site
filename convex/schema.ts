@@ -12,9 +12,10 @@ const schema = defineSchema({
     category: v.string(),
     attendees: v.string(),
     pricing: v.object({
-      general: v.string(),
-      earlyBird: v.union(v.string(), v.null()),
-      vip: v.union(v.string(), v.null()),
+      type: v.string(), // "Free" or "Paid"
+      general: v.string(), // Display price (e.g., "$99" or "Free")
+      regular: v.union(v.string(), v.null()),
+      discounted: v.union(v.string(), v.null()),
     }),
     description: v.string(),
     fullDescription: v.string(),
@@ -27,7 +28,7 @@ const schema = defineSchema({
     ),
     whatToExpect: v.array(v.string()),
     whatToBring: v.array(v.string()),
-    pricingDetails: v.any(), // Flexible structure for different pricing models
+    pricingDetails: v.any(),
     registrationCount: v.number(),
     maxCapacity: v.optional(v.number()),
   })
@@ -37,6 +38,8 @@ const schema = defineSchema({
   eventRegistrations: defineTable({
     eventId: v.id("events"),
     userEmail: v.string(),
+    userName: v.optional(v.string()),
+    phone: v.optional(v.string()),
     registeredAt: v.number(),
     status: v.union(
       v.literal("registered"),
@@ -46,6 +49,14 @@ const schema = defineSchema({
     ),
     ticketType: v.optional(v.string()),
     notes: v.optional(v.string()),
+    numberOfPeople: v.optional(v.number()),
+    paymentStatus: v.optional(
+      v.union(
+        v.literal("pending"),
+        v.literal("completed"),
+        v.literal("failed"),
+      ),
+    ),
   })
     .index("by_user", ["userEmail"])
     .index("by_event", ["eventId"])

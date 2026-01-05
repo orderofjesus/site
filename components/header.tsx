@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { larken } from "@/lib/fonts";
 import { usePathname } from "next/navigation";
 import { HandCoins, Handshake } from "lucide-react";
+// import { AuthButton } from "@/components/auth-button";
 
 const links = [
   {
@@ -164,6 +165,7 @@ export function Header() {
 
           <div className="flex items-center gap-3">
             <ThemeToggle />
+            {/* <AuthButton /> */}
 
             <button
               className={cn(

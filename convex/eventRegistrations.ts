@@ -13,8 +13,11 @@ export const register = mutation({
   args: {
     eventId: v.id("events"),
     userEmail: v.string(),
+    userName: v.optional(v.string()),
+    phone: v.optional(v.string()),
     ticketType: v.optional(v.string()),
     notes: v.optional(v.string()),
+    numberOfPeople: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     if (!args.userEmail) {
@@ -44,14 +47,30 @@ export const register = mutation({
       throw new Error("Sorry, this event is at full capacity");
     }
 
+    // Validate numberOfPeople if provided
+    if (
+      args.numberOfPeople !== undefined &&
+      (args.numberOfPeople < 1 || args.numberOfPeople > 5)
+    ) {
+      throw new Error("Number of people must be between 1 and 5");
+    }
+
+    // Determine payment status based on event pricing
+    const isPaidEvent = event.pricing.type !== "Free";
+    const paymentStatus = isPaidEvent ? "pending" : undefined;
+
     // Create registration
     const registrationId = await ctx.db.insert("eventRegistrations", {
       eventId: args.eventId,
       userEmail: args.userEmail,
+      userName: args.userName,
+      phone: args.phone,
       registeredAt: Date.now(),
       status: "registered",
       ticketType: args.ticketType,
       notes: args.notes,
+      numberOfPeople: args.numberOfPeople || 1,
+      paymentStatus: paymentStatus,
     });
 
     // Increment registration count
@@ -158,7 +177,7 @@ export const getUserRegistrations = query({
  */
 export const getActiveRegistrations = query({
   args: {
-    userEmail: v.string(),
+    userEmail: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     if (!args.userEmail) {
@@ -167,7 +186,7 @@ export const getActiveRegistrations = query({
 
     const registrations = await ctx.db
       .query("eventRegistrations")
-      .withIndex("by_user", (q) => q.eq("userEmail", args.userEmail))
+      .withIndex("by_user", (q) => q.eq("userEmail", args.userEmail as string))
       .filter((q) => q.neq(q.field("status"), "cancelled"))
       .order("desc")
       .collect();

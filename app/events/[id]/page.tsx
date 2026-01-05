@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { PageWrapper } from "@/components/page-wrapper";
 import { motion } from "framer-motion";
 import {
@@ -13,14 +13,28 @@ import {
   Loader2,
   CheckCircle2,
   XCircle,
+  Phone,
+  AlertCircle,
+  CreditCard,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { larken } from "@/lib/fonts";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { useQuery, useMutation } from "convex/react";
+import {
+  useQuery,
+  useMutation,
+  Authenticated,
+  Unauthenticated,
+} from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
+import { useAuth } from "@workos-inc/authkit-nextjs/components";
+
+import { useRouter } from "next/navigation";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 
 export default function EventDetailPage({
   params,
@@ -28,13 +42,49 @@ export default function EventDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
+  const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
+  const isAuthenticated = !!user;
   const [isRegistering, setIsRegistering] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
   const [selectedTicketType, setSelectedTicketType] = useState<string | null>(
-    "general",
+    "adult",
   );
   const [userEmail, setUserEmail] = useState("");
   const [showEmailInput, setShowEmailInput] = useState(false);
+
+  // Form state
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    numberOfPeople: 1,
+  });
+
+  // Prefill form when user loads
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        name: `${user.firstName || ""} ${user.lastName || ""}`.trim(),
+        email: user.email || "",
+        phone: "",
+        numberOfPeople: 1,
+      });
+      // Set userEmail to enable registration query
+      setUserEmail(user.email || "");
+    }
+  }, [user]);
+
+  // Reset number of people if it exceeds the new maximum when switching ticket types
+  useEffect(() => {
+    const maxPeople = selectedTicketType === "couple" ? 8 : 5;
+    if (formData.numberOfPeople > maxPeople) {
+      setFormData({
+        ...formData,
+        numberOfPeople: maxPeople,
+      });
+    }
+  }, [selectedTicketType]);
 
   // Validate ID format - Convex IDs have a specific format
   let eventId: Id<"events"> | null = null;
@@ -86,41 +136,80 @@ export default function EventDetailPage({
 
   const isRegistered = registration !== null && registration !== undefined;
   const isFull = eventStats?.isFull ?? false;
+  const isPaidEvent = event.pricing.type !== "Free";
+  const hasPaymentPending =
+    isRegistered && registration?.paymentStatus === "pending";
 
-  const handleRegister = async () => {
-    if (!userEmail) {
-      setShowEmailInput(true);
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isAuthenticated) return;
+
+    if (!formData.phone) {
+      toast.error("Phone number required", {
+        description: "Please enter a telephone number to continue.",
+      });
       return;
     }
 
     setIsRegistering(true);
     try {
+      if (!user?.email) {
+        throw new Error("User email not available");
+      }
       await registerMutation({
         eventId: eventId!,
-        userEmail,
+        userEmail: user.email,
+        userName: formData.name,
+        phone: formData.phone,
         ticketType: selectedTicketType ?? undefined,
+        numberOfPeople: formData.numberOfPeople,
       });
-      setShowEmailInput(false);
+
+      toast.success("Successfully registered!", {
+        description: isPaidEvent
+          ? `You're registered for ${formData.numberOfPeople} ${formData.numberOfPeople > 1 ? "people" : "person"}. Please complete payment to confirm your spot.`
+          : `You're all set for ${event.title}!`,
+      });
     } catch (error) {
       console.error("Registration failed:", error);
-      alert(error instanceof Error ? error.message : "Registration failed");
+      const errorMessage =
+        error instanceof Error ? error.message : "Registration failed";
+
+      if (errorMessage.includes("already registered")) {
+        toast.info("Already registered", {
+          description: "You're already registered for this event.",
+        });
+      } else {
+        toast.error("Registration failed", {
+          description: errorMessage,
+        });
+      }
     } finally {
       setIsRegistering(false);
     }
   };
 
   const handleCancelRegistration = async () => {
-    if (!registration?._id || !userEmail) return;
+    if (!registration?._id || !user?.email) return;
 
     setIsCancelling(true);
     try {
       await cancelMutation({
         registrationId: registration._id,
-        userEmail,
+        userEmail: user.email,
+      });
+
+      toast.success("Registration cancelled", {
+        description: "Your registration has been cancelled successfully.",
       });
     } catch (error) {
       console.error("Cancellation failed:", error);
-      alert(error instanceof Error ? error.message : "Cancellation failed");
+      toast.error("Cancellation failed", {
+        description:
+          error instanceof Error
+            ? error.message
+            : "Unable to cancel registration",
+      });
     } finally {
       setIsCancelling(false);
     }
@@ -128,9 +217,8 @@ export default function EventDetailPage({
 
   // Parse pricing details safely
   const pricingDetails = event.pricingDetails as {
-    general?: { price: string; includes: string[] };
-    earlyBird?: { price: string; includes: string[]; note: string };
-    vip?: { price: string; includes: string[] };
+    regular?: { price: string; includes: string[] };
+    discounted?: { price: string; includes: string[]; note: string };
   } | null;
 
   return (
@@ -366,7 +454,7 @@ export default function EventDetailPage({
                       <div>
                         <p className="font-medium">{event.attendees}</p>
                         <p className="text-black/60 dark:text-white/60">
-                          {event.pricing.general === "Free"
+                          {event.pricing.type === "Free"
                             ? "Free event"
                             : "Paid event"}
                         </p>
@@ -415,181 +503,316 @@ export default function EventDetailPage({
 
                   {/* Pricing Options */}
                   <div className="mb-8 space-y-4">
-                    {pricingDetails ? (
-                      // Multiple pricing tiers
+                    {event.pricing.type !== "Free" ? (
+                      // Paid event - Adult and Couple pricing
                       <>
-                        {pricingDetails.earlyBird && (
-                          <div
-                            className={`cursor-pointer border-2 p-4 font-medium transition-all ${
-                              selectedTicketType === "earlyBird"
-                                ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
-                                : "border-black/20 bg-neutral-50 hover:border-black/40 dark:border-white/20 dark:bg-neutral-900 dark:hover:border-white/40"
-                            }`}
-                            onClick={() => setSelectedTicketType("earlyBird")}
-                          >
-                            <div className="mb-2 flex items-center justify-between">
-                              <h4 className="font-semibold">Early Bird</h4>
-                              <p className="text-2xl font-bold">
-                                {pricingDetails.earlyBird.price}
-                              </p>
-                            </div>
-                            <p className="mb-3 text-xs">
-                              {pricingDetails.earlyBird.note}
+                        <div
+                          className={`cursor-pointer border-2 p-4 font-medium transition-all ${
+                            selectedTicketType === "adult"
+                              ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
+                              : "border-black/20 bg-neutral-50 hover:border-black/40 dark:border-white/20 dark:bg-neutral-900 dark:hover:border-white/40"
+                          }`}
+                          onClick={() => setSelectedTicketType("adult")}
+                        >
+                          <div className="mb-2 flex items-center justify-between">
+                            <h4 className="font-semibold">Adult</h4>
+                            <p className="text-2xl font-bold">
+                              {event.pricing.regular}
                             </p>
-                            <ul className="space-y-1.5 text-sm">
-                              {pricingDetails.earlyBird.includes.map(
-                                (item, i) => (
-                                  <li
-                                    key={i}
-                                    className="flex items-start gap-2"
-                                  >
-                                    <Check className="mt-0.5 h-4 w-4 shrink-0" />
-                                    <span className="">{item}</span>
-                                  </li>
-                                ),
-                              )}
-                            </ul>
                           </div>
-                        )}
+                          <p
+                            className={`text-sm ${selectedTicketType === "adult" ? "text-white/80 dark:text-black/80" : ""}`}
+                          >
+                            Maximum 5 people
+                          </p>
+                          <p className="mt-2 text-xs">Base price per person</p>
+                        </div>
 
                         <div
                           className={`cursor-pointer border-2 p-4 font-medium transition-all ${
-                            selectedTicketType === "general" ||
-                            (!selectedTicketType && !pricingDetails.earlyBird)
+                            selectedTicketType === "couple"
                               ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
-                              : "boborder-black/20 bg-neutral-50 hover:border-black/40 dark:border-white/20 dark:bg-neutral-900 dark:hover:border-white/40"
+                              : "border-black/20 bg-neutral-50 hover:border-black/40 dark:border-white/20 dark:bg-neutral-900 dark:hover:border-white/40"
                           }`}
-                          onClick={() => setSelectedTicketType("general")}
+                          onClick={() => setSelectedTicketType("couple")}
                         >
                           <div className="mb-2 flex items-center justify-between">
-                            <h4 className="font-semibold">General Admission</h4>
+                            <h4 className="font-semibold">
+                              Married Couple (Discounted)
+                            </h4>
                             <p className="text-2xl font-bold">
-                              {pricingDetails.general?.price ??
-                                event.pricing.general}
+                              {event.pricing.discounted}
                             </p>
                           </div>
-                          {pricingDetails.general?.includes && (
-                            <ul className="space-y-1.5 text-sm">
-                              {pricingDetails.general.includes.map(
-                                (item, i) => (
-                                  <li
-                                    key={i}
-                                    className="flex items-start gap-2"
-                                  >
-                                    <Check className="mt-0.5 h-4 w-4 shrink-0" />
-                                    <span className="">{item}</span>
-                                  </li>
-                                ),
-                              )}
-                            </ul>
-                          )}
-                        </div>
-
-                        {pricingDetails.vip && (
-                          <div
-                            className={`cursor-pointer border-2 p-4 font-medium transition-all ${
-                              selectedTicketType === "vip"
-                                ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
-                                : "border-black/20 bg-neutral-50 hover:border-black/40 dark:border-white/20 dark:bg-neutral-900 dark:hover:border-white/40"
-                            }`}
-                            onClick={() => setSelectedTicketType("vip")}
+                          <p
+                            className={`text-sm ${selectedTicketType === "couple" ? "text-white/80 dark:text-black/80" : ""}`}
                           >
-                            <div className="mb-3 flex items-center justify-between">
-                              <h4 className="font-semibold">VIP Experience</h4>
-                              <p className="text-2xl font-bold">
-                                {pricingDetails.vip.price}
-                              </p>
-                            </div>
-                            <ul className="space-y-1.5 text-sm">
-                              {pricingDetails.vip.includes.map((item, i) => (
-                                <li key={i} className="flex items-start gap-2">
-                                  <Check className="mt-0.5 h-4 w-4 shrink-0" />
-                                  <span className="">{item}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
+                            Maximum 8 people
+                          </p>
+                          <p
+                            className={`mt-2 text-xs ${selectedTicketType === "couple" ? "text-white/80 dark:text-black/80" : ""}`}
+                          >
+                            Discounted rate per couple
+                          </p>
+                        </div>
                       </>
                     ) : (
-                      // Single pricing
+                      // Free event
                       <div className="py-4 text-center">
                         <p className="mb-2 text-sm tracking-wider text-black/60 uppercase dark:text-white/60">
                           Admission
                         </p>
                         <p className="text-4xl font-bold">
-                          {event.pricing.general}
+                          {event.pricing.type}
                         </p>
                       </div>
                     )}
                   </div>
 
-                  {/* Email Input for Registration */}
-                  {showEmailInput && !isRegistered && (
-                    <div className="mb-4 space-y-3">
-                      <label className="block text-sm font-medium text-black/70 dark:text-white/70">
-                        Enter your email to register
-                      </label>
-                      <input
-                        type="email"
-                        value={userEmail}
-                        onChange={(e) => setUserEmail(e.target.value)}
-                        placeholder="your@email.com"
-                        className="w-full border border-black/20 bg-white px-4 py-3 text-sm focus:border-black focus:outline-none dark:border-white/20 dark:bg-neutral-800 dark:focus:border-white"
-                      />
-                    </div>
-                  )}
+                  <Authenticated>
+                    {/* Registration/Cancel Button */}
+                    {isRegistered ? (
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-center gap-2 rounded-md bg-green-50 py-3 text-green-700 dark:bg-green-900/20 dark:text-green-400">
+                          <CheckCircle2 className="h-5 w-5" />
+                          <span className="font-semibold">
+                            You&apos;re registered!
+                          </span>
+                        </div>
 
-                  {/* Registration/Cancel Button */}
-                  {isRegistered ? (
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-center gap-2 rounded-md bg-green-50 py-3 text-green-700 dark:bg-green-900/20 dark:text-green-400">
-                        <CheckCircle2 className="h-5 w-5" />
-                        <span className="font-semibold">
-                          You&apos;re registered!
-                        </span>
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="lg"
-                        onClick={handleCancelRegistration}
-                        disabled={isCancelling}
-                        className="w-full cursor-pointer rounded-none border-red-500 py-6 text-base font-semibold text-red-500 hover:bg-red-50 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-900/20"
-                      >
-                        {isCancelling ? (
-                          <>
-                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                            Cancelling...
-                          </>
-                        ) : (
-                          <>
-                            <XCircle className="mr-2 h-5 w-5" />
-                            Cancel Registration
-                          </>
+                        {/* Number of People Input - After Registration */}
+                        <div className="space-y-2">
+                          <Label htmlFor="numberOfPeople">
+                            Number of People
+                          </Label>
+                          <div className="relative">
+                            <Users className="absolute top-3 left-3 h-4 w-4 text-black/40 dark:text-white/40" />
+                            <Input
+                              id="numberOfPeople"
+                              type="number"
+                              min="1"
+                              max={selectedTicketType === "couple" ? 8 : 5}
+                              value={formData.numberOfPeople}
+                              onChange={(e) => {
+                                const maxPeople =
+                                  selectedTicketType === "couple" ? 8 : 5;
+                                setFormData({
+                                  ...formData,
+                                  numberOfPeople: Math.min(
+                                    maxPeople,
+                                    Math.max(1, parseInt(e.target.value) || 1),
+                                  ),
+                                });
+                              }}
+                              className="pl-10"
+                              placeholder="1"
+                            />
+                          </div>
+                          <p className="text-xs text-black/60 dark:text-white/60">
+                            Including yourself (max{" "}
+                            {selectedTicketType === "couple" ? 8 : 5} people)
+                          </p>
+                        </div>
+
+                        {/* Estimated Total - After Registration */}
+                        {isPaidEvent && (
+                          <div className="rounded-md border-2 border-black/10 bg-neutral-50 p-4 dark:border-white/10 dark:bg-neutral-800">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-medium text-black/70 dark:text-white/70">
+                                Estimated Total
+                              </span>
+                              <span className="text-2xl font-bold">
+                                {(() => {
+                                  const priceString =
+                                    selectedTicketType === "couple"
+                                      ? event.pricing.discounted || event.pricing.regular
+                                      : event.pricing.regular;
+                                  if (!priceString) return "N/A";
+                                  
+                                  const match = priceString.match(/[\d,]+/);
+                                  if (!match) return priceString;
+                                  
+                                  const basePrice = parseFloat(
+                                    match[0].replace(/,/g, ""),
+                                  );
+                                  const total = basePrice * formData.numberOfPeople;
+                                  
+                                  return priceString.replace(
+                                    /[\d,]+/,
+                                    total.toLocaleString(),
+                                  );
+                                })()}
+                              </span>
+                            </div>
+                            <p className="mt-1 text-xs text-black/60 dark:text-white/60">
+                              {formData.numberOfPeople}{" "}
+                              {formData.numberOfPeople > 1 ? "people" : "person"} ×{" "}
+                              {selectedTicketType === "couple"
+                                ? event.pricing.discounted || event.pricing.regular
+                                : event.pricing.regular}
+                            </p>
+                          </div>
                         )}
+
+                        {/* Payment Status Indicator */}
+                        {hasPaymentPending && (
+                          <div className="rounded-md border-2 border-yellow-500 bg-yellow-50 p-4 dark:bg-yellow-900/20">
+                            <div className="flex items-start gap-3">
+                              <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-yellow-700 dark:text-yellow-400" />
+                              <div className="flex-1">
+                                <h4 className="mb-1 font-semibold text-yellow-900 dark:text-yellow-200">
+                                  Payment Required
+                                </h4>
+                                <p className="text-sm text-yellow-800 dark:text-yellow-300">
+                                  Your registration is pending. Please complete
+                                  payment to confirm your spot.
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Action Buttons */}
+                        <div className="space-y-3">
+                          {hasPaymentPending ? (
+                            <>
+                              <Button
+                                size="lg"
+                                className="w-full cursor-pointer rounded-none bg-yellow-600 py-6 text-base font-semibold text-white hover:bg-yellow-700 dark:bg-yellow-500 dark:hover:bg-yellow-600"
+                                onClick={() => {
+                                  toast.info("Payment integration", {
+                                    description:
+                                      "Payment processing will be integrated here.",
+                                  });
+                                }}
+                              >
+                                <CreditCard className="mr-2 h-5 w-5" />
+                                Complete Payment Now
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="lg"
+                                onClick={handleCancelRegistration}
+                                disabled={isCancelling}
+                                className="w-full cursor-pointer rounded-none border-red-500 py-6 text-base font-semibold text-red-500 hover:bg-red-50 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-900/20"
+                              >
+                                {isCancelling ? (
+                                  <>
+                                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                    Cancelling...
+                                  </>
+                                ) : (
+                                  <>
+                                    <XCircle className="mr-2 h-5 w-5" />
+                                    Cancel Registration
+                                  </>
+                                )}
+                              </Button>
+                            </>
+                          ) : (
+                            <Button
+                              variant="outline"
+                              size="lg"
+                              onClick={handleCancelRegistration}
+                              disabled={isCancelling}
+                              className="w-full cursor-pointer rounded-none border-red-500 py-6 text-base font-semibold text-red-500 hover:bg-red-50 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-900/20"
+                            >
+                              {isCancelling ? (
+                                <>
+                                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                  Cancelling...
+                                </>
+                              ) : (
+                                <>
+                                  <XCircle className="mr-2 h-5 w-5" />
+                                  Cancel Registration
+                                </>
+                              )}
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <form onSubmit={handleRegister} className="space-y-6">
+                        <div className="space-y-2">
+                          <Label htmlFor="name">Full Name</Label>
+                          <Input
+                            id="name"
+                            value={formData.name}
+                            onChange={(e) =>
+                              setFormData({ ...formData, name: e.target.value })
+                            }
+                            required
+                            placeholder="Your full name"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="email">Email Address</Label>
+                          <Input
+                            id="email"
+                            type="email"
+                            defaultValue={formData.email}
+                            disabled
+                            placeholder="Your email address"
+                            className="bg-neutral-50 dark:bg-neutral-800"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="phone">Telephone Number</Label>
+                          <div className="relative">
+                            <Phone className="absolute top-3 left-3 h-4 w-4 text-black/40 dark:text-white/40" />
+                            <Input
+                              id="phone"
+                              type="tel"
+                              value={formData.phone}
+                              onChange={(e) =>
+                                setFormData({
+                                  ...formData,
+                                  phone: e.target.value,
+                                })
+                              }
+                              className="pl-10"
+                              placeholder="+1 (555) 000-0000"
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        <Button
+                          type="submit"
+                          size="lg"
+                          disabled={isRegistering || isFull || authLoading}
+                          className="w-full cursor-pointer rounded-none bg-black py-6 font-semibold text-white hover:bg-black/90 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-white/90"
+                        >
+                          {isRegistering ? (
+                            <>
+                              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                              Registering...
+                            </>
+                          ) : isFull ? (
+                            "Sold Out"
+                          ) : (
+                            "Register Now"
+                          )}
+                        </Button>
+                      </form>
+                    )}
+                  </Authenticated>
+
+                  <Unauthenticated>
+                    <Link href={"/auth/login"}>
+                      <Button
+                        type="submit"
+                        size="lg"
+                        disabled={isRegistering || isFull || authLoading}
+                        className="w-full cursor-pointer rounded-none bg-black py-6 font-semibold text-white hover:bg-black/90 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-white/90"
+                      >
+                        Login and register
                       </Button>
-                    </div>
-                  ) : (
-                    <Button
-                      size="lg"
-                      onClick={handleRegister}
-                      disabled={isRegistering || isFull}
-                      className="w-full cursor-pointer rounded-none bg-black py-6 text-base font-semibold text-white hover:bg-black/90 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-white/90"
-                    >
-                      {isRegistering ? (
-                        <>
-                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                          Registering...
-                        </>
-                      ) : isFull ? (
-                        "Sold Out"
-                      ) : showEmailInput && userEmail ? (
-                        "Complete Registration"
-                      ) : (
-                        "Register Now"
-                      )}
-                    </Button>
-                  )}
+                    </Link>
+                  </Unauthenticated>
 
                   <p className="mt-4 text-center text-xs text-black/60 dark:text-white/60">
                     {isRegistered

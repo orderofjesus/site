@@ -35,7 +35,9 @@ export const seedEvents = mutation({
     // Check if events already exist
     const existingEvents = await ctx.db.query("events").first();
     if (existingEvents) {
-      throw new Error("Events already seeded. Delete existing events first if you want to re-seed.");
+      throw new Error(
+        "Events already seeded. Delete existing events first if you want to re-seed.",
+      );
     }
 
     const events = [
@@ -49,9 +51,10 @@ export const seedEvents = mutation({
         category: "Healing",
         attendees: "200+ Expected",
         pricing: {
+          type: "Free",
           general: "Free",
-          earlyBird: null,
-          vip: null,
+          regular: null,
+          discounted: null,
         },
         description:
           "Join us for a powerful evening of worship, prayer, and divine healing. Witness testimonies of miraculous healings and experience God's transformative touch in your life.",
@@ -95,9 +98,10 @@ export const seedEvents = mutation({
         category: "Conference",
         attendees: "500+ Expected",
         pricing: {
+          type: "Paid",
           general: "$99",
-          earlyBird: "$79",
-          vip: "$199",
+          regular: "$99",
+          discounted: "$79",
         },
         description:
           "A three-day intensive conference focused on developing the prophetic gift and understanding the Elijah mandate for this generation.",
@@ -131,7 +135,7 @@ export const seedEvents = mutation({
           "Questions for Q&A sessions",
         ],
         pricingDetails: {
-          general: {
+          regular: {
             price: "$99",
             includes: [
               "All main sessions",
@@ -140,25 +144,13 @@ export const seedEvents = mutation({
               "Lunch",
             ],
           },
-          earlyBird: {
+          discounted: {
             price: "$79",
             includes: [
-              "All general benefits",
-              "Early bird discount (valid until April 30)",
+              "All benefits of regular ticket",
+              "Special discounted rate for married couples",
             ],
-            note: "Save $20 when you register early!",
-          },
-          vip: {
-            price: "$199",
-            includes: [
-              "All main sessions",
-              "All workshops (unlimited access)",
-              "VIP seating",
-              "Conference materials",
-              "Lunch & dinner",
-              "Meet & greet with speakers",
-              "Exclusive VIP reception",
-            ],
+            note: "Save $20 with the couple discount!",
           },
         },
         registrationCount: 0,
@@ -174,9 +166,10 @@ export const seedEvents = mutation({
         category: "Healing",
         attendees: "300+ Expected",
         pricing: {
+          type: "Free",
           general: "Free",
-          earlyBird: null,
-          vip: null,
+          regular: null,
+          discounted: null,
         },
         description:
           "An extended evening of supernatural ministry where we press in for breakthrough healings and miraculous signs from heaven.",
@@ -217,9 +210,10 @@ export const seedEvents = mutation({
         category: "Conference",
         attendees: "150+ Expected",
         pricing: {
+          type: "Paid",
           general: "$25",
-          earlyBird: null,
-          vip: null,
+          regular: "$25",
+          discounted: null,
         },
         description:
           "An intimate gathering focused on hearing God's voice and receiving prophetic words for your life and calling.",
@@ -247,7 +241,7 @@ export const seedEvents = mutation({
           "Questions about your calling",
         ],
         pricingDetails: {
-          general: {
+          regular: {
             price: "$25",
             includes: [
               "All sessions",
@@ -270,9 +264,10 @@ export const seedEvents = mutation({
         category: "Healing",
         attendees: "1000+ Expected",
         pricing: {
+          type: "Free",
           general: "Free",
-          earlyBird: null,
-          vip: null,
+          regular: null,
+          discounted: null,
         },
         description:
           "Our largest healing event of the year - a three-day outdoor crusade bringing the message of Jesus and His healing power to our entire city.",
@@ -317,9 +312,10 @@ export const seedEvents = mutation({
         category: "Conference",
         attendees: "250+ Expected",
         pricing: {
+          type: "Paid",
           general: "$15",
-          earlyBird: null,
-          vip: null,
+          regular: "$15",
+          discounted: null,
         },
         description:
           "Experience the power of prophetic worship as spontaneous songs flow from the throne room, bringing breakthrough and transformation.",
@@ -347,7 +343,7 @@ export const seedEvents = mutation({
           "Journal for prophetic words",
         ],
         pricingDetails: {
-          general: {
+          regular: {
             price: "$15",
             includes: [
               "Extended worship experience",
@@ -367,11 +363,11 @@ export const seedEvents = mutation({
       insertedIds.push(id);
     }
 
-    return { 
-      success: true, 
+    return {
+      success: true,
       count: events.length,
       message: `Successfully seeded ${events.length} events into the database`,
-      eventIds: insertedIds
+      eventIds: insertedIds,
     };
   },
 });
@@ -381,15 +377,15 @@ export const deleteAllEvents = mutation({
   args: {},
   handler: async (ctx) => {
     const events = await ctx.db.query("events").collect();
-    
+
     for (const event of events) {
       await ctx.db.delete(event._id);
     }
 
-    return { 
-      success: true, 
+    return {
+      success: true,
       deletedCount: events.length,
-      message: `Successfully deleted ${events.length} events`
+      message: `Successfully deleted ${events.length} events`,
     };
   },
 });
