@@ -13,6 +13,12 @@ export function AuthGuard({ children }: AuthGuardProps) {
   const router = useRouter();
   const isAuthenticated = !!user;
 
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      router.push("/auth/login");
+    }
+  }, [loading, isAuthenticated, router]);
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -25,7 +31,13 @@ export function AuthGuard({ children }: AuthGuardProps) {
   }
 
   if (!isAuthenticated) {
-    return null;
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600 dark:text-gray-400">Redirecting to login...</p>
+        </div>
+      </div>
+    );
   }
 
   return <>{children}</>;

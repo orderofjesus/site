@@ -13,26 +13,31 @@ import { AuthButton } from "@/components/auth-button";
 const links = [
   {
     id: "1",
+    title: "Dashboard",
+    href: "/dashboard",
+  },
+  {
+    id: "2",
     title: "Mentorship",
     href: "/mentorship",
   },
   {
-    id: "2",
+    id: "3",
     title: "Events",
     href: "/events",
   },
   {
-    id: "3",
+    id: "4",
     title: "Schools",
     href: "/schools",
   },
   {
-    id: "4",
+    id: "5",
     title: "Sermons",
     href: "/sermons",
   },
   // {
-  //   id: "5",
+  //   id: "6",
   //   title: "About",
   //   href: "/about",
   // },

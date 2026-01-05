@@ -15,6 +15,7 @@ import Link from "next/link";
 import { useQuery } from "convex/react";
 import { useAuth } from "@workos-inc/authkit-nextjs/components";
 import { api } from "@/convex/_generated/api";
+import { EventsListSkeleton } from "@/components/event-skeleton";
 
 export default function EventsPage() {
   const { user } = useAuth();
@@ -37,18 +38,7 @@ export default function EventsPage() {
   );
 
   if (!events) {
-    return (
-      <PageWrapper>
-        <div className="flex min-h-screen items-center justify-center">
-          <div className="text-center">
-            <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600"></div>
-            <p className="text-gray-600 dark:text-gray-400">
-              Loading events...
-            </p>
-          </div>
-        </div>
-      </PageWrapper>
-    );
+    return <EventsListSkeleton />;
   }
 
   const [upcomingEvent, ...otherEvents] = events;

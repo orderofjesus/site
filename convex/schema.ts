@@ -62,6 +62,50 @@ const schema = defineSchema({
     .index("by_event", ["eventId"])
     .index("by_user_and_event", ["userEmail", "eventId"])
     .index("by_status", ["status"]),
+
+  userProfiles: defineTable({
+    email: v.string(),
+    firstName: v.optional(v.string()),
+    lastName: v.optional(v.string()),
+    phone: v.optional(v.string()),
+    profilePictureUrl: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("by_email", ["email"]),
+
+  schoolEnrollments: defineTable({
+    userEmail: v.string(),
+    schoolName: v.string(), // "Mystical Masterclass" or "Open Scroll"
+    enrolledAt: v.number(),
+    status: v.union(
+      v.literal("active"),
+      v.literal("completed"),
+      v.literal("cancelled")
+    ),
+    progress: v.optional(v.number()), // 0-100
+    notes: v.optional(v.string()),
+  })
+    .index("by_user", ["userEmail"])
+    .index("by_school", ["schoolName"])
+    .index("by_user_and_school", ["userEmail", "schoolName"]),
+
+  mentorshipEnrollments: defineTable({
+    userEmail: v.string(),
+    programType: v.string(), // "one-on-one" or "elijah-network"
+    enrolledAt: v.number(),
+    status: v.union(
+      v.literal("active"),
+      v.literal("completed"),
+      v.literal("on-hold"),
+      v.literal("cancelled")
+    ),
+    mentorEmail: v.optional(v.string()),
+    startDate: v.optional(v.string()),
+    notes: v.optional(v.string()),
+  })
+    .index("by_user", ["userEmail"])
+    .index("by_program", ["programType"])
+    .index("by_mentor", ["mentorEmail"]),
 });
 
 export default schema;

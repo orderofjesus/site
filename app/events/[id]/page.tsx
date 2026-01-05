@@ -16,6 +16,9 @@ import {
   Phone,
   AlertCircle,
   CreditCard,
+  Smartphone,
+  Building2,
+  Copy,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { larken } from "@/lib/fonts";
@@ -35,6 +38,7 @@ import { useRouter } from "next/navigation";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { EventDetailSkeleton } from "@/components/event-skeleton";
 
 export default function EventDetailPage({
   params,
@@ -52,6 +56,9 @@ export default function EventDetailPage({
   );
   const [userEmail, setUserEmail] = useState("");
   const [showEmailInput, setShowEmailInput] = useState(false);
+  const [expandedPaymentMethod, setExpandedPaymentMethod] = useState<
+    string | null
+  >(null);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -115,18 +122,7 @@ export default function EventDetailPage({
 
   // Loading state
   if (event === undefined) {
-    return (
-      <PageWrapper>
-        <div className="flex min-h-screen items-center justify-center">
-          <div className="text-center">
-            <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600"></div>
-            <p className="text-gray-600 dark:text-gray-400">
-              Loading event details...
-            </p>
-          </div>
-        </div>
-      </PageWrapper>
-    );
+    return <EventDetailSkeleton />;
   }
 
   // Not found state
@@ -678,64 +674,426 @@ export default function EventDetailPage({
                           </div>
                         )}
 
-                        {/* Action Buttons */}
-                        <div className="space-y-3">
-                          {hasPaymentPending ? (
-                            <>
-                              <Button
-                                size="lg"
-                                className="w-full cursor-pointer rounded-none bg-yellow-600 py-6 text-base font-semibold text-white hover:bg-yellow-700 dark:bg-yellow-500 dark:hover:bg-yellow-600"
-                                onClick={() => {
-                                  toast.info("Payment integration", {
-                                    description:
-                                      "Payment processing will be integrated here.",
-                                  });
-                                }}
-                              >
-                                <CreditCard className="mr-2 h-5 w-5" />
-                                Complete Payment Now
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="lg"
-                                onClick={handleCancelRegistration}
-                                disabled={isCancelling}
-                                className="w-full cursor-pointer rounded-none border-red-500 py-6 text-base font-semibold text-red-500 hover:bg-red-50 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-900/20"
-                              >
-                                {isCancelling ? (
-                                  <>
-                                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                    Cancelling...
-                                  </>
-                                ) : (
-                                  <>
-                                    <XCircle className="mr-2 h-5 w-5" />
-                                    Cancel Registration
-                                  </>
-                                )}
-                              </Button>
-                            </>
-                          ) : (
+                        {/* Payment Methods */}
+                        {hasPaymentPending && (
+                          <div className="space-y-3">
+                            <h4 className="text-sm font-semibold text-black/70 dark:text-white/70">
+                              Choose Payment Method
+                            </h4>
+
+                            {/* Credit Card */}
                             <Button
                               variant="outline"
                               size="lg"
-                              onClick={handleCancelRegistration}
-                              disabled={isCancelling}
-                              className="w-full cursor-pointer rounded-none border-red-500 py-6 text-base font-semibold text-red-500 hover:bg-red-50 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-900/20"
+                              className="w-full cursor-pointer justify-start gap-3 rounded-none border-2 border-black/10 py-6 text-left hover:border-black hover:bg-black hover:text-white dark:border-white/10 dark:hover:border-white dark:hover:bg-white dark:hover:text-black"
+                              onClick={() => {
+                                toast.info("Credit Card Payment", {
+                                  description:
+                                    "Credit card payment integration will be available here.",
+                                });
+                              }}
                             >
-                              {isCancelling ? (
-                                <>
-                                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                  Cancelling...
-                                </>
-                              ) : (
-                                <>
-                                  <XCircle className="mr-2 h-5 w-5" />
-                                  Cancel Registration
-                                </>
-                              )}
+                              <CreditCard className="h-5 w-5 shrink-0" />
+                              <div className="group flex-1">
+                                <div className="font-semibold">Credit Card</div>
+                                <div className="text-xs opacity-70">
+                                  Pay securely with Visa, Mastercard, or Amex
+                                </div>
+                              </div>
                             </Button>
-                          )}
+
+                            {/* Mobile Money */}
+                            <div className="overflow-hidden rounded-none border-2 border-black/10 dark:border-white/10">
+                              <Button
+                                variant="outline"
+                                size="lg"
+                                className={`w-full cursor-pointer justify-start gap-3 rounded-none border-0 py-6 text-left transition-colors ${
+                                  expandedPaymentMethod === "mobile"
+                                    ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
+                                    : "hover:border-black hover:bg-black hover:text-white dark:hover:border-white dark:hover:bg-white dark:hover:text-black"
+                                }`}
+                                onClick={() => {
+                                  setExpandedPaymentMethod(
+                                    expandedPaymentMethod === "mobile"
+                                      ? null
+                                      : "mobile",
+                                  );
+                                }}
+                              >
+                                <Smartphone className="h-5 w-5 shrink-0 group-hover:text-white dark:group-hover:text-black" />
+                                <div className="group flex-1">
+                                  <div className="font-semibold group-hover:text-black dark:group-hover:text-white">
+                                    Mobile Money
+                                  </div>
+                                  <div className="text-xs opacity-70 group-hover:text-black dark:group-hover:text-white">
+                                    Pay with MTN, Airtel, or other mobile
+                                    wallets
+                                  </div>
+                                </div>
+                              </Button>
+
+                              {expandedPaymentMethod === "mobile" && (
+                                <div className="border-t-2 border-black/10 bg-neutral-50 p-6 dark:border-white/10 dark:bg-neutral-800">
+                                  <h5 className="mb-4 font-semibold">
+                                    Mobile Money Payment Instructions
+                                  </h5>
+
+                                  <div className="mb-4 space-y-3 text-sm">
+                                    <div>
+                                      <p className="mb-1 font-medium">
+                                        MTN Mobile Money:
+                                      </p>
+                                      <ul className="ml-4 list-disc space-y-1 text-black/70 dark:text-white/70">
+                                        <li>Dial *165#</li>
+                                        <li>Select option 4 (Send Money)</li>
+                                        <li className="flex items-center gap-2">
+                                          <span>
+                                            Enter:{" "}
+                                            <strong className="font-mono text-xs">
+                                              0772 123 456
+                                            </strong>
+                                          </span>
+                                          <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-5 w-5 p-0 hover:bg-black/10 dark:hover:bg-white/10"
+                                            onClick={() => {
+                                              navigator.clipboard.writeText(
+                                                "0772123456",
+                                              );
+                                              toast.success(
+                                                "Copied to clipboard",
+                                                {
+                                                  description:
+                                                    "MTN number copied successfully",
+                                                },
+                                              );
+                                            }}
+                                          >
+                                            <Copy className="h-3 w-3" />
+                                          </Button>
+                                        </li>
+                                        <li>
+                                          Enter amount:{" "}
+                                          <strong>
+                                            {(() => {
+                                              const priceString =
+                                                selectedTicketType === "couple"
+                                                  ? event.pricing.discounted ||
+                                                    event.pricing.regular
+                                                  : event.pricing.regular;
+                                              if (!priceString) return "N/A";
+                                              const match =
+                                                priceString.match(/[\d,]+/);
+                                              if (!match) return priceString;
+                                              const basePrice = parseFloat(
+                                                match[0].replace(/,/g, ""),
+                                              );
+                                              const total =
+                                                basePrice *
+                                                formData.numberOfPeople;
+                                              return `UGX ${total.toLocaleString()}`;
+                                            })()}
+                                          </strong>
+                                        </li>
+                                        <li>
+                                          Reference:{" "}
+                                          <strong>Event Registration</strong>
+                                        </li>
+                                      </ul>
+                                    </div>
+
+                                    <div>
+                                      <p className="mb-1 font-medium">
+                                        Airtel Money:
+                                      </p>
+                                      <ul className="ml-4 list-disc space-y-1 text-black/70 dark:text-white/70">
+                                        <li>Dial *185#</li>
+                                        <li>Select option 1 (Send Money)</li>
+                                        <li className="flex items-center gap-2">
+                                          <span>
+                                            Enter:{" "}
+                                            <strong className="font-mono text-xs">
+                                              0752 123 456
+                                            </strong>
+                                          </span>
+                                          <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-5 w-5 p-0 hover:bg-black/10 dark:hover:bg-white/10"
+                                            onClick={() => {
+                                              navigator.clipboard.writeText(
+                                                "0752123456",
+                                              );
+                                              toast.success(
+                                                "Copied to clipboard",
+                                                {
+                                                  description:
+                                                    "Airtel number copied successfully",
+                                                },
+                                              );
+                                            }}
+                                          >
+                                            <Copy className="h-3 w-3" />
+                                          </Button>
+                                        </li>
+                                        <li>Enter amount and confirm</li>
+                                      </ul>
+                                    </div>
+                                  </div>
+
+                                  <div className="rounded-md bg-yellow-50 p-3 dark:bg-yellow-900/20">
+                                    <p className="text-xs text-yellow-800 dark:text-yellow-300">
+                                      <strong>Important:</strong> After payment,
+                                      please send a screenshot of the
+                                      transaction to our WhatsApp:{" "}
+                                      <strong>+256 772 123 456</strong>
+                                    </p>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Bank Transfer */}
+                            <div className="overflow-hidden rounded-none border-2 border-black/10 dark:border-white/10">
+                              <Button
+                                variant="outline"
+                                size="lg"
+                                className={`w-full cursor-pointer justify-start gap-3 rounded-none border-0 py-6 text-left transition-colors ${
+                                  expandedPaymentMethod === "bank"
+                                    ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
+                                    : "hover:border-black hover:bg-black hover:text-white dark:hover:border-white dark:hover:bg-white dark:hover:text-black"
+                                }`}
+                                onClick={() => {
+                                  setExpandedPaymentMethod(
+                                    expandedPaymentMethod === "bank"
+                                      ? null
+                                      : "bank",
+                                  );
+                                }}
+                              >
+                                <Building2 className="h-5 w-5 shrink-0 group-hover:fill-white dark:group-hover:fill-black" />
+                                <div className="group flex-1">
+                                  <div className="font-semibold group-hover:text-black dark:group-hover:text-white">
+                                    Bank Transfer
+                                  </div>
+                                  <div className="text-xs opacity-70 group-hover:text-black dark:group-hover:text-white">
+                                    Transfer to our bank account (details
+                                    provided)
+                                  </div>
+                                </div>
+                              </Button>
+
+                              {expandedPaymentMethod === "bank" && (
+                                <div className="border-t-2 border-black/10 bg-neutral-50 p-6 dark:border-white/10 dark:bg-neutral-800">
+                                  <h5 className="mb-4 font-semibold">
+                                    Bank Transfer Details
+                                  </h5>
+
+                                  <div className="mb-4 space-y-3 text-sm">
+                                    <div className="flex justify-between border-b border-black/10 pb-2 dark:border-white/10">
+                                      <span className="text-black/70 dark:text-white/70">
+                                        Bank Name:
+                                      </span>
+                                      <span className="font-medium">
+                                        Stanbic Bank Uganda
+                                      </span>
+                                    </div>
+                                    <div className="flex justify-between border-b border-black/10 pb-2 dark:border-white/10">
+                                      <span className="text-black/70 dark:text-white/70">
+                                        Account Name:
+                                      </span>
+                                      <span className="font-medium">
+                                        Victory Church
+                                      </span>
+                                    </div>
+                                    <div className="flex justify-between border-b border-black/10 pb-2 dark:border-white/10">
+                                      <span className="text-black/70 dark:text-white/70">
+                                        Account Number:
+                                      </span>
+                                      <div className="flex items-center gap-2">
+                                        <span className="font-mono text-xs font-medium">
+                                          9030012345678
+                                        </span>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          className="h-6 w-6 cursor-pointer p-0 hover:bg-black/10 dark:hover:bg-white/10"
+                                          onClick={() => {
+                                            navigator.clipboard.writeText(
+                                              "9030012345678",
+                                            );
+                                            toast.success(
+                                              "Copied to clipboard",
+                                              {
+                                                description:
+                                                  "Account number copied successfully",
+                                              },
+                                            );
+                                          }}
+                                        >
+                                          <Copy className="h-3 w-3" />
+                                        </Button>
+                                      </div>
+                                    </div>
+                                    <div className="flex justify-between border-b border-black/10 pb-2 dark:border-white/10">
+                                      <span className="text-black/70 dark:text-white/70">
+                                        Swift Code:
+                                      </span>
+                                      <div className="flex items-center gap-2">
+                                        <span className="font-mono text-xs font-medium">
+                                          SBICUGKX
+                                        </span>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          className="h-6 w-6 cursor-pointer p-0 hover:bg-black/10 dark:hover:bg-white/10"
+                                          onClick={() => {
+                                            navigator.clipboard.writeText(
+                                              "SBICUGKX",
+                                            );
+                                            toast.success(
+                                              "Copied to clipboard",
+                                              {
+                                                description:
+                                                  "Swift code copied successfully",
+                                              },
+                                            );
+                                          }}
+                                        >
+                                          <Copy className="h-3 w-3" />
+                                        </Button>
+                                      </div>
+                                    </div>
+                                    <div className="flex justify-between border-b border-black/10 pb-2 dark:border-white/10">
+                                      <span className="text-black/70 dark:text-white/70">
+                                        Amount:
+                                      </span>
+                                      <div className="flex items-center gap-2">
+                                        <span className="font-medium">
+                                          {(() => {
+                                            const priceString =
+                                              selectedTicketType === "couple"
+                                                ? event.pricing.discounted ||
+                                                  event.pricing.regular
+                                                : event.pricing.regular;
+                                            if (!priceString) return "N/A";
+                                            const match =
+                                              priceString.match(/[\d,]+/);
+                                            if (!match) return priceString;
+                                            const basePrice = parseFloat(
+                                              match[0].replace(/,/g, ""),
+                                            );
+                                            const total =
+                                              basePrice *
+                                              formData.numberOfPeople;
+                                            return `UGX ${total.toLocaleString()}`;
+                                          })()}
+                                        </span>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          className="h-6 w-6 p-0 hover:bg-black/10 dark:hover:bg-white/10"
+                                          onClick={() => {
+                                            const priceString =
+                                              selectedTicketType === "couple"
+                                                ? event.pricing.discounted ||
+                                                  event.pricing.regular
+                                                : event.pricing.regular;
+                                            if (!priceString) return;
+                                            const match =
+                                              priceString.match(/[\d,]+/);
+                                            if (!match) return;
+                                            const basePrice = parseFloat(
+                                              match[0].replace(/,/g, ""),
+                                            );
+                                            const total =
+                                              basePrice *
+                                              formData.numberOfPeople;
+                                            navigator.clipboard.writeText(
+                                              total.toString(),
+                                            );
+                                            toast.success(
+                                              "Copied to clipboard",
+                                              {
+                                                description:
+                                                  "Amount copied successfully",
+                                              },
+                                            );
+                                          }}
+                                        >
+                                          <Copy className="h-3 w-3" />
+                                        </Button>
+                                      </div>
+                                    </div>
+                                    <div className="flex flex-col justify-between">
+                                      <span className="text-black/70 dark:text-white/70">
+                                        Reference:
+                                      </span>
+                                      <div className="flex items-center gap-2">
+                                        <span className="font-mono text-xs font-medium">
+                                          {registration?._id ||
+                                            "Event Registration"}
+                                        </span>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          className="h-6 w-6 cursor-pointer p-0 hover:bg-black/10 dark:hover:bg-white/10"
+                                          onClick={() => {
+                                            navigator.clipboard.writeText(
+                                              registration?._id ||
+                                                "Event Registration",
+                                            );
+                                            toast.success(
+                                              "Copied to clipboard",
+                                              {
+                                                description:
+                                                  "Reference ID copied successfully",
+                                              },
+                                            );
+                                          }}
+                                        >
+                                          <Copy className="h-3 w-3" />
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div className="rounded-md bg-blue-50 p-3 dark:bg-blue-900/20">
+                                    <p className="text-xs text-blue-800 dark:text-blue-300">
+                                      <strong>Note:</strong> Please use your
+                                      registration ID as the payment reference.
+                                      Send proof of payment to
+                                      finance@victorychurch.org
+                                    </p>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Action Buttons */}
+                        <div className="space-y-3">
+                          <Button
+                            variant="outline"
+                            size="lg"
+                            onClick={handleCancelRegistration}
+                            disabled={isCancelling}
+                            className="w-full cursor-pointer rounded-none border-red-500 py-6 text-base font-semibold text-red-500 hover:bg-red-50 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-900/20"
+                          >
+                            {isCancelling ? (
+                              <>
+                                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                Cancelling...
+                              </>
+                            ) : (
+                              <>
+                                <XCircle className="mr-2 h-5 w-5" />
+                                Cancel Registration
+                              </>
+                            )}
+                          </Button>
                         </div>
                       </div>
                     ) : (
