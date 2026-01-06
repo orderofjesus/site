@@ -16,6 +16,11 @@ function base64urlDecode(input: string) {
 }
 
 function hmacSHA256(secret: string, data: string) {
+  if (!secret) {
+    throw new Error(
+      "Missing WORKOS_STATE_SECRET environment variable. Please set it in your production environment.",
+    );
+  }
   return crypto.createHmac("sha256", secret).update(data).digest("base64url");
 }
 
