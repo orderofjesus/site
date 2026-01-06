@@ -92,7 +92,7 @@ export function DashboardMentorships({ userEmail }: DashboardMentorshipsProps) {
 
                 return (
                   <Card key={enrollment._id} className="overflow-hidden">
-                    <CardHeader className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20">
+                    <CardHeader className="bg-linear-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20">
                       <div className="flex items-start justify-between">
                         <div>
                           <CardTitle className="text-lg">{info.name}</CardTitle>

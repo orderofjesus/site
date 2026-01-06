@@ -15,6 +15,7 @@ import {
   Sun,
   Monitor,
   LogOut,
+  Home,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
@@ -88,7 +89,7 @@ export function UserDashboardSidebar({
 
   return (
     <Sidebar variant="sidebar" {...props}>
-      <SidebarHeader className="border-sidebar-border border-b">
+      <SidebarHeader className="border-sidebar-border bg-card border-b">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
@@ -100,7 +101,7 @@ export function UserDashboardSidebar({
               </div>
               <div className="flex flex-col gap-0.5 leading-none">
                 <span className="font-semibold">My Dashboard</span>
-                <span className="text-muted-foreground text-xs">
+                <span className="text-xs font-medium text-zinc-800 dark:text-zinc-300">
                   {user?.firstName || user?.email?.split("@")[0] || "User"}
                   &apos;s Portal
                 </span>
@@ -113,11 +114,22 @@ export function UserDashboardSidebar({
       <SidebarContent>
         {/* Main Navigation */}
         <SidebarGroup>
-          <SidebarGroupLabel className="text-muted-foreground text-[10px] tracking-wider uppercase">
+          {/* <SidebarGroupLabel className="text-muted-foreground text-[10px] tracking-wider uppercase">
             Navigation
-          </SidebarGroupLabel>
+          </SidebarGroupLabel> */}
           <SidebarGroupContent>
             <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  onClick={() => router.push("/")}
+                  className="cursor-pointer text-sm font-medium"
+                >
+                  <Home className="size-4" />
+                  <span className="text-base font-semibold">
+                    Back to Main Site
+                  </span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton
                   onClick={() => router.push(`/dashboard`)}
@@ -183,7 +195,7 @@ export function UserDashboardSidebar({
                     })
                   ) : (
                     <SidebarMenuItem>
-                      <div className="text-muted-foreground px-2 py-1.5 text-xs">
+                      <div className="px-2 py-1.5 text-sm font-medium text-zinc-800 dark:text-zinc-400">
                         No events registered
                       </div>
                     </SidebarMenuItem>
@@ -242,7 +254,7 @@ export function UserDashboardSidebar({
                     ))
                   ) : (
                     <SidebarMenuItem>
-                      <div className="text-muted-foreground px-2 py-1.5 text-xs">
+                      <div className="px-2 py-1.5 text-sm font-medium text-zinc-800 dark:text-zinc-400">
                         No schools enrolled
                       </div>
                     </SidebarMenuItem>
@@ -307,7 +319,7 @@ export function UserDashboardSidebar({
                     ))
                   ) : (
                     <SidebarMenuItem>
-                      <div className="text-muted-foreground px-2 py-1.5 text-xs">
+                      <div className="px-2 py-1.5 text-sm font-medium text-zinc-800 dark:text-zinc-400">
                         No mentorships enrolled
                       </div>
                     </SidebarMenuItem>

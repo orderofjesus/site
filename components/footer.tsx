@@ -77,7 +77,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/#connect"
+                  href="/contact"
                   className="text-sm text-neutral-600 transition-colors hover:text-black dark:text-neutral-400 dark:hover:text-white"
                 >
                   Contact
@@ -169,29 +169,28 @@ export function Footer() {
           </div>
 
           {/* Legal */}
-          <div className="col-span-1">
+          {/* <div className="col-span-1">
             <h3 className="mb-4 text-sm font-semibold text-black dark:text-white">
               Legal
             </h3>
             <ul className="space-y-3">
               <li>
-                <Link
-                  href="/privacy"
-                  className="text-sm text-neutral-600 transition-colors hover:text-black dark:text-neutral-400 dark:hover:text-white"
-                >
-                  Privacy Policy
-                </Link>
+                <Link href="/privacy" className="text-sm text-neutral-600 transition-colors hover:text-black dark:text-neutral-400 dark:hover:text-white">Privacy Policy</Link>
               </li>
               <li>
-                <Link
-                  href="/terms"
-                  className="text-sm text-neutral-600 transition-colors hover:text-black dark:text-neutral-400 dark:hover:text-white"
-                >
-                  Terms of Service
-                </Link>
+                <Link href="/terms" className="text-sm text-neutral-600 transition-colors hover:text-black dark:text-neutral-400 dark:hover:text-white">Terms of Service</Link>
+              </li>
+              <li>
+                <Link href="/cookies" className="text-sm text-neutral-600 transition-colors hover:text-black dark:text-neutral-400 dark:hover:text-white">Cookies Policy</Link>
+              </li>
+              <li>
+                <Link href="/refund-policy" className="text-sm text-neutral-600 transition-colors hover:text-black dark:text-neutral-400 dark:hover:text-white">Refund Policy</Link>
+              </li>
+              <li>
+                <Link href="/disclaimer" className="text-sm text-neutral-600 transition-colors hover:text-black dark:text-neutral-400 dark:hover:text-white">Disclaimer</Link>
               </li>
             </ul>
-          </div>
+          </div> */}
         </div>
 
         {/* Bottom Bar */}

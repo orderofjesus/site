@@ -11,11 +11,11 @@ import { HandCoins, Handshake } from "lucide-react";
 import { AuthButton } from "@/components/auth-button";
 
 const links = [
-  {
-    id: "1",
-    title: "Dashboard",
-    href: "/dashboard",
-  },
+  // {
+  //   id: "1",
+  //   title: "Dashboard",
+  //   href: "/dashboard",
+  // },
   {
     id: "2",
     title: "Mentorship",

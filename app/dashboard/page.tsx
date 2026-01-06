@@ -101,7 +101,7 @@ function OverviewSection({
 }) {
   const stats = [
     {
-      label: "Upcoming Events",
+      label: "My Events",
       value: upcomingRegistrations.length,
       icon: Calendar,
       description: "Events you're registered for",
@@ -986,11 +986,6 @@ function DashboardContent() {
 
         <main className="flex-1 bg-white dark:bg-[#0a0a0a]">
           <div className="relative overflow-hidden px-6 pt-12 pb-16 lg:px-12">
-            <div className="pointer-events-none absolute inset-0">
-              <div className="absolute top-20 right-0 h-96 w-96 rounded-full bg-black/5 blur-3xl dark:bg-white/5"></div>
-              <div className="absolute bottom-0 left-0 h-80 w-80 rounded-full bg-black/5 blur-3xl dark:bg-white/5"></div>
-            </div>
-
             <div className="relative z-10 mx-auto max-w-7xl">
               {!currentView && (
                 <OverviewSection

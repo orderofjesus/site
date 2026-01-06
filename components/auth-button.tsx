@@ -34,7 +34,7 @@ export function AuthButton({ className }: AuthButtonProps = {}) {
         className={`h-0 cursor-pointer gap-2 rounded-full p-1 py-2 ${className}`}
       >
         <Avatar className="h-8 w-8">
-          <AvatarFallback className="bg-gray-200 dark:bg-zinc-700">
+          <AvatarFallback className="bg-zinc-200 dark:bg-zinc-700">
             <User className="h-4 w-4" />
           </AvatarFallback>
         </Avatar>
@@ -52,7 +52,7 @@ export function AuthButton({ className }: AuthButtonProps = {}) {
           className={`h-0 cursor-pointer gap-2 rounded-full p-1 py-2 hover:bg-transparent focus-visible:ring-0 dark:hover:bg-transparent ${className}`}
         >
           <Avatar className="h-8 w-8">
-            <AvatarFallback className="bg-gray-200 dark:bg-zinc-800">
+            <AvatarFallback className="bg-zinc-200 dark:bg-zinc-800">
               <User className="h-4 w-4" />
             </AvatarFallback>
           </Avatar>
@@ -71,7 +71,7 @@ export function AuthButton({ className }: AuthButtonProps = {}) {
                   src={user?.profilePictureUrl || undefined}
                   alt={user?.firstName || "User"}
                 />
-                <AvatarFallback className="bg-gray-200 dark:bg-gray-700">
+                <AvatarFallback className="bg-zinc-200 dark:bg-zinc-700">
                   {user?.firstName?.[0]?.toUpperCase() || (
                     <User className="h-4 w-4" />
                   )}
@@ -82,21 +82,27 @@ export function AuthButton({ className }: AuthButtonProps = {}) {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium">
-                  {user?.firstName || "User"}
+                <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                  {user?.firstName || "User"} {user?.lastName || ""}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {user?.email}
-                </p>
+                {/* <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                  {user?.email}eeeeeeeeeeeeeeeeeeeeeeeeeeee
+                </p> */}
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => router.push("/profile")}>
+            {/* <DropdownMenuItem
+              className="font-medium"
+              onClick={() => router.push("/profile")}
+            >
               <User className="mr-2 h-4 w-4" />
               Profile
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => router.push("/dashboard")}>
-              <User className="mr-2 h-4 w-4" />
+            </DropdownMenuItem> */}
+            <DropdownMenuItem
+              className="font-medium"
+              onClick={() => router.push("/dashboard")}
+            >
+              <User className="mr-2 h-4 w-4 text-zinc-900 dark:text-zinc-100" />
               Dashboard
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -108,10 +114,10 @@ export function AuthButton({ className }: AuthButtonProps = {}) {
                   router.refresh();
                 });
               }}
-              className="text-red-600 dark:text-red-400"
+              className="font-medium text-red-600 dark:text-red-400"
             >
-              <LogOut className="mr-2 h-4 w-4" />
-              Sign Out
+              <LogOut className="mr-2 h-4 w-4 text-red-600 dark:text-red-400" />
+              Log out
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
