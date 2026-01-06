@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import Link from "next/link";
+import { Doc } from "@/convex/_generated/dataModel";
 
 interface DashboardMentorshipsProps {
   userEmail: string | undefined;
@@ -15,20 +16,25 @@ interface DashboardMentorshipsProps {
 export function DashboardMentorships({ userEmail }: DashboardMentorshipsProps) {
   const mentorships = useQuery(
     api.dashboard.getUserMentorships,
-    userEmail ? { userEmail } : "skip"
+    userEmail ? { userEmail } : "skip",
   );
 
-  const programInfo: Record<string, { name: string; description: string; icon: any; link: string }> = {
+  const programInfo: Record<
+    string,
+    { name: string; description: string; icon: React.ReactNode; link: string }
+  > = {
     "one-on-one": {
       name: "One-on-One Mentorship",
-      description: "Personalized spiritual guidance and prophetic training with dedicated mentors.",
-      icon: User,
+      description:
+        "Personalized spiritual guidance and prophetic training with dedicated mentors.",
+      icon: <User className="h-5 w-5 text-green-600 dark:text-green-400" />,
       link: "/mentorship/one-on-one",
     },
     "elijah-network": {
       name: "Elijah Network",
-      description: "Join a community of prophetic voices for collective growth and accountability.",
-      icon: Users,
+      description:
+        "Join a community of prophetic voices for collective growth and accountability.",
+      icon: <Users className="h-5 w-5 text-green-600 dark:text-green-400" />,
       link: "/mentorship/elijah-network",
     },
   };
@@ -41,8 +47,8 @@ export function DashboardMentorships({ userEmail }: DashboardMentorshipsProps) {
           No mentorship enrollments yet
         </h3>
         <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
-          You haven&apos;t joined any mentorship programs. Connect with mentors to accelerate
-          your spiritual growth.
+          You haven&apos;t joined any mentorship programs. Connect with mentors
+          to accelerate your spiritual growth.
         </p>
         <div className="mt-4 flex justify-center gap-3">
           <Link href="/mentorship/one-on-one">
@@ -56,9 +62,15 @@ export function DashboardMentorships({ userEmail }: DashboardMentorshipsProps) {
     );
   }
 
-  const activeMentorships = mentorships.filter((m: any) => m.status === "active");
-  const completedMentorships = mentorships.filter((m: any) => m.status === "completed");
-  const onHoldMentorships = mentorships.filter((m: any) => m.status === "on-hold");
+  const activeMentorships = mentorships.filter(
+    (m: Doc<"mentorshipEnrollments">) => m.status === "active",
+  );
+  const completedMentorships = mentorships.filter(
+    (m: Doc<"mentorshipEnrollments">) => m.status === "completed",
+  );
+  const onHoldMentorships = mentorships.filter(
+    (m: Doc<"mentorshipEnrollments">) => m.status === "on-hold",
+  );
 
   return (
     <div className="space-y-6">
@@ -69,74 +81,80 @@ export function DashboardMentorships({ userEmail }: DashboardMentorshipsProps) {
             Active Mentorships ({activeMentorships.length})
           </h2>
           <div className="grid gap-4 md:grid-cols-2">
-            {activeMentorships.map((enrollment: any) => {
-              const info = programInfo[enrollment.programType] || {
-                name: enrollment.programType,
-                description: "Mentorship program",
-                icon: Users,
-                link: "/mentorship",
-              };
-              const IconComponent = info.icon;
+            {activeMentorships.map(
+              (enrollment: Doc<"mentorshipEnrollments">) => {
+                const info = programInfo[enrollment.programType] || {
+                  name: enrollment.programType,
+                  description: "Mentorship program",
+                  icon: Users,
+                  link: "/mentorship",
+                };
 
-              return (
-                <Card key={enrollment._id} className="overflow-hidden">
-                  <CardHeader className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <CardTitle className="text-lg">{info.name}</CardTitle>
-                        <Badge className="mt-2" variant="secondary">
-                          Active
-                        </Badge>
-                      </div>
-                      <div className="rounded-lg bg-white p-2 dark:bg-neutral-900">
-                        <IconComponent className="h-5 w-5 text-green-600 dark:text-green-400" />
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-4">
-                    <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                      {info.description}
-                    </p>
-
-                    {/* Mentor Info */}
-                    {enrollment.mentorEmail && (
-                      <div className="mt-4 rounded-lg bg-neutral-50 p-3 dark:bg-neutral-900">
-                        <div className="flex items-center gap-2">
-                          <User className="h-4 w-4 text-neutral-600 dark:text-neutral-400" />
-                          <span className="text-sm font-medium text-neutral-900 dark:text-white">
-                            Mentor
-                          </span>
+                return (
+                  <Card key={enrollment._id} className="overflow-hidden">
+                    <CardHeader className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <CardTitle className="text-lg">{info.name}</CardTitle>
+                          <Badge className="mt-2" variant="secondary">
+                            Active
+                          </Badge>
                         </div>
-                        <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
-                          {enrollment.mentorEmail}
-                        </p>
+                        <div className="rounded-lg bg-white p-2 dark:bg-neutral-900">
+                          {info.icon}
+                        </div>
                       </div>
-                    )}
+                    </CardHeader>
+                    <CardContent className="pt-4">
+                      <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                        {info.description}
+                      </p>
 
-                    {/* Start Date */}
-                    {enrollment.startDate && (
-                      <div className="mt-4 flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
-                        <Calendar className="h-4 w-4" />
-                        <span>Started: {enrollment.startDate}</span>
+                      {/* Mentor Info */}
+                      {enrollment.mentorEmail && (
+                        <div className="mt-4 rounded-lg bg-neutral-50 p-3 dark:bg-neutral-900">
+                          <div className="flex items-center gap-2">
+                            <User className="h-4 w-4 text-neutral-600 dark:text-neutral-400" />
+                            <span className="text-sm font-medium text-neutral-900 dark:text-white">
+                              Mentor
+                            </span>
+                          </div>
+                          <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
+                            {enrollment.mentorEmail}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Start Date */}
+                      {enrollment.startDate && (
+                        <div className="mt-4 flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
+                          <Calendar className="h-4 w-4" />
+                          <span>Started: {enrollment.startDate}</span>
+                        </div>
+                      )}
+
+                      <div className="mt-4 flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400">
+                        <span>
+                          Enrolled{" "}
+                          {new Date(enrollment.enrolledAt).toLocaleDateString()}
+                        </span>
                       </div>
-                    )}
 
-                    <div className="mt-4 flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400">
-                      <span>
-                        Enrolled {new Date(enrollment.enrolledAt).toLocaleDateString()}
-                      </span>
-                    </div>
-
-                    <Link href={info.link}>
-                      <Button variant="outline" size="sm" className="mt-4 w-full">
-                        <Users className="mr-2 h-4 w-4" />
-                        View Program Details
-                      </Button>
-                    </Link>
-                  </CardContent>
-                </Card>
-              );
-            })}
+                      <Link href={info.link}>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="mt-4 w-full"
+                        >
+                          <Users className="mr-2 h-4 w-4" />
+                          View Program Details
+                        </Button>
+                      </Link>
+                    </CardContent>
+                  </Card>
+                );
+              },
+            )}
           </div>
         </div>
       )}
@@ -148,37 +166,39 @@ export function DashboardMentorships({ userEmail }: DashboardMentorshipsProps) {
             On Hold ({onHoldMentorships.length})
           </h2>
           <div className="grid gap-4 md:grid-cols-2">
-            {onHoldMentorships.map((enrollment: any) => {
-              const info = programInfo[enrollment.programType] || {
-                name: enrollment.programType,
-                description: "Mentorship program",
-                icon: Users,
-                link: "/mentorship",
-              };
+            {onHoldMentorships.map(
+              (enrollment: Doc<"mentorshipEnrollments">) => {
+                const info = programInfo[enrollment.programType] || {
+                  name: enrollment.programType,
+                  description: "Mentorship program",
+                  icon: Users,
+                  link: "/mentorship",
+                };
 
-              return (
-                <Card key={enrollment._id} className="opacity-75">
-                  <CardContent className="pt-6">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h3 className="font-semibold text-neutral-900 dark:text-white">
-                          {info.name}
-                        </h3>
-                        <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
-                          Paused temporarily
-                        </p>
+                return (
+                  <Card key={enrollment._id} className="opacity-75">
+                    <CardContent className="pt-6">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <h3 className="font-semibold text-neutral-900 dark:text-white">
+                            {info.name}
+                          </h3>
+                          <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
+                            Paused temporarily
+                          </p>
+                        </div>
+                        <Badge variant="outline">On Hold</Badge>
                       </div>
-                      <Badge variant="outline">On Hold</Badge>
-                    </div>
-                    {enrollment.notes && (
-                      <p className="mt-3 text-sm text-neutral-600 dark:text-neutral-400">
-                        {enrollment.notes}
-                      </p>
-                    )}
-                  </CardContent>
-                </Card>
-              );
-            })}
+                      {enrollment.notes && (
+                        <p className="mt-3 text-sm text-neutral-600 dark:text-neutral-400">
+                          {enrollment.notes}
+                        </p>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              },
+            )}
           </div>
         </div>
       )}
@@ -190,35 +210,37 @@ export function DashboardMentorships({ userEmail }: DashboardMentorshipsProps) {
             Completed Mentorships ({completedMentorships.length})
           </h2>
           <div className="grid gap-4 md:grid-cols-2">
-            {completedMentorships.map((enrollment: any) => {
-              const info = programInfo[enrollment.programType] || {
-                name: enrollment.programType,
-                description: "Mentorship program",
-                icon: Users,
-                link: "/mentorship",
-              };
+            {completedMentorships.map(
+              (enrollment: Doc<"mentorshipEnrollments">) => {
+                const info = programInfo[enrollment.programType] || {
+                  name: enrollment.programType,
+                  description: "Mentorship program",
+                  icon: Users,
+                  link: "/mentorship",
+                };
 
-              return (
-                <Card key={enrollment._id} className="opacity-75">
-                  <CardContent className="pt-6">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-semibold text-neutral-900 dark:text-white">
-                            {info.name}
-                          </h3>
-                          <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
+                return (
+                  <Card key={enrollment._id} className="opacity-75">
+                    <CardContent className="pt-6">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-semibold text-neutral-900 dark:text-white">
+                              {info.name}
+                            </h3>
+                            <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
+                          </div>
+                          <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
+                            Completed successfully
+                          </p>
                         </div>
-                        <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
-                          Completed successfully
-                        </p>
+                        <Badge variant="outline">Completed</Badge>
                       </div>
-                      <Badge variant="outline">Completed</Badge>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
+                    </CardContent>
+                  </Card>
+                );
+              },
+            )}
           </div>
         </div>
       )}
@@ -230,7 +252,8 @@ export function DashboardMentorships({ userEmail }: DashboardMentorshipsProps) {
         </CardHeader>
         <CardContent>
           <p className="mb-4 text-sm text-neutral-600 dark:text-neutral-400">
-            Connect with experienced mentors to deepen your spiritual journey and prophetic calling.
+            Connect with experienced mentors to deepen your spiritual journey
+            and prophetic calling.
           </p>
           <div className="grid gap-3 md:grid-cols-2">
             <Link href="/mentorship/one-on-one">

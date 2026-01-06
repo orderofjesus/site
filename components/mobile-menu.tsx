@@ -136,9 +136,9 @@ export function MobileMenu() {
           )}
           aria-label="Toggle menu"
         >
-          <span className="h-[2px] w-5 rounded-full bg-current transition-all duration-300 ease-out group-hover:w-6" />
-          <span className="h-[2px] w-5 rounded-full bg-current transition-all duration-300 ease-out group-hover:w-4" />
-          <span className="h-[2px] w-5 rounded-full bg-current transition-all duration-300 ease-out group-hover:w-6" />
+          <span className="h-[2px] w-5 rounded-full bg-current transition-all duration-300 ease-out" />
+          <span className="h-[2px] w-5 rounded-full bg-current transition-all duration-300 ease-out" />
+          <span className="h-[2px] w-5 rounded-full bg-current transition-all duration-300 ease-out" />
         </button>
       </SheetTrigger>
       <SheetContent

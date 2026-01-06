@@ -1,12 +1,18 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Calendar, GraduationCap, Users, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { Doc } from "@/convex/_generated/dataModel";
 
 interface DashboardOverviewProps {
-  dashboardData: any;
+  dashboardData: {
+    upcomingEvents: Doc<"events">[];
+    activeSchools: number;
+    activeMentorships: number;
+  };
   onViewChange: (view: "events" | "schools" | "mentorship") => void;
 }
 
@@ -61,7 +67,7 @@ export function DashboardOverview({
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stat.value}</div>
-              <p className="mt-1 text-xs text-muted-foreground">
+              <p className="text-muted-foreground mt-1 text-xs">
                 Click to view details
               </p>
             </CardContent>
@@ -70,50 +76,53 @@ export function DashboardOverview({
       </div>
 
       {/* Upcoming Events */}
-      {dashboardData?.upcomingEvents && dashboardData.upcomingEvents.length > 0 && (
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Upcoming Events</CardTitle>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onViewChange("events")}
-              >
-                View All
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {dashboardData.upcomingEvents.slice(0, 3).map((event: any) => (
-                <Link
-                  key={event._id}
-                  href={`/events/${event._id}`}
-                  className="block rounded-lg border border-neutral-200 p-4 transition-colors hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-900"
+      {dashboardData?.upcomingEvents &&
+        dashboardData.upcomingEvents.length > 0 && (
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>Upcoming Events</CardTitle>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onViewChange("events")}
                 >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="font-semibold text-neutral-900 dark:text-white">
-                        {event.title}
-                      </h3>
-                      <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                        {event.date} • {event.time}
-                      </p>
-                      <p className="text-sm text-neutral-500 dark:text-neutral-500">
-                        {event.location}
-                      </p>
-                    </div>
-                    <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700 dark:bg-green-900/20 dark:text-green-400">
-                      Registered
-                    </span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+                  View All
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {dashboardData.upcomingEvents
+                  .slice(0, 3)
+                  .map((event: Doc<"events">) => (
+                    <Link
+                      key={event._id}
+                      href={`/events/${event._id}`}
+                      className="block rounded-lg border border-neutral-200 p-4 transition-colors hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-900"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <h3 className="font-semibold text-neutral-900 dark:text-white">
+                            {event.title}
+                          </h3>
+                          <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                            {event.date} • {event.time}
+                          </p>
+                          <p className="text-sm text-neutral-500 dark:text-neutral-500">
+                            {event.location}
+                          </p>
+                        </div>
+                        <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700 dark:bg-green-900/20 dark:text-green-400">
+                          Registered
+                        </span>
+                      </div>
+                    </Link>
+                  ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
       {/* Quick Actions */}
       <Card>

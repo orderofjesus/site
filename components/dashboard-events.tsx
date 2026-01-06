@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import React from "react";
 import { Calendar, MapPin, Clock, Users, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,6 +10,7 @@ import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
 import Link from "next/link";
 import Image from "next/image";
+import { Id } from "@/convex/_generated/dataModel";
 
 interface DashboardEventsProps {
   registrations: any;
@@ -17,8 +20,9 @@ export function DashboardEvents({ registrations }: DashboardEventsProps) {
   const cancelRegistration = useMutation(api.eventRegistrations.cancel);
 
   const handleCancel = async (registrationId: string, userEmail: string) => {
+    const regId = registrationId as Id<"eventRegistrations">;
     try {
-      await cancelRegistration({ registrationId, userEmail });
+      await cancelRegistration({ registrationId: regId, userEmail });
       toast.success("Registration cancelled successfully");
     } catch (error: any) {
       toast.error(error.message || "Failed to cancel registration");
@@ -26,10 +30,10 @@ export function DashboardEvents({ registrations }: DashboardEventsProps) {
   };
 
   const activeRegistrations = registrations?.filter(
-    (reg: any) => reg.status === "registered"
+    (reg: any) => reg.status === "registered",
   );
   const pastRegistrations = registrations?.filter(
-    (reg: any) => reg.status !== "registered"
+    (reg: any) => reg.status !== "registered",
   );
 
   if (!registrations || registrations.length === 0) {
@@ -40,8 +44,8 @@ export function DashboardEvents({ registrations }: DashboardEventsProps) {
           No events yet
         </h3>
         <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
-          You haven&apos;t registered for any events. Browse available events to get
-          started.
+          You haven&apos;t registered for any events. Browse available events to
+          get started.
         </p>
         <Link href="/events">
           <Button className="mt-4">Browse Events</Button>
@@ -100,12 +104,15 @@ export function DashboardEvents({ registrations }: DashboardEventsProps) {
                               <MapPin className="h-4 w-4" />
                               <span>{registration.event?.location}</span>
                             </div>
-                            {registration.numberOfPeople && registration.numberOfPeople > 1 && (
-                              <div className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
-                                <Users className="h-4 w-4" />
-                                <span>{registration.numberOfPeople} people</span>
-                              </div>
-                            )}
+                            {registration.numberOfPeople &&
+                              registration.numberOfPeople > 1 && (
+                                <div className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
+                                  <Users className="h-4 w-4" />
+                                  <span>
+                                    {registration.numberOfPeople} people
+                                  </span>
+                                </div>
+                              )}
                           </div>
 
                           <div className="mt-4 flex items-center gap-2">
@@ -124,7 +131,10 @@ export function DashboardEvents({ registrations }: DashboardEventsProps) {
                           variant="ghost"
                           size="sm"
                           onClick={() =>
-                            handleCancel(registration._id, registration.userEmail)
+                            handleCancel(
+                              registration._id,
+                              registration.userEmail,
+                            )
                           }
                           className="text-red-600 hover:text-red-700 dark:text-red-400"
                         >
@@ -156,7 +166,8 @@ export function DashboardEvents({ registrations }: DashboardEventsProps) {
                         {registration.event?.title}
                       </h3>
                       <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                        {registration.event?.date} • {registration.event?.location}
+                        {registration.event?.date} •{" "}
+                        {registration.event?.location}
                       </p>
                     </div>
                     <span className="rounded-full bg-neutral-100 px-3 py-1 text-xs font-semibold text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300">

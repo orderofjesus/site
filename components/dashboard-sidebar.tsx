@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
-import Image from "next/image"
+import * as React from "react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import Image from "next/image";
 import {
   ChevronDown,
   Home,
@@ -17,8 +17,8 @@ import {
   User,
   LogOut,
   LayoutDashboard,
-} from "lucide-react"
-import { useAuth } from "@workos-inc/authkit-nextjs/components"
+} from "lucide-react";
+import { useAuth } from "@workos-inc/authkit-nextjs/components";
 
 import {
   Sidebar,
@@ -31,12 +31,12 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible"
+} from "@/components/ui/collapsible";
 
 const data = {
   navMain: [
@@ -74,12 +74,14 @@ const data = {
       ],
     },
   ],
-}
+};
 
-export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const pathname = usePathname()
-  const router = useRouter()
-  const { user, signOut } = useAuth()
+export function DashboardSidebar({
+  ...props
+}: React.ComponentProps<typeof Sidebar>) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const { user, signOut } = useAuth();
 
   return (
     <Sidebar {...props}>
@@ -92,26 +94,30 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                   <span className="text-sm font-bold">M</span>
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold text-black dark:text-white">Melchizedek</span>
-                  <span className="truncate text-xs text-neutral-600 dark:text-neutral-400">Ministry</span>
+                  <span className="truncate font-semibold text-black dark:text-white">
+                    Melchizedek
+                  </span>
+                  <span className="truncate text-xs text-neutral-600 dark:text-neutral-400">
+                    Ministry
+                  </span>
                 </div>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      
+
       <SidebarContent>
         <SidebarMenu className="gap-1 px-2">
           {data.navMain.map((item) => {
-            const isActive = pathname === item.url
+            const isActive = pathname === item.url;
             return (
               <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton 
-                  asChild 
+                <SidebarMenuButton
+                  asChild
                   isActive={isActive}
                   tooltip={item.title}
-                  className="font-semibold data-[active=true]:bg-black data-[active=true]:text-white data-[active=true]:shadow-sm dark:data-[active=true]:bg-white dark:data-[active=true]:text-black hover:bg-neutral-100 hover:text-black dark:hover:bg-neutral-800 dark:hover:text-white"
+                  className="font-semibold hover:bg-neutral-100 hover:text-black data-[active=true]:bg-black data-[active=true]:text-white data-[active=true]:shadow-sm dark:hover:bg-neutral-800 dark:hover:text-white dark:data-[active=true]:bg-white dark:data-[active=true]:text-black"
                 >
                   <Link href={item.url}>
                     <item.icon className="h-4 w-4" />
@@ -119,11 +125,11 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-            )
+            );
           })}
         </SidebarMenu>
 
-        <SidebarMenu className="gap-2 px-2 mt-4">
+        <SidebarMenu className="mt-4 gap-2 px-2">
           {data.expandable.map((section) => (
             <Collapsible
               key={section.title}
@@ -133,20 +139,20 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
             >
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton 
+                  <SidebarMenuButton
                     tooltip={section.title}
                     className="font-semibold text-neutral-900 hover:bg-neutral-50 dark:text-neutral-100 dark:hover:bg-neutral-900"
                   >
                     <section.icon className="h-4 w-4 text-neutral-600 dark:text-neutral-400" />
                     <span>{section.title}</span>
-                    <ChevronDown className="ml-auto h-4 w-4 text-neutral-500 dark:text-neutral-400 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180" />
+                    <ChevronDown className="ml-auto h-4 w-4 text-neutral-500 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180 dark:text-neutral-400" />
                   </SidebarMenuButton>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <SidebarMenuSub className="border-l-2 border-neutral-200 dark:border-neutral-800 ml-4 pl-4">
+                  <SidebarMenuSub className="ml-4 border-l-2 border-neutral-200 pl-4 dark:border-neutral-800">
                     {section.items.map((item) => (
                       <SidebarMenuSubItem key={item.name}>
-                        <SidebarMenuSubButton 
+                        <SidebarMenuSubButton
                           asChild
                           className="font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-900 dark:hover:text-neutral-200"
                         >
@@ -198,19 +204,21 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                           </span>
                         </div>
                       )}
-                      <div className="grid flex-1 text-left text-sm leading-tight min-w-0">
+                      <div className="grid min-w-0 flex-1 text-left text-sm leading-tight">
                         <span className="truncate font-semibold text-neutral-900 dark:text-neutral-100">
                           {user.firstName || "User"}
                         </span>
-                        <span className="truncate text-xs text-neutral-500 dark:text-neutral-400">{user.email}</span>
+                        <span className="truncate text-xs text-neutral-500 dark:text-neutral-400">
+                          {user.email}
+                        </span>
                       </div>
-                      <ChevronDown className="ml-auto h-4 w-4 shrink-0 text-neutral-400 dark:text-neutral-500 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180" />
+                      <ChevronDown className="ml-auto h-4 w-4 shrink-0 text-neutral-400 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180 dark:text-neutral-500" />
                     </SidebarMenuButton>
                   </CollapsibleTrigger>
                   <CollapsibleContent>
                     <SidebarMenuSub className="px-2 py-1">
                       <SidebarMenuSubItem>
-                        <SidebarMenuSubButton 
+                        <SidebarMenuSubButton
                           asChild
                           className="font-medium text-neutral-700 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-900"
                         >
@@ -223,8 +231,8 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                       <SidebarMenuSubItem>
                         <SidebarMenuSubButton
                           onClick={async () => {
-                            await signOut({ returnTo: "/" })
-                            router.refresh()
+                            await signOut({ returnTo: "/" });
+                            router.refresh();
                           }}
                           className="font-medium text-red-600 hover:bg-red-50 hover:text-red-600 dark:text-red-400 dark:hover:bg-red-900/20 dark:hover:text-red-400"
                         >
@@ -241,5 +249,5 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
         )}
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }

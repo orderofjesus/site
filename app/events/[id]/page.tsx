@@ -198,6 +198,7 @@ export default function EventDetailPage({
       toast.success("Registration cancelled", {
         description: "Your registration has been cancelled successfully.",
       });
+      router.push("/events");
     } catch (error) {
       console.error("Cancellation failed:", error);
       toast.error("Cancellation failed", {
@@ -676,7 +677,7 @@ export default function EventDetailPage({
 
                         {/* Payment Methods */}
                         {hasPaymentPending && (
-                          <div className="space-y-3">
+                          <div id="payment-section" className="space-y-3">
                             <h4 className="text-sm font-semibold text-black/70 dark:text-white/70">
                               Choose Payment Method
                             </h4>
@@ -792,7 +793,7 @@ export default function EventDetailPage({
                                               const total =
                                                 basePrice *
                                                 formData.numberOfPeople;
-                                              return `UGX ${total.toLocaleString()}`;
+                                              return `$ ${total.toLocaleString()}`;
                                             })()}
                                           </strong>
                                         </li>
@@ -987,7 +988,7 @@ export default function EventDetailPage({
                                             const total =
                                               basePrice *
                                               formData.numberOfPeople;
-                                            return `UGX ${total.toLocaleString()}`;
+                                            return `$ ${total.toLocaleString()}`;
                                           })()}
                                         </span>
                                         <Button
