@@ -82,7 +82,7 @@ export function AuthButton({ className }: AuthButtonProps = {}) {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                   {user?.firstName || "User"} {user?.lastName || ""}
                 </p>
                 {/* <p className="text-xs text-zinc-500 dark:text-zinc-400">
@@ -99,7 +99,7 @@ export function AuthButton({ className }: AuthButtonProps = {}) {
               Profile
             </DropdownMenuItem> */}
             <DropdownMenuItem
-              className="font-medium"
+              className="cursor-pointer font-semibold"
               onClick={() => router.push("/dashboard")}
             >
               <User className="mr-2 h-4 w-4 text-zinc-900 dark:text-zinc-100" />
@@ -114,10 +114,12 @@ export function AuthButton({ className }: AuthButtonProps = {}) {
                   router.refresh();
                 });
               }}
-              className="font-medium text-red-600 dark:text-red-400"
+              className="cursor-pointer font-semibold text-red-600 dark:text-red-400"
             >
               <LogOut className="mr-2 h-4 w-4 text-red-600 dark:text-red-400" />
-              Log out
+              <span className="cursor-pointer font-semibold text-red-600 dark:text-red-400">
+                Log out
+              </span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

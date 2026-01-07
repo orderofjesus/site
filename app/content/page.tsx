@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { larken } from "@/lib/fonts";
+import Image from "next/image";
 
 export default function ContentPage() {
   const { user, loading: isLoading } = useAuth();
@@ -46,20 +47,15 @@ export default function ContentPage() {
     [selectedSchool, searchQuery],
   );
 
-  // Get paginated content library with access status
+  // Get paginated content library (public - no authentication required)
   const {
     results: contentLibrary,
     status,
     loadMore,
     isLoading: isLoadingContent,
   } = usePaginatedQuery(
-    api.subscriptions.getUserContentLibrary,
-    user?.email
-      ? {
-          userEmail: user.email,
-          filters,
-        }
-      : "skip",
+    api.subscriptions.getPublicContentLibrary,
+    { filters },
     { initialNumItems: 10 },
   );
 
@@ -110,7 +106,7 @@ export default function ContentPage() {
     }
   };
 
-  if (isLoading) {
+  if (isLoadingContent) {
     return (
       <PageWrapper className="bg-neutral-50 dark:bg-[#0a0a0a]">
         <section className="relative overflow-hidden px-6 pt-32 pb-20 lg:px-8">
@@ -125,7 +121,7 @@ export default function ContentPage() {
                 Content Library
               </h1>
               <p className="mx-auto max-w-2xl text-lg text-black/70 dark:text-white/70">
-                Loading your personalized content library...
+                Loading content library...
               </p>
             </div>
             <ContentSkeleton count={6} />
@@ -135,26 +131,26 @@ export default function ContentPage() {
     );
   }
 
-  if (!user) {
-    return (
-      <PageWrapper>
-        <div className="flex min-h-screen items-center justify-center p-6">
-          <div className="w-full max-w-md space-y-4 text-center">
-            <h2 className="text-2xl font-bold">Sign In Required</h2>
-            <p className="text-black/70 dark:text-white/70">
-              Please sign in to access our content library
-            </p>
-            <Button
-              onClick={() => router.push("/auth/login")}
-              className="bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
-            >
-              Sign In
-            </Button>
-          </div>
-        </div>
-      </PageWrapper>
-    );
-  }
+  // if (!user) {
+  //   return (
+  //     <PageWrapper>
+  //       <div className="flex min-h-screen items-center justify-center p-6">
+  //         <div className="w-full max-w-md space-y-4 text-center">
+  //           <h2 className="text-2xl font-bold">Sign In Required</h2>
+  //           <p className="text-black/70 dark:text-white/70">
+  //             Please sign in to access our content library
+  //           </p>
+  //           <Button
+  //             onClick={() => router.push("/auth/login")}
+  //             className="bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+  //           >
+  //             Sign In
+  //           </Button>
+  //         </div>
+  //       </div>
+  //     </PageWrapper>
+  //   );
+  // }
 
   if (showSubscriptionPlans) {
     return (
@@ -337,25 +333,22 @@ export default function ContentPage() {
                       src={content.thumbnailUrl}
                       alt={content.title}
                       className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      // width={500}
+                      // height={500}
                     />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-black/5 to-black/10 dark:from-white/5 dark:to-white/10">
+                    <div className="flex h-full w-full items-center justify-center bg-linear-to-br from-black/5 to-black/10 dark:from-white/5 dark:to-white/10">
                       {getSchoolIcon(content.school)}
                     </div>
                   )}
                   <div className="absolute inset-0 bg-black/20 transition-colors duration-500 group-hover:bg-black/40"></div>
 
-                  {/* Access and School indicators */}
+                  {/* School indicator and Premium badge */}
                   <div className="absolute top-4 right-4 left-4 flex items-center justify-between gap-2">
                     <div className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-black">
                       {getSchoolName(content.school)}
                     </div>
-                    {content.hasAccess ? (
-                      <div className="flex items-center gap-1 rounded-full bg-green-500 px-3 py-1 text-xs font-semibold text-white">
-                        <CheckCircle className="h-3 w-3" />
-                        Access
-                      </div>
-                    ) : (
+                    {content.isSubscriberOnly && (
                       <div className="flex items-center gap-1 rounded-full bg-black/70 px-3 py-1 text-xs font-semibold text-white">
                         <Lock className="h-3 w-3" />
                         Premium
@@ -388,25 +381,11 @@ export default function ContentPage() {
                     {content.description}
                   </p>
 
-                  {/* Progress bar for accessed content */}
-                  {content.hasAccess && content.progress > 0 && (
-                    <div className="mb-4">
-                      <div className="mb-1 flex justify-between text-xs text-black/60 dark:text-white/60">
-                        <span>Progress</span>
-                        <span>{content.progress}%</span>
-                      </div>
-                      <div className="h-2 w-full rounded-full bg-black/10 dark:bg-white/10">
-                        <div
-                          className="h-2 rounded-full bg-black transition-all dark:bg-white"
-                          style={{ width: `${content.progress}%` }}
-                        />
-                      </div>
-                    </div>
-                  )}
+                  {/* Progress bar - will be shown on individual content pages with auth */}
 
                   {/* Price and Action - always at bottom */}
                   <div className="mt-auto space-y-4">
-                    {!content.hasAccess && (
+                    {content.isSubscriberOnly && (
                       <div className="flex items-center justify-between rounded-lg border border-black/10 bg-black/5 p-4 dark:border-white/10 dark:bg-white/5">
                         <div className="flex items-center gap-2 text-xl font-bold">
                           <DollarSign className="h-5 w-5" />
@@ -421,26 +400,18 @@ export default function ContentPage() {
                     <Button
                       className="group/btn w-full bg-black font-semibold text-white transition-all duration-300 hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
                       onClick={() => {
-                        if (content.hasAccess) {
-                          router.push(`/content/${content._id}`);
-                        } else {
-                          router.push(`/content/${content._id}`);
-                        }
+                        router.push(`/content/${content._id}`);
                       }}
                     >
-                      {content.hasAccess ? (
+                      {content.isSubscriberOnly ? (
                         <>
-                          <Play className="mr-2 h-4 w-4" fill="currentColor" />
-                          {content.completed
-                            ? "Watch Again"
-                            : content.progress > 0
-                              ? "Continue"
-                              : "Watch Now"}
+                          <ShoppingCart className="mr-2 h-4 w-4" />
+                          View Details
                         </>
                       ) : (
                         <>
-                          <ShoppingCart className="mr-2 h-4 w-4" />
-                          Buy Now
+                          <Play className="mr-2 h-4 w-4" fill="currentColor" />
+                          Watch Free
                         </>
                       )}
                       <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
@@ -461,10 +432,10 @@ export default function ContentPage() {
             >
               <Button
                 onClick={() => loadMore(10)}
-                disabled={status === "LoadingMore"}
+                disabled={(status as string) === "LoadingMore"}
                 className="bg-black px-8 py-3 text-lg font-semibold text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
               >
-                {status === "LoadingMore" ? (
+                {(status as string) === "LoadingMore" ? (
                   <>
                     <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
                     Loading more...
@@ -485,7 +456,7 @@ export default function ContentPage() {
           )}
 
           {/* Empty state */}
-          {status !== "Exhausted" && filteredContent.length === 0 && (
+          {status === "Exhausted" && filteredContent.length === 0 && (
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}

@@ -355,6 +355,67 @@ export const getUserContentLibrary = query({
 });
 
 /**
+ * Get public content library (no authentication required)
+ */
+export const getPublicContentLibrary = query({
+  args: {
+    paginationOpts: paginationOptsValidator,
+    filters: v.optional(
+      v.object({
+        school: v.optional(v.string()),
+        searchQuery: v.optional(v.string()),
+      }),
+    ),
+  },
+  handler: async (ctx, { paginationOpts, filters }) => {
+    // Set default pagination - provided by usePaginatedQuery via paginationOpts
+    const { numItems, cursor } = paginationOpts;
+
+    // Build base query
+    let query = ctx.db
+      .query("contentLibrary")
+      .filter((q) => q.eq(q.field("isPublished"), true));
+
+    // Apply school filter
+    if (filters?.school && filters.school !== "all") {
+      query = query.filter((q) => q.eq(q.field("school"), filters.school));
+    }
+
+    // Get paginated results
+    const result = await query.paginate({
+      numItems,
+      cursor,
+    });
+
+    // Process content items (no user access info since this is public)
+    let processedContent = result.page.map((content) => ({
+      ...content,
+      hasAccess: false, // Will be determined on individual pages with authentication
+      accessType: null,
+      progress: 0,
+      lastAccessed: null,
+      completed: false,
+    }));
+
+    // Apply search filter (client-side for now, can be optimized with search index later)
+    if (filters?.searchQuery) {
+      const searchLower = filters.searchQuery.toLowerCase();
+      processedContent = processedContent.filter(
+        (content) =>
+          content.title.toLowerCase().includes(searchLower) ||
+          content.description.toLowerCase().includes(searchLower),
+      );
+    }
+
+    return {
+      page: processedContent,
+      isDone: result.isDone,
+      continueCursor: result.continueCursor,
+    };
+  },
+});
+
+/**
  * Get total count of content items for pagination info
  */
 export const getContentCount = query({

@@ -2,6 +2,7 @@
 
 import { use, useState, useEffect } from "react";
 import { PageWrapper } from "@/components/page-wrapper";
+import { ContentDetailSkeleton } from "@/components/content-detail-skeleton";
 import { motion } from "framer-motion";
 import {
   ArrowLeft,
@@ -130,18 +131,7 @@ export default function ContentDetailPage({
   }
 
   if (contentItem === undefined) {
-    return (
-      <PageWrapper className="bg-neutral-50 dark:bg-[#0a0a0a]">
-        <div className="flex min-h-screen items-center justify-center">
-          <div className="space-y-2 text-center">
-            <div className="border-primary mx-auto h-8 w-8 animate-spin rounded-full border-b-2"></div>
-            <p className="text-black/60 dark:text-white/60">
-              Loading content...
-            </p>
-          </div>
-        </div>
-      </PageWrapper>
-    );
+    return <ContentDetailSkeleton />;
   }
 
   const handlePurchase = async () => {

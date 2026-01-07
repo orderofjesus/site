@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery, useMutation } from "convex/react";
+import { useQuery, useMutation, usePaginatedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import {
   Card,
@@ -44,9 +44,11 @@ export function SubscriptionManagement({
   const allSubscriptions = useQuery(api.subscriptions.getUserSubscriptions, {
     userEmail,
   });
-  const contentLibrary = useQuery(api.subscriptions.getUserContentLibrary, {
-    userEmail,
-  });
+  const { results: contentLibrary } = usePaginatedQuery(
+    api.subscriptions.getUserContentLibrary,
+    { userEmail },
+    { initialNumItems: 10 },
+  );
 
   const getPlanIcon = (planType: string) => {
     switch (planType) {
