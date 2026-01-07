@@ -88,7 +88,7 @@ This project uses [Convex Auth](https://github.com/get-convex/convex-auth) with 
 
 ### Auth Flow
 
-1. User clicks "Sign In" → Redirected to `/sign-in`
+1. User clicks "Sign In" → Redirected to `/auth/login`
 2. User clicks "Continue with Google" → Google OAuth flow
 3. After authentication → Redirected to `/auth/callback`
 4. Callback page → Redirects to `/dashboard` or original destination

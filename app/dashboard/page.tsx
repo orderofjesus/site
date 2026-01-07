@@ -4,6 +4,7 @@ import { useAuth } from "@workos-inc/authkit-nextjs/components";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { AuthGuard } from "@/components/auth-guard";
+import { SubscriptionManagement } from "@/components/subscriptions/subscription-management";
 import { motion } from "framer-motion";
 import * as React from "react";
 import { useMutation } from "convex/react";
@@ -1018,6 +1019,23 @@ function DashboardContent() {
 
               {currentView?.startsWith("mentorship:") && (
                 <MentorshipDetail id={viewId as string} />
+              )}
+
+              {currentView === "subscription" && user?.email && (
+                <div className="space-y-6">
+                  <div className="flex items-center gap-3">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => window.history.back()}
+                      className="p-0 h-auto"
+                    >
+                      <ArrowLeft className="h-4 w-4 mr-1" />
+                      Back
+                    </Button>
+                  </div>
+                  <SubscriptionManagement userEmail={user.email} />
+                </div>
               )}
             </div>
           </div>

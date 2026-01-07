@@ -11,11 +11,11 @@ import { HandCoins, Handshake } from "lucide-react";
 import { AuthButton } from "@/components/auth-button";
 
 const links = [
-  // {
-  //   id: "1",
-  //   title: "Dashboard",
-  //   href: "/dashboard",
-  // },
+  {
+    id: "1",
+    title: "Content",
+    href: "/content",
+  },
   {
     id: "2",
     title: "Mentorship",
@@ -49,6 +49,7 @@ const darkBackgroundRoutes = [
   /^\/events\/[^/]+$/, // Matches /events/[id] with any ID format (including Convex IDs)
   /^\/schools\/[^/]+$/,
   /^\/mentorship\/[^/]+$/,
+  /^\/content\/[^/]+$/,
 ];
 
 export function Header() {

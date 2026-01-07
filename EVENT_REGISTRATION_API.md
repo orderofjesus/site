@@ -258,7 +258,7 @@ export default function EventPage({ params }: { params: { id: string } }) {
 
   const handleRegister = async () => {
     if (!isAuthenticated) {
-      window.location.href = "/sign-in";
+      window.location.href = "auth/login";
       return;
     }
     

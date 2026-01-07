@@ -106,6 +106,132 @@ const schema = defineSchema({
     .index("by_user", ["userEmail"])
     .index("by_program", ["programType"])
     .index("by_mentor", ["mentorEmail"]),
+
+  // Subscription Management Tables
+  subscriptions: defineTable({
+    userId: v.string(),
+    userEmail: v.string(), // For easy lookup
+    planType: v.union(
+      v.literal("all-access"),
+      v.literal("mystical-masterclass"), 
+      v.literal("open-scroll")
+    ),
+    status: v.union(
+      v.literal("active"),
+      v.literal("cancelled"),
+      v.literal("expired"),
+      v.literal("trial"),
+      v.literal("past_due")
+    ),
+    startDate: v.string(), // ISO date string
+    endDate: v.optional(v.string()), // ISO date string, null for ongoing
+    billingCycle: v.union(v.literal("monthly"), v.literal("yearly")),
+    price: v.number(), // Price in cents
+    stripeSubscriptionId: v.string(), // Stripe subscription ID
+    stripeCustomerId: v.string(), // Stripe customer ID
+    trialEndsAt: v.optional(v.string()), // For free trials
+    cancelAtPeriodEnd: v.optional(v.boolean()),
+    createdAt: v.string(),
+    updatedAt: v.string(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_email", ["userEmail"])
+    .index("by_stripe_subscription", ["stripeSubscriptionId"])
+    .index("by_status", ["status"])
+    .index("by_plan_type", ["planType"]),
+
+  individualPurchases: defineTable({
+    userId: v.string(),
+    userEmail: v.string(),
+    contentId: v.string(), // ID of video/course purchased
+    contentType: v.union(
+      v.literal("video"),
+      v.literal("course"),
+      v.literal("bundle")
+    ),
+    contentTitle: v.string(),
+    purchaseDate: v.string(),
+    price: v.number(), // Price in cents
+    stripePaymentIntentId: v.string(),
+    accessExpirationDate: v.optional(v.string()), // null for permanent
+    isRefunded: v.optional(v.boolean()),
+    createdAt: v.string(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_content", ["contentId"])
+    .index("by_email", ["userEmail"])
+    .index("by_purchase_date", ["purchaseDate"]),
+
+  contentLibrary: defineTable({
+    title: v.string(),
+    description: v.string(),
+    contentType: v.union(
+      v.literal("video"),
+      v.literal("course"),
+      v.literal("bundle")
+    ),
+    school: v.union(
+      v.literal("mystical-masterclass"),
+      v.literal("open-scroll"),
+      v.literal("general")
+    ),
+    videoUrl: v.optional(v.string()),
+    thumbnailUrl: v.optional(v.string()),
+    duration: v.optional(v.number()), // Duration in seconds
+    previewDuration: v.optional(v.number()), // Free preview duration
+    price: v.number(), // Individual purchase price in cents
+    isSubscriberOnly: v.boolean(), // Requires subscription
+    orderIndex: v.optional(v.number()), // For course ordering
+    parentCourseId: v.optional(v.id("contentLibrary")), // For videos in courses
+    resources: v.optional(v.array(v.object({
+      name: v.string(),
+      url: v.string(),
+      type: v.string() // "pdf", "audio", "worksheet", etc.
+    }))),
+    tags: v.optional(v.array(v.string())),
+    isPublished: v.boolean(),
+    publishedAt: v.optional(v.string()),
+    createdAt: v.string(),
+    updatedAt: v.string(),
+  })
+    .index("by_school", ["school"])
+    .index("by_type", ["contentType"])
+    .index("by_published", ["isPublished"])
+    .index("by_parent_course", ["parentCourseId"]),
+
+  userContentAccess: defineTable({
+    userId: v.string(),
+    userEmail: v.string(),
+    contentId: v.id("contentLibrary"),
+    accessType: v.union(
+      v.literal("subscription"),
+      v.literal("purchase"),
+      v.literal("trial")
+    ),
+    grantedAt: v.string(),
+    expiresAt: v.optional(v.string()), // null for permanent access
+    lastAccessedAt: v.optional(v.string()),
+    progressPercentage: v.optional(v.number()), // 0-100
+    completedAt: v.optional(v.string()),
+  })
+    .index("by_user", ["userId"])
+    .index("by_content", ["contentId"])
+    .index("by_access_type", ["accessType"])
+    .index("by_user_and_content", ["userId", "contentId"]),
+
+  subscriptionUsage: defineTable({
+    subscriptionId: v.id("subscriptions"),
+    userId: v.string(),
+    month: v.string(), // "2024-01" format
+    contentViewsCount: v.number(),
+    totalWatchTime: v.number(), // Total minutes watched
+    uniqueContentAccessed: v.number(),
+    downloadCount: v.number(),
+    createdAt: v.string(),
+  })
+    .index("by_subscription", ["subscriptionId"])
+    .index("by_month", ["month"])
+    .index("by_user", ["userId"]),
 });
 
 export default schema;
