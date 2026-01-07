@@ -46,10 +46,10 @@ const links = [
 // Routes that have dark backgrounds initially (hero images, dark sections, etc.)
 const darkBackgroundRoutes = [
   "/",
-  /^\/events\/[^/]+$/, // Matches /events/[id] with any ID format (including Convex IDs)
-  /^\/schools\/[^/]+$/,
-  /^\/mentorship\/[^/]+$/,
-  /^\/content\/[^/]+$/,
+  // Specific dynamic routes that actually have dark hero sections
+  /^\/events\/[^/]+$/, // Only /events/[id] pages have dark backgrounds
+  /^\/schools\/[^/]+$/, // Only /schools/[id] pages have dark backgrounds
+  // Note: /mentorship/* and /content/* routes have light backgrounds, so they're not included
 ];
 
 export function Header() {

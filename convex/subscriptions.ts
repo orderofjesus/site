@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query, MutationCtx } from "./_generated/server";
+import { paginationOptsValidator } from "convex/server";
 import { Id } from "./_generated/dataModel";
 
 // Stripe Integration Functions for Subscription Management
@@ -261,16 +262,40 @@ export const recordContentPurchase = mutation({
 });
 
 /**
- * Get user's content library with access status
+ * Get user's content library with access status (paginated)
  */
 export const getUserContentLibrary = query({
-  args: { userEmail: v.string() },
-  handler: async (ctx, { userEmail }) => {
-    const allContent = await ctx.db
-      .query("contentLibrary")
-      .filter((q) => q.eq(q.field("isPublished"), true))
-      .collect();
+  args: {
+    userEmail: v.string(),
+    paginationOpts: paginationOptsValidator,
+    filters: v.optional(
+      v.object({
+        school: v.optional(v.string()),
+        searchQuery: v.optional(v.string()),
+      }),
+    ),
+  },
+  handler: async (ctx, { userEmail, paginationOpts, filters }) => {
+    // Set default pagination - provided by usePaginatedQuery via paginationOpts
+    const { numItems, cursor } = paginationOpts;
 
+    // Build base query
+    let query = ctx.db
+      .query("contentLibrary")
+      .filter((q) => q.eq(q.field("isPublished"), true));
+
+    // Apply school filter
+    if (filters?.school && filters.school !== "all") {
+      query = query.filter((q) => q.eq(q.field("school"), filters.school));
+    }
+
+    // Get paginated results
+    const result = await query.paginate({
+      numItems,
+      cursor,
+    });
+
+    // Get user access data
     const userAccess = await ctx.db
       .query("userContentAccess")
       .filter((q) => q.eq(q.field("userEmail"), userEmail))
@@ -282,7 +307,8 @@ export const getUserContentLibrary = query({
       .filter((q) => q.eq(q.field("status"), "active"))
       .first();
 
-    return allContent.map((content) => {
+    // Process content items
+    let processedContent = result.page.map((content) => {
       // Check if user has access through subscription or purchase
       const directAccess = userAccess.find(
         (access) =>
@@ -309,6 +335,61 @@ export const getUserContentLibrary = query({
         completed: !!directAccess?.completedAt,
       };
     });
+
+    // Apply search filter (client-side for now, can be optimized with search index later)
+    if (filters?.searchQuery) {
+      const searchLower = filters.searchQuery.toLowerCase();
+      processedContent = processedContent.filter(
+        (content) =>
+          content.title.toLowerCase().includes(searchLower) ||
+          content.description.toLowerCase().includes(searchLower),
+      );
+    }
+
+    return {
+      page: processedContent,
+      isDone: result.isDone,
+      continueCursor: result.continueCursor,
+    };
+  },
+});
+
+/**
+ * Get total count of content items for pagination info
+ */
+export const getContentCount = query({
+  args: {
+    filters: v.optional(
+      v.object({
+        school: v.optional(v.string()),
+        searchQuery: v.optional(v.string()),
+      }),
+    ),
+  },
+  handler: async (ctx, { filters }) => {
+    let allContent = await ctx.db
+      .query("contentLibrary")
+      .filter((q) => q.eq(q.field("isPublished"), true))
+      .collect();
+
+    // Apply school filter
+    if (filters?.school && filters.school !== "all") {
+      allContent = allContent.filter(
+        (content) => content.school === filters.school,
+      );
+    }
+
+    // Apply search filter
+    if (filters?.searchQuery) {
+      const searchLower = filters.searchQuery.toLowerCase();
+      allContent = allContent.filter(
+        (content) =>
+          content.title.toLowerCase().includes(searchLower) ||
+          content.description.toLowerCase().includes(searchLower),
+      );
+    }
+
+    return allContent.length;
   },
 });
 
@@ -633,5 +714,65 @@ export const getAllSubscriptions = query({
 export const getAllContent = query({
   handler: async (ctx) => {
     return await ctx.db.query("contentLibrary").collect();
+  },
+});
+
+/**
+ * Get individual content item with user access status
+ */
+export const getContentItem = query({
+  args: { 
+    contentId: v.id("contentLibrary"), 
+    userEmail: v.optional(v.string()) 
+  },
+  handler: async (ctx, { contentId, userEmail }) => {
+    const content = await ctx.db.get(contentId);
+    
+    if (!content || !content.isPublished) {
+      return null;
+    }
+
+    let userAccess = null;
+    let activeSubscription = null;
+    
+    if (userEmail) {
+      // Get user access
+      userAccess = await ctx.db
+        .query("userContentAccess")
+        .filter((q) => 
+          q.and(
+            q.eq(q.field("userEmail"), userEmail),
+            q.eq(q.field("contentId"), contentId)
+          )
+        )
+        .first();
+
+      // Get active subscription
+      activeSubscription = await ctx.db
+        .query("subscriptions")
+        .withIndex("by_email", (q) => q.eq("userEmail", userEmail))
+        .filter((q) => q.eq(q.field("status"), "active"))
+        .first();
+    }
+
+    // Check access
+    const subscriptionAccess = activeSubscription && 
+      subscriptionCoversContent(activeSubscription.planType, content.school);
+    
+    const hasAccess = !!(
+      userAccess && (!userAccess.expiresAt || new Date(userAccess.expiresAt) > new Date()) ||
+      subscriptionAccess ||
+      !content.isSubscriberOnly
+    );
+
+    return {
+      ...content,
+      hasAccess,
+      accessType: userAccess?.accessType || (subscriptionAccess ? "subscription" : null),
+      progress: userAccess?.progressPercentage || 0,
+      lastAccessed: userAccess?.lastAccessedAt,
+      completed: !!userAccess?.completedAt,
+      subscription: activeSubscription,
+    };
   },
 });

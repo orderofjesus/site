@@ -1,25 +1,18 @@
 "use client";
 
-import { useState } from "react";
-import { useQuery } from "convex/react";
+import { useState, useMemo } from "react";
+import { useQuery, usePaginatedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useAuth } from "@workos-inc/authkit-nextjs/components";
-import { ContentPaywall } from "@/components/subscriptions/content-paywall";
+import { PageWrapper } from "@/components/page-wrapper";
 import { SubscriptionPlans } from "@/components/subscriptions/subscription-plans";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { ContentSkeleton } from "@/components/content-skeleton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { motion } from "framer-motion";
 import {
   Search,
-  Filter,
   Play,
   BookOpen,
   Star,
@@ -27,8 +20,15 @@ import {
   Clock,
   CheckCircle,
   Lock,
+  ShoppingCart,
+  ArrowRight,
+  DollarSign,
+  ChevronLeft,
+  ChevronRight,
+  Filter,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { larken } from "@/lib/fonts";
 
 export default function ContentPage() {
   const { user, loading: isLoading } = useAuth();
@@ -37,10 +37,30 @@ export default function ContentPage() {
   const [selectedSchool, setSelectedSchool] = useState<string>("all");
   const [showSubscriptionPlans, setShowSubscriptionPlans] = useState(false);
 
-  // Get user's content library with access status
-  const contentLibrary = useQuery(
+  // Memoize filters to prevent unnecessary re-renders
+  const filters = useMemo(
+    () => ({
+      school: selectedSchool,
+      searchQuery: searchQuery.trim() || undefined,
+    }),
+    [selectedSchool, searchQuery],
+  );
+
+  // Get paginated content library with access status
+  const {
+    results: contentLibrary,
+    status,
+    loadMore,
+    isLoading: isLoadingContent,
+  } = usePaginatedQuery(
     api.subscriptions.getUserContentLibrary,
-    user?.email ? { userEmail: user.email } : "skip",
+    user?.email
+      ? {
+          userEmail: user.email,
+          filters,
+        }
+      : "skip",
+    { initialNumItems: 10 },
   );
 
   // Get user's active subscription
@@ -48,6 +68,9 @@ export default function ContentPage() {
     api.subscriptions.getUserActiveSubscription,
     user?.email ? { userEmail: user.email } : "skip",
   );
+
+  // Get total content count for pagination info
+  const totalCount = useQuery(api.subscriptions.getContentCount, { filters });
 
   const handleSubscribe = (planType: string) => {
     router.push(`/subscribe?plan=${planType}`);
@@ -62,17 +85,8 @@ export default function ContentPage() {
     router.push("/subscribe");
   };
 
-  const filteredContent =
-    contentLibrary?.filter((content) => {
-      const matchesSearch =
-        content.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        content.description.toLowerCase().includes(searchQuery.toLowerCase());
-
-      const matchesSchool =
-        selectedSchool === "all" || content.school === selectedSchool;
-
-      return matchesSearch && matchesSchool;
-    }) || [];
+  // Content is already filtered by the backend
+  const filteredContent = contentLibrary || [];
 
   const getSchoolIcon = (school: string) => {
     switch (school) {
@@ -98,36 +112,53 @@ export default function ContentPage() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="space-y-2 text-center">
-          <div className="border-primary mx-auto h-8 w-8 animate-spin rounded-full border-b-2"></div>
-          <p className="text-muted-foreground">Loading content...</p>
-        </div>
-      </div>
+      <PageWrapper className="bg-neutral-50 dark:bg-[#0a0a0a]">
+        <section className="relative overflow-hidden px-6 pt-32 pb-20 lg:px-8">
+          <div className="relative z-10 mx-auto max-w-7xl">
+            <div className="mt-16 mb-24 text-center">
+              <p className="mb-4 text-xs tracking-[0.4em] text-black/60 uppercase dark:text-white/60">
+                Discover
+              </p>
+              <h1
+                className={`${larken.className} mb-6 text-5xl font-bold md:text-7xl`}
+              >
+                Content Library
+              </h1>
+              <p className="mx-auto max-w-2xl text-lg text-black/70 dark:text-white/70">
+                Loading your personalized content library...
+              </p>
+            </div>
+            <ContentSkeleton count={6} />
+          </div>
+        </section>
+      </PageWrapper>
     );
   }
 
   if (!user) {
     return (
-      <div className="flex min-h-screen items-center justify-center p-6">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <CardTitle>Sign In Required</CardTitle>
-            <CardDescription>
+      <PageWrapper>
+        <div className="flex min-h-screen items-center justify-center p-6">
+          <div className="w-full max-w-md space-y-4 text-center">
+            <h2 className="text-2xl font-bold">Sign In Required</h2>
+            <p className="text-black/70 dark:text-white/70">
               Please sign in to access our content library
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="text-center">
-            <Button onClick={() => router.push("/auth/login")}>Sign In</Button>
-          </CardContent>
-        </Card>
-      </div>
+            </p>
+            <Button
+              onClick={() => router.push("/auth/login")}
+              className="bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+            >
+              Sign In
+            </Button>
+          </div>
+        </div>
+      </PageWrapper>
     );
   }
 
   if (showSubscriptionPlans) {
     return (
-      <div className="bg-background min-h-screen">
+      <PageWrapper>
         <div className="container mx-auto py-8">
           <Button
             variant="ghost"
@@ -143,229 +174,345 @@ export default function ContentPage() {
             currentPlan={activeSubscription?.planType}
           />
         </div>
-      </div>
+      </PageWrapper>
     );
   }
 
   return (
-    <div className="bg-background min-h-screen">
-      <div className="container mx-auto px-6 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="mb-4 text-4xl font-bold">Content Library</h1>
-          <p className="text-muted-foreground mb-6 text-xl">
-            Discover transformative spiritual content tailored to your journey
-          </p>
+    <PageWrapper className="bg-neutral-50 dark:bg-[#0a0a0a]">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden px-6 pt-32 pb-20 lg:px-8">
+        {/* Decorative Background Element */}
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute top-20 right-0 h-96 w-96 rounded-full bg-black/5 blur-3xl dark:bg-white/5"></div>
+          <div className="absolute bottom-0 left-0 h-80 w-80 rounded-full bg-black/5 blur-3xl dark:bg-white/5"></div>
+        </div>
+
+        <div className="relative z-10 mx-auto max-w-7xl">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="mt-16 mb-24 text-center"
+          >
+            <p className="mb-4 text-xs tracking-[0.4em] text-black/60 uppercase dark:text-white/60">
+              Discover
+            </p>
+            <h1
+              className={`${larken.className} mb-6 text-5xl font-bold md:text-7xl`}
+            >
+              Content Library
+            </h1>
+            <p className="mx-auto max-w-2xl text-lg text-black/70 dark:text-white/70">
+              Discover transformative spiritual content tailored to your
+              journey. From mystical masterclasses to prophetic insights.
+            </p>
+          </motion.div>
 
           {/* Subscription Status */}
-          {activeSubscription ? (
-            <div className="mb-6 flex items-center gap-2">
-              <Badge variant="default" className="bg-green-600">
-                <Crown className="mr-1 h-3 w-3" />
-                {activeSubscription.planType === "all-access"
-                  ? "All-Access"
-                  : getSchoolName(activeSubscription.planType)}{" "}
-                Active
-              </Badge>
-              {activeSubscription.status === "trial" && (
-                <Badge variant="outline">Free Trial</Badge>
-              )}
-            </div>
-          ) : (
-            <div className="mb-6 flex items-center gap-4">
-              <p className="text-muted-foreground">
-                Subscribe to unlock premium content
-              </p>
-              <Button onClick={() => setShowSubscriptionPlans(true)}>
-                View Plans
-              </Button>
-            </div>
-          )}
-        </div>
-
-        {/* Search and Filters */}
-        <div className="mb-8 flex flex-col gap-4 sm:flex-row">
-          <div className="relative flex-1">
-            <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
-            <Input
-              placeholder="Search content..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-
-          <Tabs value={selectedSchool} onValueChange={setSelectedSchool}>
-            <TabsList>
-              <TabsTrigger value="all">All Content</TabsTrigger>
-              <TabsTrigger value="mystical-masterclass">
-                <BookOpen className="mr-1 h-4 w-4" />
-                Mystical
-              </TabsTrigger>
-              <TabsTrigger value="open-scroll">
-                <Star className="mr-1 h-4 w-4" />
-                Prophecy
-              </TabsTrigger>
-              <TabsTrigger value="general">
-                <Crown className="mr-1 h-4 w-4" />
-                General
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
-
-        {/* Content Grid */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {filteredContent.map((content) => (
-            <Card
-              key={content._id}
-              className="group cursor-pointer transition-shadow hover:shadow-lg"
-            >
-              <div className="from-primary/20 to-primary/5 relative aspect-video overflow-hidden rounded-t-lg bg-gradient-to-br">
-                {content.thumbnailUrl ? (
-                  <img
-                    src={content.thumbnailUrl}
-                    alt={content.title}
-                    className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center">
-                    {getSchoolIcon(content.school)}
-                  </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="mb-12 text-center"
+          >
+            {activeSubscription ? (
+              <div className="flex items-center justify-center gap-2">
+                <Badge variant="default" className="bg-green-600">
+                  <Crown className="mr-1 h-3 w-3" />
+                  {activeSubscription.planType === "all-access"
+                    ? "All-Access"
+                    : getSchoolName(activeSubscription.planType)}{" "}
+                  Active
+                </Badge>
+                {activeSubscription.status === "trial" && (
+                  <Badge variant="outline">Free Trial</Badge>
                 )}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+                <p className="text-black/70 dark:text-white/70">
+                  Subscribe to unlock premium content
+                </p>
+                <Button
+                  onClick={() => setShowSubscriptionPlans(true)}
+                  className="bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+                >
+                  View Plans
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </motion.div>
 
-                {/* Access indicator */}
-                <div className="absolute top-3 left-3">
-                  {content.hasAccess ? (
-                    <Badge variant="default" className="bg-green-600">
-                      <CheckCircle className="mr-1 h-3 w-3" />
-                      Access
-                    </Badge>
+          {/* Search and Filters */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="mb-16"
+          >
+            {/* Search Bar */}
+            <div className="mb-6">
+              <div className="relative mx-auto max-w-lg">
+                <Search className="absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 transform text-black/40 dark:text-white/40" />
+                <Input
+                  placeholder="Search spiritual content..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="rounded-2xl border-2 border-black/10 bg-white/80 py-4 pr-4 pl-12 text-center text-lg font-medium shadow-sm backdrop-blur-sm transition-all duration-300 hover:border-black/20 focus:border-black/30 dark:border-white/10 dark:bg-neutral-900/80 dark:hover:border-white/20 dark:focus:border-white/30"
+                />
+              </div>
+            </div>
+
+            {/* Filter Pills */}
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <div className="flex items-center gap-2 text-sm text-black/60 dark:text-white/60">
+                <Filter className="h-4 w-4" />
+                <span className="font-medium">Filter by school:</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { value: "all", label: "All Content", icon: null },
+                  {
+                    value: "mystical-masterclass",
+                    label: "Mystical Masterclass",
+                    icon: BookOpen,
+                  },
+                  { value: "open-scroll", label: "Open Scroll", icon: Star },
+                  { value: "general", label: "General", icon: Crown },
+                ].map((filter) => {
+                  const isActive = selectedSchool === filter.value;
+                  const Icon = filter.icon;
+
+                  return (
+                    <button
+                      key={filter.value}
+                      onClick={() => setSelectedSchool(filter.value)}
+                      className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 ${
+                        isActive
+                          ? "bg-black text-white shadow-md dark:bg-white dark:text-black"
+                          : "border border-black/10 bg-white text-black/70 hover:border-black/20 hover:bg-black/5 dark:border-white/10 dark:bg-neutral-800 dark:text-white/70 dark:hover:border-white/20 dark:hover:bg-white/5"
+                      } `}
+                    >
+                      {Icon && <Icon className="h-4 w-4" />}
+                      <span>{filter.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Results Info */}
+            <div className="mt-6 text-center">
+              <p className="text-sm text-black/60 dark:text-white/60">
+                {totalCount !== undefined ? (
+                  <>
+                    Showing {filteredContent.length} of {totalCount} content
+                    items
+                    {searchQuery && ` for "${searchQuery}"`}
+                    {selectedSchool !== "all" &&
+                      ` in ${getSchoolName(selectedSchool)}`}
+                  </>
+                ) : (
+                  "Loading content..."
+                )}
+              </p>
+            </div>
+          </motion.div>
+
+          {/* Content Grid */}
+          <div className="mb-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {filteredContent.map((content, index) => (
+              <motion.article
+                key={content._id}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
+                className="group flex flex-col overflow-hidden border border-black/10 bg-white transition-all duration-500 hover:border-black hover:shadow-2xl dark:border-white/10 dark:bg-neutral-900 dark:hover:border-white"
+              >
+                <div className="relative h-64 overflow-hidden">
+                  {content.thumbnailUrl ? (
+                    <img
+                      src={content.thumbnailUrl}
+                      alt={content.title}
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
                   ) : (
-                    <Badge variant="secondary">
-                      <Lock className="mr-1 h-3 w-3" />
-                      Premium
-                    </Badge>
+                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-black/5 to-black/10 dark:from-white/5 dark:to-white/10">
+                      {getSchoolIcon(content.school)}
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-black/20 transition-colors duration-500 group-hover:bg-black/40"></div>
+
+                  {/* Access and School indicators */}
+                  <div className="absolute top-4 right-4 left-4 flex items-center justify-between gap-2">
+                    <div className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-black">
+                      {getSchoolName(content.school)}
+                    </div>
+                    {content.hasAccess ? (
+                      <div className="flex items-center gap-1 rounded-full bg-green-500 px-3 py-1 text-xs font-semibold text-white">
+                        <CheckCircle className="h-3 w-3" />
+                        Access
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1 rounded-full bg-black/70 px-3 py-1 text-xs font-semibold text-white">
+                        <Lock className="h-3 w-3" />
+                        Premium
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Duration */}
+                  {content.duration && (
+                    <div className="absolute right-4 bottom-4">
+                      <div className="flex items-center gap-1 rounded-full bg-black/70 px-2 py-1 text-xs text-white">
+                        <Clock className="h-3 w-3" />
+                        {Math.floor(content.duration / 60)}m
+                      </div>
+                    </div>
                   )}
                 </div>
 
-                {/* Duration */}
-                {content.duration && (
-                  <div className="absolute right-3 bottom-3">
-                    <Badge
-                      variant="outline"
-                      className="border-white/20 bg-black/50 text-white"
-                    >
-                      <Clock className="mr-1 h-3 w-3" />
-                      {Math.floor(content.duration / 60)}m
-                    </Badge>
-                  </div>
-                )}
-
-                {/* Play button overlay */}
-                <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
-                  <Button size="lg" className="rounded-full">
-                    <Play className="mr-2 h-5 w-5" />
-                    {content.hasAccess ? "Watch" : "Preview"}
-                  </Button>
-                </div>
-              </div>
-
-              <CardHeader className="pb-3">
-                <div className="mb-2 flex items-center gap-2">
-                  <Badge variant="outline" className="text-xs">
-                    {getSchoolIcon(content.school)}
-                    <span className="ml-1">
-                      {getSchoolName(content.school)}
-                    </span>
-                  </Badge>
-                  <Badge variant="secondary" className="text-xs">
+                {/* Content section - flex-1 to push button to bottom */}
+                <div className="flex flex-1 flex-col p-6">
+                  <p className="mb-2 text-xs tracking-[0.2em] text-black/60 uppercase dark:text-white/60">
                     {content.contentType}
-                  </Badge>
-                </div>
-                <CardTitle className="text-lg leading-tight">
-                  {content.title}
-                </CardTitle>
-              </CardHeader>
-
-              <CardContent className="pt-0">
-                <p className="text-muted-foreground mb-4 line-clamp-2 text-sm">
-                  {content.description}
-                </p>
-
-                {/* Progress bar for accessed content */}
-                {content.hasAccess && content.progress > 0 && (
-                  <div className="mb-4">
-                    <div className="text-muted-foreground mb-1 flex justify-between text-xs">
-                      <span>Progress</span>
-                      <span>{content.progress}%</span>
-                    </div>
-                    <div className="bg-muted h-2 w-full rounded-full">
-                      <div
-                        className="bg-primary h-2 rounded-full transition-all"
-                        style={{ width: `${content.progress}%` }}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* Action button */}
-                {content.hasAccess ? (
-                  <Button
-                    className="w-full"
-                    onClick={() => router.push(`/content/${content._id}`)}
+                  </p>
+                  <h3
+                    className={`${larken.className} mb-3 text-2xl leading-tight font-bold`}
                   >
-                    <Play className="mr-2 h-4 w-4" />
-                    {content.completed
-                      ? "Watch Again"
-                      : content.progress > 0
-                        ? "Continue"
-                        : "Watch Now"}
-                  </Button>
-                ) : (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Price:</span>
-                      <span className="font-medium">
-                        ${(content.price / 100).toFixed(0)}
-                      </span>
+                    {content.title}
+                  </h3>
+                  <p className="mb-4 line-clamp-3 flex-1 text-sm text-black/70 dark:text-white/70">
+                    {content.description}
+                  </p>
+
+                  {/* Progress bar for accessed content */}
+                  {content.hasAccess && content.progress > 0 && (
+                    <div className="mb-4">
+                      <div className="mb-1 flex justify-between text-xs text-black/60 dark:text-white/60">
+                        <span>Progress</span>
+                        <span>{content.progress}%</span>
+                      </div>
+                      <div className="h-2 w-full rounded-full bg-black/10 dark:bg-white/10">
+                        <div
+                          className="h-2 rounded-full bg-black transition-all dark:bg-white"
+                          style={{ width: `${content.progress}%` }}
+                        />
+                      </div>
                     </div>
+                  )}
+
+                  {/* Price and Action - always at bottom */}
+                  <div className="mt-auto space-y-4">
+                    {!content.hasAccess && (
+                      <div className="flex items-center justify-between rounded-lg border border-black/10 bg-black/5 p-4 dark:border-white/10 dark:bg-white/5">
+                        <div className="flex items-center gap-2 text-xl font-bold">
+                          <DollarSign className="h-5 w-5" />
+                          {(content.price / 100).toFixed(0)}
+                        </div>
+                        <span className="text-xs text-black/60 dark:text-white/60">
+                          One-time purchase
+                        </span>
+                      </div>
+                    )}
+
                     <Button
-                      variant="outline"
-                      className="w-full"
+                      className="group/btn w-full bg-black font-semibold text-white transition-all duration-300 hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
                       onClick={() => {
-                        // Show content paywall
-                        router.push(`/content/${content._id}/preview`);
+                        if (content.hasAccess) {
+                          router.push(`/content/${content._id}`);
+                        } else {
+                          router.push(`/content/${content._id}`);
+                        }
                       }}
                     >
-                      <Lock className="mr-2 h-4 w-4" />
-                      View Options
+                      {content.hasAccess ? (
+                        <>
+                          <Play className="mr-2 h-4 w-4" fill="currentColor" />
+                          {content.completed
+                            ? "Watch Again"
+                            : content.progress > 0
+                              ? "Continue"
+                              : "Watch Now"}
+                        </>
+                      ) : (
+                        <>
+                          <ShoppingCart className="mr-2 h-4 w-4" />
+                          Buy Now
+                        </>
+                      )}
+                      <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
                     </Button>
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                </div>
+              </motion.article>
+            ))}
+          </div>
 
-        {/* Empty state */}
-        {filteredContent.length === 0 && (
-          <Card className="py-12 text-center">
-            <CardContent>
-              <BookOpen className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
-              <h3 className="mb-2 text-lg font-semibold">No content found</h3>
-              <p className="text-muted-foreground mb-4">
+          {/* Pagination Controls */}
+          {status !== "Exhausted" && filteredContent.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="mb-16 text-center"
+            >
+              <Button
+                onClick={() => loadMore(10)}
+                disabled={status === "LoadingMore"}
+                className="bg-black px-8 py-3 text-lg font-semibold text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+              >
+                {status === "LoadingMore" ? (
+                  <>
+                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    Loading more...
+                  </>
+                ) : (
+                  <>
+                    Load More Content
+                    <ChevronRight className="ml-2 h-5 w-5" />
+                  </>
+                )}
+              </Button>
+              {totalCount !== undefined && (
+                <p className="mt-3 text-sm text-black/60 dark:text-white/60">
+                  Showing {filteredContent.length} of {totalCount} items
+                </p>
+              )}
+            </motion.div>
+          )}
+
+          {/* Empty state */}
+          {status !== "Exhausted" && filteredContent.length === 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="py-20 text-center"
+            >
+              <BookOpen className="mx-auto mb-6 h-16 w-16 text-black/30 dark:text-white/30" />
+              <h3 className={`${larken.className} mb-4 text-2xl font-bold`}>
+                No content found
+              </h3>
+              <p className="mx-auto mb-6 max-w-md text-black/70 dark:text-white/70">
                 {searchQuery
                   ? `No content matches "${searchQuery}"`
                   : "No content available in this category"}
               </p>
               {searchQuery && (
-                <Button onClick={() => setSearchQuery("")}>Clear Search</Button>
+                <Button
+                  onClick={() => setSearchQuery("")}
+                  className="bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+                >
+                  Clear Search
+                </Button>
               )}
-            </CardContent>
-          </Card>
-        )}
-      </div>
-    </div>
+            </motion.div>
+          )}
+        </div>
+      </section>
+    </PageWrapper>
   );
 }
