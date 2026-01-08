@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 
 type PlanType = "all-access" | "mystical-masterclass" | "open-scroll";
 type BillingCycle = "monthly" | "yearly";
@@ -66,7 +67,9 @@ export default function SubscribePage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center">
-            <Button onClick={() => router.push("/auth/login")}>Sign In</Button>
+            <Link href={`/auth/login?returnTo=/subscribe`}>
+              <Button>Log in</Button>
+            </Link>
           </CardContent>
         </Card>
       </div>

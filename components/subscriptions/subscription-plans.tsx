@@ -2,7 +2,14 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Check, Star, Crown, BookOpen } from "lucide-react";
@@ -116,93 +123,110 @@ interface SubscriptionPlansProps {
   isLoading?: boolean;
 }
 
-export function SubscriptionPlans({ onSelectPlan, currentPlan, isLoading }: SubscriptionPlansProps) {
-  const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
+export function SubscriptionPlans({
+  onSelectPlan,
+  currentPlan,
+  isLoading,
+}: SubscriptionPlansProps) {
+  const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">(
+    "monthly",
+  );
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-6">
+    <div className="mx-auto w-full max-w-7xl p-6">
       {/* Header */}
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold mb-4">Choose Your Spiritual Journey</h2>
-        <p className="text-muted-foreground text-lg mb-6">
+      <div className="mb-8 md:text-center">
+        <h2 className="mb-4 text-3xl font-bold">
+          Choose Your Spiritual Journey
+        </h2>
+        <p className="text-muted-foreground mb-6 text-lg">
           Access transformative content and deepen your spiritual understanding
         </p>
-        
+
         {/* Billing Toggle */}
-        <Tabs value={billingCycle} onValueChange={(value) => setBillingCycle(value as "monthly" | "yearly")}>
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
+        <Tabs
+          value={billingCycle}
+          onValueChange={(value) =>
+            setBillingCycle(value as "monthly" | "yearly")
+          }
+        >
+          <TabsList className="mx-auto grid w-full max-w-md grid-cols-2">
             <TabsTrigger value="monthly">Monthly</TabsTrigger>
             <TabsTrigger value="yearly" className="relative">
               Yearly
-              <Badge variant="secondary" className="ml-2 text-xs">Save 20%</Badge>
+              <Badge variant="secondary" className="ml-2 text-xs">
+                Save 20%
+              </Badge>
             </TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
 
       {/* Plans Grid */}
-      <div className="grid md:grid-cols-3 gap-6 mb-8">
+      <div className="mb-8 grid gap-6 md:grid-cols-3">
         {plans.map((plan) => (
-          <Card 
-            key={plan.id} 
+          <Card
+            key={plan.id}
             className={`relative ${
-              plan.popular 
-                ? "border-primary ring-2 ring-primary/20 shadow-lg scale-105" 
+              plan.popular
+                ? "border-primary ring-primary/20 scale-105 shadow-lg ring-2"
                 : "border-border"
             }`}
           >
             {plan.popular && (
-              <Badge 
-                variant="default" 
-                className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-primary"
+              <Badge
+                variant="default"
+                className="bg-primary absolute -top-3 left-1/2 -translate-x-1/2 transform"
               >
                 Most Popular
               </Badge>
             )}
-            
-            <CardHeader className="text-center pb-4">
-              <div className="flex items-center justify-center mb-3">
-                <div className="p-3 rounded-full bg-primary/10 text-primary">
+
+            <CardHeader className="pb-4 text-center">
+              <div className="mb-3 flex items-center justify-center">
+                <div className="bg-primary/10 text-primary rounded-full p-3">
                   {plan.icon}
                 </div>
               </div>
               <CardTitle className="text-xl">{plan.name}</CardTitle>
               <CardDescription>{plan.description}</CardDescription>
-              
+
               {/* Pricing */}
               <div className="mt-4">
                 <div className="flex items-center justify-center gap-2">
                   <span className="text-3xl font-bold">
-                    {billingCycle === "monthly" ? plan.monthly.displayPrice : plan.yearly.displayPrice}
+                    {billingCycle === "monthly"
+                      ? plan.monthly.displayPrice
+                      : plan.yearly.displayPrice}
                   </span>
                   <span className="text-muted-foreground">
                     /{billingCycle === "monthly" ? "month" : "year"}
                   </span>
                 </div>
                 {billingCycle === "yearly" && (
-                  <p className="text-sm text-green-600 font-medium mt-1">
+                  <p className="mt-1 text-sm font-medium text-green-600">
                     {plan.yearly.savings}
                   </p>
                 )}
               </div>
             </CardHeader>
-            
+
             <CardContent>
               <ul className="space-y-3">
                 {plan.features.map((feature, index) => (
                   <li key={index} className="flex items-start gap-2">
-                    <Check 
-                      className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
-                        feature.included 
-                          ? "text-green-500" 
+                    <Check
+                      className={`mt-0.5 h-5 w-5 flex-shrink-0 ${
+                        feature.included
+                          ? "text-green-500"
                           : "text-muted-foreground opacity-30"
                       }`}
                     />
-                    <span 
+                    <span
                       className={`text-sm ${
-                        feature.included 
-                          ? "text-foreground" 
-                          : "text-muted-foreground opacity-60 line-through"
+                        feature.included
+                          ? "text-foreground"
+                          : "text-muted-foreground line-through opacity-60"
                       }`}
                     >
                       {feature.text}
@@ -211,21 +235,19 @@ export function SubscriptionPlans({ onSelectPlan, currentPlan, isLoading }: Subs
                 ))}
               </ul>
             </CardContent>
-            
+
             <CardFooter>
-              <Button 
-                className="w-full" 
+              <Button
+                className="w-full"
                 variant={plan.popular ? "default" : "outline"}
                 onClick={() => onSelectPlan(plan.id, billingCycle)}
                 disabled={isLoading || currentPlan === plan.id}
               >
-                {isLoading ? (
-                  "Processing..."
-                ) : currentPlan === plan.id ? (
-                  "Current Plan"
-                ) : (
-                  plan.cta
-                )}
+                {isLoading
+                  ? "Processing..."
+                  : currentPlan === plan.id
+                    ? "Current Plan"
+                    : plan.cta}
               </Button>
             </CardFooter>
           </Card>
@@ -233,8 +255,10 @@ export function SubscriptionPlans({ onSelectPlan, currentPlan, isLoading }: Subs
       </div>
 
       {/* Free Trial Notice */}
-      <div className="text-center text-sm text-muted-foreground">
-        <p>✨ Start with a 7-day free trial • Cancel anytime • No hidden fees</p>
+      <div className="text-muted-foreground text-center text-sm">
+        <p>
+          ✨ Start with a 7-day free trial • Cancel anytime • No hidden fees
+        </p>
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@workos-inc/authkit-nextjs/components";
 
 interface AuthGuardProps {
@@ -11,11 +11,12 @@ interface AuthGuardProps {
 export function AuthGuard({ children }: AuthGuardProps) {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   const isAuthenticated = !!user;
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
-      router.push("/auth/login");
+      router.push(`/auth/login?returnTo=${pathname}`);
     }
   }, [loading, isAuthenticated, router]);
 
@@ -34,7 +35,9 @@ export function AuthGuard({ children }: AuthGuardProps) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-600 dark:text-gray-400">Redirecting to login...</p>
+          <p className="text-gray-600 dark:text-gray-400">
+            Redirecting to login...
+          </p>
         </div>
       </div>
     );

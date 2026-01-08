@@ -136,7 +136,7 @@ export default function ContentDetailPage({
 
   const handlePurchase = async () => {
     if (!user) {
-      router.push("/auth/login");
+      router.push(`/auth/login?returnTo=/content/${id}`);
       return;
     }
 
@@ -549,137 +549,165 @@ export default function ContentDetailPage({
                           className="w-full bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
                           onClick={handlePurchase}
                         >
-                          <ShoppingCart className="mr-2 h-4 w-4" />
-                          Purchase Now
+                          {user ? (
+                            <>
+                              <ShoppingCart className="mr-2 h-4 w-4" />
+                              Purchase Now
+                            </>
+                          ) : (
+                            <>
+                              <Lock className="mr-2 h-4 w-4" />
+                              Login to Purchase
+                            </>
+                          )}
                         </Button>
 
-                        {/* Payment Methods */}
-                        <div className="space-y-3">
-                          <p className="text-center text-sm font-medium text-black/60 dark:text-white/60">
-                            Payment Methods
-                          </p>
+                        {/* Payment Methods / Login Message */}
+                        {user ? (
+                          <>
+                            <div className="space-y-3">
+                              <p className="text-center text-sm font-medium text-black/60 dark:text-white/60">
+                                Payment Methods
+                              </p>
 
-                          {/* Stripe Payment */}
-                          <div className="rounded-lg border border-black/10 p-4 dark:border-white/10">
-                            <button
-                              onClick={() =>
-                                setExpandedPaymentMethod(
-                                  expandedPaymentMethod === "stripe"
-                                    ? null
-                                    : "stripe",
-                                )
-                              }
-                              className="flex w-full items-center justify-between"
-                            >
-                              <div className="flex items-center gap-3">
-                                <CreditCard className="h-5 w-5" />
-                                <span className="font-medium">
-                                  Credit/Debit Card
-                                </span>
-                              </div>
-                              <Badge variant="outline">Recommended</Badge>
-                            </button>
-                            {expandedPaymentMethod === "stripe" && (
-                              <div className="mt-3 space-y-2 text-sm text-black/60 dark:text-white/60">
-                                <p>• Secure payment via Stripe</p>
-                                <p>• Instant access after payment</p>
-                                <p>• Supports all major cards</p>
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Bank Transfer */}
-                          <div className="rounded-lg border border-black/10 p-4 dark:border-white/10">
-                            <button
-                              onClick={() =>
-                                setExpandedPaymentMethod(
-                                  expandedPaymentMethod === "bank"
-                                    ? null
-                                    : "bank",
-                                )
-                              }
-                              className="flex w-full items-center justify-between"
-                            >
-                              <div className="flex items-center gap-3">
-                                <Building2 className="h-5 w-5" />
-                                <span className="font-medium">
-                                  Bank Transfer
-                                </span>
-                              </div>
-                            </button>
-                            {expandedPaymentMethod === "bank" && (
-                              <div className="mt-3 space-y-2 text-sm text-black/60 dark:text-white/60">
-                                <div className="space-y-1">
-                                  <p className="font-medium">Bank Details:</p>
-                                  <div className="rounded bg-black/5 p-3 dark:bg-white/5">
-                                    <p>Account: 1234567890</p>
-                                    <p>Routing: 987654321</p>
-                                    <p>Bank: First National Bank</p>
+                              {/* Stripe Payment */}
+                              <div className="rounded-lg border border-black/10 p-4 dark:border-white/10">
+                                <button
+                                  onClick={() =>
+                                    setExpandedPaymentMethod(
+                                      expandedPaymentMethod === "stripe"
+                                        ? null
+                                        : "stripe",
+                                    )
+                                  }
+                                  className="flex w-full items-center justify-between"
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <CreditCard className="h-5 w-5" />
+                                    <span className="font-medium">
+                                      Credit/Debit Card
+                                    </span>
                                   </div>
-                                </div>
-                                <p>• Include your email in transfer memo</p>
-                                <p>• Access granted within 24 hours</p>
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Mobile Money */}
-                          <div className="rounded-lg border border-black/10 p-4 dark:border-white/10">
-                            <button
-                              onClick={() =>
-                                setExpandedPaymentMethod(
-                                  expandedPaymentMethod === "mobile"
-                                    ? null
-                                    : "mobile",
-                                )
-                              }
-                              className="flex w-full items-center justify-between"
-                            >
-                              <div className="flex items-center gap-3">
-                                <Smartphone className="h-5 w-5" />
-                                <span className="font-medium">
-                                  Mobile Money
-                                </span>
-                              </div>
-                            </button>
-                            {expandedPaymentMethod === "mobile" && (
-                              <div className="mt-3 space-y-2 text-sm text-black/60 dark:text-white/60">
-                                <div className="space-y-1">
-                                  <p className="font-medium">
-                                    MTN Mobile Money:
-                                  </p>
-                                  <div className="flex items-center justify-between rounded bg-black/5 p-3 dark:bg-white/5">
-                                    <span>+256 700 123 456</span>
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={() => {
-                                        navigator.clipboard.writeText(
-                                          "+256700123456",
-                                        );
-                                        toast.success("Phone number copied!");
-                                      }}
-                                    >
-                                      <Copy className="h-3 w-3" />
-                                    </Button>
+                                  <Badge variant="outline">Recommended</Badge>
+                                </button>
+                                {expandedPaymentMethod === "stripe" && (
+                                  <div className="mt-3 space-y-2 text-sm text-black/60 dark:text-white/60">
+                                    <p>• Secure payment via Stripe</p>
+                                    <p>• Instant access after payment</p>
+                                    <p>• Supports all major cards</p>
                                   </div>
-                                </div>
-                                <p>
-                                  • Send ${(contentItem.price / 100).toFixed(0)}{" "}
-                                  to the number above
-                                </p>
-                                <p>• Include your email in transaction note</p>
-                                <p>• Access granted within 2 hours</p>
+                                )}
                               </div>
-                            )}
-                          </div>
-                        </div>
 
-                        <div className="text-center">
-                          <p className="text-xs text-black/40 dark:text-white/40">
-                            Need help? Contact support@yoursite.com
-                          </p>
-                        </div>
+                              {/* Bank Transfer */}
+                              <div className="rounded-lg border border-black/10 p-4 dark:border-white/10">
+                                <button
+                                  onClick={() =>
+                                    setExpandedPaymentMethod(
+                                      expandedPaymentMethod === "bank"
+                                        ? null
+                                        : "bank",
+                                    )
+                                  }
+                                  className="flex w-full items-center justify-between"
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <Building2 className="h-5 w-5" />
+                                    <span className="font-medium">
+                                      Bank Transfer
+                                    </span>
+                                  </div>
+                                </button>
+                                {expandedPaymentMethod === "bank" && (
+                                  <div className="mt-3 space-y-2 text-sm text-black/60 dark:text-white/60">
+                                    <div className="space-y-1">
+                                      <p className="font-medium">
+                                        Bank Details:
+                                      </p>
+                                      <div className="rounded bg-black/5 p-3 dark:bg-white/5">
+                                        <p>Account: 1234567890</p>
+                                        <p>Routing: 987654321</p>
+                                        <p>Bank: First National Bank</p>
+                                      </div>
+                                    </div>
+                                    <p>• Include your email in transfer memo</p>
+                                    <p>• Access granted within 24 hours</p>
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Mobile Money */}
+                              <div className="rounded-lg border border-black/10 p-4 dark:border-white/10">
+                                <button
+                                  onClick={() =>
+                                    setExpandedPaymentMethod(
+                                      expandedPaymentMethod === "mobile"
+                                        ? null
+                                        : "mobile",
+                                    )
+                                  }
+                                  className="flex w-full items-center justify-between"
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <Smartphone className="h-5 w-5" />
+                                    <span className="font-medium">
+                                      Mobile Money
+                                    </span>
+                                  </div>
+                                </button>
+                                {expandedPaymentMethod === "mobile" && (
+                                  <div className="mt-3 space-y-2 text-sm text-black/60 dark:text-white/60">
+                                    <div className="space-y-1">
+                                      <p className="font-medium">
+                                        MTN Mobile Money:
+                                      </p>
+                                      <div className="flex items-center justify-between rounded bg-black/5 p-3 dark:bg-white/5">
+                                        <span>+256 700 123 456</span>
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          onClick={() => {
+                                            navigator.clipboard.writeText(
+                                              "+256700123456",
+                                            );
+                                            toast.success(
+                                              "Phone number copied!",
+                                            );
+                                          }}
+                                        >
+                                          <Copy className="h-3 w-3" />
+                                        </Button>
+                                      </div>
+                                    </div>
+                                    <p>
+                                      • Send $
+                                      {(contentItem.price / 100).toFixed(0)} to
+                                      the number above
+                                    </p>
+                                    <p>
+                                      • Include your email in transaction note
+                                    </p>
+                                    <p>• Access granted within 2 hours</p>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="text-center">
+                              <p className="text-xs text-black/40 dark:text-white/40">
+                                Need help? Contact support@yoursite.com
+                              </p>
+                            </div>
+                          </>
+                        ) : (
+                          <div className="rounded-lg border border-black/10 bg-black/5 p-4 text-center dark:border-white/10 dark:bg-white/5">
+                            <AlertCircle className="mx-auto mb-2 h-5 w-5 text-black/60 dark:text-white/60" />
+                            <p className="text-sm text-black/70 dark:text-white/70">
+                              Please log in to view payment options and complete
+                              your purchase.
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}

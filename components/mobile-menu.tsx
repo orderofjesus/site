@@ -12,7 +12,7 @@ import {
   GraduationCap,
   Heart,
   BookOpen,
-  Info,
+  TvMinimalPlay,
   Phone,
   User,
   Settings,
@@ -34,7 +34,7 @@ const data = {
   navMain: [
     { title: "Home", url: "/", icon: Home },
     { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-    { title: "About", url: "/about", icon: Info },
+    { title: "Content", url: "/content", icon: TvMinimalPlay },
     { title: "Sermons", url: "/sermons", icon: BookOpen },
     { title: "Partner", url: "/#partner", icon: Heart },
     { title: "Contact", url: "/#connect", icon: Phone },
@@ -294,11 +294,11 @@ export function MobileMenu() {
                 </>
               ) : (
                 <Link
-                  href="/auth/login"
+                  href={`/auth/login?returnTo=${pathname}`}
                   className="flex w-full items-center justify-center gap-2 rounded-lg bg-black px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
                 >
                   <LogIn className="h-4 w-4" />
-                  <span>Sign In</span>
+                  <span>Log in</span>
                 </Link>
               )}
             </>

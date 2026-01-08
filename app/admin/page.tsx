@@ -31,6 +31,7 @@ import {
   Download,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface SubscriptionAnalytics {
   totalActiveSubscriptions: number;
@@ -76,7 +77,9 @@ export default function AdminDashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center">
-            <Button onClick={() => router.push("/auth/login")}>Sign In</Button>
+            <Link href={`/auth/login?returnTo=/admin`}>
+              <Button>Sign In</Button>
+            </Link>
           </CardContent>
         </Card>
       </div>

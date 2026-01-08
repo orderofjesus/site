@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { LogIn, LogOut, User } from "lucide-react";
 import {
   DropdownMenu,
@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@workos-inc/authkit-nextjs/components";
 import { useEffect } from "react";
 import { Authenticated, Unauthenticated } from "convex/react";
+import Link from "next/link";
 
 interface AuthButtonProps {
   className?: string;
@@ -23,6 +24,7 @@ interface AuthButtonProps {
 export function AuthButton({ className }: AuthButtonProps = {}) {
   const { user, loading, signOut } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   const isAuthenticated = !!user;
 
   if (loading) {
@@ -45,18 +47,19 @@ export function AuthButton({ className }: AuthButtonProps = {}) {
   return (
     <>
       <Unauthenticated>
-        <Button
-          onClick={() => router.push("/auth/login")}
-          variant="ghost"
-          size="sm"
-          className={`h-0 cursor-pointer gap-2 rounded-full p-1 py-2 hover:bg-transparent focus-visible:ring-0 dark:hover:bg-transparent ${className}`}
-        >
-          <Avatar className="h-8 w-8">
-            <AvatarFallback className="bg-zinc-200 dark:bg-zinc-800">
-              <User className="h-4 w-4" />
-            </AvatarFallback>
-          </Avatar>
-        </Button>
+        <Link href={`/auth/login?returnTo=${pathname}`}>
+          <Button
+            variant="ghost"
+            size="sm"
+            className={`h-0 cursor-pointer gap-2 rounded-full p-1 py-2 hover:bg-transparent focus-visible:ring-0 dark:hover:bg-transparent ${className}`}
+          >
+            <Avatar className="h-8 w-8">
+              <AvatarFallback className="bg-zinc-200 dark:bg-zinc-800">
+                <User className="h-4 w-4" />
+              </AvatarFallback>
+            </Avatar>
+          </Button>
+        </Link>
       </Unauthenticated>
       <Authenticated>
         <DropdownMenu>

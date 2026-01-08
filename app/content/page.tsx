@@ -35,6 +35,7 @@ export default function ContentPage() {
   const { user, loading: isLoading } = useAuth();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeSearchQuery, setActiveSearchQuery] = useState("");
   const [selectedSchool, setSelectedSchool] = useState<string>("all");
   const [showSubscriptionPlans, setShowSubscriptionPlans] = useState(false);
 
@@ -42,20 +43,32 @@ export default function ContentPage() {
   const filters = useMemo(
     () => ({
       school: selectedSchool,
-      searchQuery: searchQuery.trim() || undefined,
+      searchQuery: activeSearchQuery.trim() || undefined,
     }),
-    [selectedSchool, searchQuery],
+    [selectedSchool, activeSearchQuery],
   );
 
-  // Get paginated content library (public - no authentication required)
+  const handleSearch = () => {
+    setActiveSearchQuery(searchQuery);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
+
+  // Get paginated content library with user access info for authenticated users
   const {
     results: contentLibrary,
     status,
     loadMore,
     isLoading: isLoadingContent,
   } = usePaginatedQuery(
-    api.subscriptions.getPublicContentLibrary,
-    { filters },
+    user?.email
+      ? api.subscriptions.getUserContentLibrary
+      : api.subscriptions.getPublicContentLibrary,
+    user?.email ? { userEmail: user.email, filters } : { filters },
     { initialNumItems: 10 },
   );
 
@@ -106,7 +119,8 @@ export default function ContentPage() {
     }
   };
 
-  if (isLoadingContent) {
+  // Show initial loading screen only when first loading (no filters applied yet)
+  if (isLoadingContent && !activeSearchQuery && selectedSchool === "all") {
     return (
       <PageWrapper className="bg-neutral-50 dark:bg-[#0a0a0a]">
         <section className="relative overflow-hidden px-6 pt-32 pb-20 lg:px-8">
@@ -155,11 +169,11 @@ export default function ContentPage() {
   if (showSubscriptionPlans) {
     return (
       <PageWrapper>
-        <div className="container mx-auto py-8">
+        <div className="mx-auto max-w-7xl py-8">
           <Button
-            variant="ghost"
+            variant="default"
             onClick={() => setShowSubscriptionPlans(false)}
-            className="mb-6"
+            className="mt-24 mb-6"
           >
             ← Back to Content
           </Button>
@@ -255,9 +269,17 @@ export default function ContentPage() {
                 <Input
                   placeholder="Search spiritual content..."
                   value={searchQuery}
+                  onKeyDown={handleKeyDown}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="rounded-2xl border-2 border-black/10 bg-white/80 py-4 pr-4 pl-12 text-center text-lg font-medium shadow-sm backdrop-blur-sm transition-all duration-300 hover:border-black/20 focus:border-black/30 dark:border-white/10 dark:bg-neutral-900/80 dark:hover:border-white/20 dark:focus:border-white/30"
+                  className="rounded-2xl border-2 border-black/10 bg-white/80 py-4 pr-16 pl-12 text-center text-lg font-medium shadow-sm backdrop-blur-sm transition-all duration-300 hover:border-black/20 focus:border-black/30 dark:border-white/10 dark:bg-neutral-900/80 dark:hover:border-white/20 dark:focus:border-white/30"
                 />
+                <Button
+                  onClick={handleSearch}
+                  size="sm"
+                  className="absolute top-1/2 right-2 h-8 w-8 -translate-y-1/2 transform rounded-xl bg-black p-0 text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+                >
+                  <Search className="h-4 w-4" />
+                </Button>
               </div>
             </div>
 
@@ -280,15 +302,21 @@ export default function ContentPage() {
                 ].map((filter) => {
                   const isActive = selectedSchool === filter.value;
                   const Icon = filter.icon;
+                  const isDisabled = isLoadingContent;
 
                   return (
                     <button
                       key={filter.value}
-                      onClick={() => setSelectedSchool(filter.value)}
+                      onClick={() =>
+                        !isDisabled && setSelectedSchool(filter.value)
+                      }
+                      disabled={isDisabled}
                       className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 ${
-                        isActive
-                          ? "bg-black text-white shadow-md dark:bg-white dark:text-black"
-                          : "border border-black/10 bg-white text-black/70 hover:border-black/20 hover:bg-black/5 dark:border-white/10 dark:bg-neutral-800 dark:text-white/70 dark:hover:border-white/20 dark:hover:bg-white/5"
+                        isDisabled
+                          ? "cursor-not-allowed opacity-50"
+                          : isActive
+                            ? "bg-black text-white shadow-md dark:bg-white dark:text-black"
+                            : "border border-black/10 bg-white text-black/70 hover:border-black/20 hover:bg-black/5 dark:border-white/10 dark:bg-neutral-800 dark:text-white/70 dark:hover:border-white/20 dark:hover:bg-white/5"
                       } `}
                     >
                       {Icon && <Icon className="h-4 w-4" />}
@@ -302,11 +330,18 @@ export default function ContentPage() {
             {/* Results Info */}
             <div className="mt-6 text-center">
               <p className="text-sm text-black/60 dark:text-white/60">
-                {totalCount !== undefined ? (
+                {isLoadingContent ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <div className="h-3 w-3 animate-spin rounded-full border border-current border-t-transparent" />
+                    {activeSearchQuery || selectedSchool !== "all"
+                      ? "Searching..."
+                      : "Loading content..."}
+                  </span>
+                ) : totalCount !== undefined ? (
                   <>
                     Showing {filteredContent.length} of {totalCount} content
                     items
-                    {searchQuery && ` for "${searchQuery}"`}
+                    {activeSearchQuery && ` for "${activeSearchQuery}"`}
                     {selectedSchool !== "all" &&
                       ` in ${getSchoolName(selectedSchool)}`}
                   </>
@@ -314,174 +349,268 @@ export default function ContentPage() {
                   "Loading content..."
                 )}
               </p>
+
+              {/* Clear Search/Filter Button */}
+              {!isLoadingContent &&
+                (activeSearchQuery || selectedSchool !== "all") && (
+                  <div className="mt-4 flex items-center justify-center gap-3">
+                    <Button
+                      onClick={() => {
+                        setSearchQuery("");
+                        setActiveSearchQuery("");
+                        setSelectedSchool("all");
+                      }}
+                      variant="outline"
+                      className="border-black/20 text-black hover:bg-black hover:text-white dark:border-white/20 dark:text-white dark:hover:bg-white dark:hover:text-black"
+                    >
+                      <ArrowRight className="mr-2 h-4 w-4 rotate-180" />
+                      View All Content
+                    </Button>
+
+                    {/* Individual clear options when both search and filter are active */}
+                    {activeSearchQuery && selectedSchool !== "all" && (
+                      <>
+                        <span className="text-xs text-black/40 dark:text-white/40">
+                          or
+                        </span>
+                        <Button
+                          onClick={() => {
+                            setSearchQuery("");
+                            setActiveSearchQuery("");
+                          }}
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"
+                        >
+                          Clear search only
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                )}
             </div>
           </motion.div>
 
           {/* Content Grid */}
-          <div className="mb-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {filteredContent.map((content, index) => (
-              <motion.article
-                key={content._id}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
-                className="group flex flex-col overflow-hidden border border-black/10 bg-white transition-all duration-500 hover:border-black hover:shadow-2xl dark:border-white/10 dark:bg-neutral-900 dark:hover:border-white"
-              >
-                <div className="relative h-64 overflow-hidden">
-                  {content.thumbnailUrl ? (
-                    <img
-                      src={content.thumbnailUrl}
-                      alt={content.title}
-                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      // width={500}
-                      // height={500}
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-linear-to-br from-black/5 to-black/10 dark:from-white/5 dark:to-white/10">
-                      {getSchoolIcon(content.school)}
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-black/20 transition-colors duration-500 group-hover:bg-black/40"></div>
-
-                  {/* School indicator and Premium badge */}
-                  <div className="absolute top-4 right-4 left-4 flex items-center justify-between gap-2">
-                    <div className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-black">
-                      {getSchoolName(content.school)}
-                    </div>
-                    {content.isSubscriberOnly && (
-                      <div className="flex items-center gap-1 rounded-full bg-black/70 px-3 py-1 text-xs font-semibold text-white">
-                        <Lock className="h-3 w-3" />
-                        Premium
+          {isLoadingContent ? (
+            <div className="mb-12">
+              <ContentSkeleton count={6} />
+            </div>
+          ) : (
+            <div className="mb-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {filteredContent.map((content, index) => (
+                <motion.article
+                  key={content._id}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
+                  className="group flex flex-col overflow-hidden border border-black/10 bg-white transition-all duration-500 hover:border-black hover:shadow-2xl dark:border-white/10 dark:bg-neutral-900 dark:hover:border-white"
+                >
+                  <div className="relative h-64 overflow-hidden">
+                    {content.thumbnailUrl ? (
+                      <img
+                        src={content.thumbnailUrl}
+                        alt={content.title}
+                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        // width={500}
+                        // height={500}
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center bg-linear-to-br from-black/5 to-black/10 dark:from-white/5 dark:to-white/10">
+                        {getSchoolIcon(content.school)}
                       </div>
                     )}
-                  </div>
+                    <div className="absolute inset-0 bg-black/20 transition-colors duration-500 group-hover:bg-black/40"></div>
 
-                  {/* Duration */}
-                  {content.duration && (
-                    <div className="absolute right-4 bottom-4">
-                      <div className="flex items-center gap-1 rounded-full bg-black/70 px-2 py-1 text-xs text-white">
-                        <Clock className="h-3 w-3" />
-                        {Math.floor(content.duration / 60)}m
+                    {/* School indicator and Premium/Purchased badge */}
+                    <div className="absolute top-4 right-4 left-4 flex items-center justify-between gap-2">
+                      <div className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-black">
+                        {getSchoolName(content.school)}
                       </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Content section - flex-1 to push button to bottom */}
-                <div className="flex flex-1 flex-col p-6">
-                  <p className="mb-2 text-xs tracking-[0.2em] text-black/60 uppercase dark:text-white/60">
-                    {content.contentType}
-                  </p>
-                  <h3
-                    className={`${larken.className} mb-3 text-2xl leading-tight font-bold`}
-                  >
-                    {content.title}
-                  </h3>
-                  <p className="mb-4 line-clamp-3 flex-1 text-sm text-black/70 dark:text-white/70">
-                    {content.description}
-                  </p>
-
-                  {/* Progress bar - will be shown on individual content pages with auth */}
-
-                  {/* Price and Action - always at bottom */}
-                  <div className="mt-auto space-y-4">
-                    {content.isSubscriberOnly && (
-                      <div className="flex items-center justify-between rounded-lg border border-black/10 bg-black/5 p-4 dark:border-white/10 dark:bg-white/5">
-                        <div className="flex items-center gap-2 text-xl font-bold">
-                          <DollarSign className="h-5 w-5" />
-                          {(content.price / 100).toFixed(0)}
+                      {content.hasAccess &&
+                      content.accessType === "purchase" ? (
+                        <div className="flex items-center gap-1 rounded-full bg-green-600 px-3 py-1 text-xs font-semibold text-white">
+                          <CheckCircle className="h-3 w-3" />
+                          Purchased
                         </div>
-                        <span className="text-xs text-black/60 dark:text-white/60">
-                          One-time purchase
-                        </span>
+                      ) : content.hasAccess &&
+                        content.accessType === "subscription" ? (
+                        <div className="flex items-center gap-1 rounded-full bg-blue-600 px-3 py-1 text-xs font-semibold text-white">
+                          <Crown className="h-3 w-3" />
+                          Included
+                        </div>
+                      ) : content.isSubscriberOnly ? (
+                        <div className="flex items-center gap-1 rounded-full bg-black/70 px-3 py-1 text-xs font-semibold text-white">
+                          <Lock className="h-3 w-3" />
+                          Premium
+                        </div>
+                      ) : null}
+                    </div>
+
+                    {/* Duration */}
+                    {content.duration && (
+                      <div className="absolute right-4 bottom-4">
+                        <div className="flex items-center gap-1 rounded-full bg-black/70 px-2 py-1 text-xs text-white">
+                          <Clock className="h-3 w-3" />
+                          {Math.floor(content.duration / 60)}m
+                        </div>
                       </div>
                     )}
-
-                    <Button
-                      className="group/btn w-full bg-black font-semibold text-white transition-all duration-300 hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
-                      onClick={() => {
-                        router.push(`/content/${content._id}`);
-                      }}
-                    >
-                      {content.isSubscriberOnly ? (
-                        <>
-                          <ShoppingCart className="mr-2 h-4 w-4" />
-                          View Details
-                        </>
-                      ) : (
-                        <>
-                          <Play className="mr-2 h-4 w-4" fill="currentColor" />
-                          Watch Free
-                        </>
-                      )}
-                      <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
-                    </Button>
                   </div>
-                </div>
-              </motion.article>
-            ))}
-          </div>
+
+                  {/* Content section - flex-1 to push button to bottom */}
+                  <div className="flex flex-1 flex-col p-6">
+                    <p className="mb-2 text-xs tracking-[0.2em] text-black/60 uppercase dark:text-white/60">
+                      {content.contentType}
+                    </p>
+                    <h3
+                      className={`${larken.className} mb-3 text-2xl leading-tight font-bold`}
+                    >
+                      {content.title}
+                    </h3>
+                    <p className="mb-4 line-clamp-3 flex-1 text-base text-ellipsis text-black/70 dark:text-white/70">
+                      {content.description}
+                    </p>
+
+                    {/* Progress bar - will be shown on individual content pages with auth */}
+
+                    {/* Price and Action - always at bottom */}
+                    <div className="mt-auto space-y-4">
+                      {content.isSubscriberOnly ? (
+                        <div className="flex items-center justify-between rounded-lg border border-black/10 bg-black/5 p-4 dark:border-white/10 dark:bg-white/5">
+                          <div className="flex items-center gap-2 text-xl font-bold">
+                            <DollarSign className="h-5 w-5" />
+                            {content.hasAccess &&
+                            content.accessType === "purchase"
+                              ? "0"
+                              : (content.price / 100).toFixed(0)}
+                          </div>
+                          <span className="text-xs font-semibold text-black/60 dark:text-white/60">
+                            {content.hasAccess &&
+                            content.accessType === "purchase"
+                              ? "Purchased"
+                              : content.hasAccess &&
+                                  content.accessType === "subscription"
+                                ? "Included in subscription"
+                                : "One-time purchase"}
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-between rounded-lg border border-black/10 bg-black/5 p-4 dark:border-white/10 dark:bg-white/5">
+                          <div className="flex items-center gap-2 text-xl font-bold">
+                            <DollarSign className="h-5 w-5" />
+                            <span>0</span>
+                          </div>
+                          <span className="text-xs font-semibold text-black/60 dark:text-white/60">
+                            Free
+                          </span>
+                        </div>
+                      )}
+
+                      <Button
+                        className="group/btn w-full bg-black font-semibold text-white transition-all duration-300 hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+                        onClick={() => {
+                          router.push(`/content/${content._id}`);
+                        }}
+                      >
+                        {content.hasAccess ? (
+                          <>
+                            <Play
+                              className="mr-2 h-4 w-4"
+                              fill="currentColor"
+                            />
+                            Watch Now
+                          </>
+                        ) : content.isSubscriberOnly ? (
+                          <>
+                            <ShoppingCart className="mr-2 h-4 w-4" />
+                            View Details
+                          </>
+                        ) : (
+                          <>
+                            <Play
+                              className="mr-2 h-4 w-4"
+                              fill="currentColor"
+                            />
+                            Watch Free
+                          </>
+                        )}
+                        <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
+                      </Button>
+                    </div>
+                  </div>
+                </motion.article>
+              ))}
+            </div>
+          )}
 
           {/* Pagination Controls */}
-          {status !== "Exhausted" && filteredContent.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="mb-16 text-center"
-            >
-              <Button
-                onClick={() => loadMore(10)}
-                disabled={(status as string) === "LoadingMore"}
-                className="bg-black px-8 py-3 text-lg font-semibold text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+          {!isLoadingContent &&
+            status !== "Exhausted" &&
+            filteredContent.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="mb-16 text-center"
               >
-                {(status as string) === "LoadingMore" ? (
-                  <>
-                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                    Loading more...
-                  </>
-                ) : (
-                  <>
-                    Load More Content
-                    <ChevronRight className="ml-2 h-5 w-5" />
-                  </>
+                <Button
+                  onClick={() => loadMore(10)}
+                  disabled={(status as string) === "LoadingMore"}
+                  className="bg-black px-8 py-3 text-lg font-semibold text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+                >
+                  {(status as string) === "LoadingMore" ? (
+                    <>
+                      <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                      Loading more...
+                    </>
+                  ) : (
+                    <>
+                      Load More Content
+                      <ChevronRight className="ml-2 h-5 w-5" />
+                    </>
+                  )}
+                </Button>
+                {totalCount !== undefined && (
+                  <p className="mt-3 text-sm text-black/60 dark:text-white/60">
+                    Showing {filteredContent.length} of {totalCount} items
+                  </p>
                 )}
-              </Button>
-              {totalCount !== undefined && (
-                <p className="mt-3 text-sm text-black/60 dark:text-white/60">
-                  Showing {filteredContent.length} of {totalCount} items
-                </p>
-              )}
-            </motion.div>
-          )}
+              </motion.div>
+            )}
 
           {/* Empty state */}
-          {status === "Exhausted" && filteredContent.length === 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="py-20 text-center"
-            >
-              <BookOpen className="mx-auto mb-6 h-16 w-16 text-black/30 dark:text-white/30" />
-              <h3 className={`${larken.className} mb-4 text-2xl font-bold`}>
-                No content found
-              </h3>
-              <p className="mx-auto mb-6 max-w-md text-black/70 dark:text-white/70">
-                {searchQuery
-                  ? `No content matches "${searchQuery}"`
-                  : "No content available in this category"}
-              </p>
-              {searchQuery && (
-                <Button
-                  onClick={() => setSearchQuery("")}
-                  className="bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
-                >
-                  Clear Search
-                </Button>
-              )}
-            </motion.div>
-          )}
+          {!isLoadingContent &&
+            status === "Exhausted" &&
+            filteredContent.length === 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="py-20 text-center"
+              >
+                <BookOpen className="mx-auto mb-6 h-16 w-16 text-black/30 dark:text-white/30" />
+                <h3 className={`${larken.className} mb-4 text-2xl font-bold`}>
+                  No content found
+                </h3>
+                <p className="mx-auto mb-6 max-w-md text-black/70 dark:text-white/70">
+                  {activeSearchQuery
+                    ? `No content matches "${activeSearchQuery}"`
+                    : "No content available in this category"}
+                </p>
+                {activeSearchQuery && (
+                  <Button
+                    onClick={() => {
+                      setSearchQuery("");
+                      setActiveSearchQuery("");
+                    }}
+                    className="bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+                  >
+                    Clear Search
+                  </Button>
+                )}
+              </motion.div>
+            )}
         </div>
       </section>
     </PageWrapper>
