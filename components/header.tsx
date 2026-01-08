@@ -172,7 +172,7 @@ export function Header() {
           <div className="flex items-center gap-3">
             <button
               className={cn(
-                "hidden gap-x-2 px-4 py-2.5 text-sm font-semibold transition-all duration-300 sm:flex sm:items-center",
+                "hidden cursor-pointer gap-x-2 px-4 py-2.5 text-sm font-semibold transition-all duration-300 sm:flex sm:items-center",
                 getButtonColors(),
               )}
             >

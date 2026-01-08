@@ -221,6 +221,65 @@ export const canUserAccessContent = query({
 });
 
 /**
+ * Check if content is accessible (works without authentication for free content)
+ */
+export const checkContentAccess = query({
+  args: {
+    userEmail: v.optional(v.string()),
+    contentId: v.string(),
+  },
+  handler: async (ctx, { userEmail, contentId }) => {
+    // Get the content first
+    const content = await ctx.db.get(contentId as Id<"contentLibrary">);
+    
+    if (!content || !content.isPublished) {
+      return { canAccess: false, accessType: null, reason: "not_found" };
+    }
+
+    // If content is free, anyone can access it
+    if (!content.isSubscriberOnly) {
+      return { canAccess: true, accessType: "free" as const };
+    }
+
+    // If no user email provided and content requires subscription
+    if (!userEmail) {
+      return { canAccess: false, accessType: null, reason: "authentication_required" };
+    }
+
+    // Check if user has active subscription covering this content
+    const activeSubscription = await ctx.db
+      .query("subscriptions")
+      .withIndex("by_email", (q) => q.eq("userEmail", userEmail))
+      .filter((q) => q.eq(q.field("status"), "active"))
+      .first();
+
+    if (activeSubscription && subscriptionCoversContent(activeSubscription.planType, content.school)) {
+      return { canAccess: true, accessType: "subscription" as const };
+    }
+
+    // Check if user purchased this specific content
+    const purchase = await ctx.db
+      .query("individualPurchases")
+      .withIndex("by_email", (q) => q.eq("userEmail", userEmail))
+      .filter((q) => q.eq(q.field("contentId"), contentId))
+      .filter((q) => q.neq(q.field("isRefunded"), true))
+      .first();
+
+    if (purchase) {
+      const isExpired =
+        purchase.accessExpirationDate &&
+        new Date(purchase.accessExpirationDate) < new Date();
+
+      if (!isExpired) {
+        return { canAccess: true, accessType: "purchase" as const };
+      }
+    }
+
+    return { canAccess: false, accessType: null, reason: "no_access" };
+  },
+});
+
+/**
  * Record individual content purchase
  */
 export const recordContentPurchase = mutation({
@@ -412,45 +471,6 @@ export const getPublicContentLibrary = query({
       isDone: result.isDone,
       continueCursor: result.continueCursor,
     };
-  },
-});
-
-/**
- * Get total count of content items for pagination info
- */
-export const getContentCount = query({
-  args: {
-    filters: v.optional(
-      v.object({
-        school: v.optional(v.string()),
-        searchQuery: v.optional(v.string()),
-      }),
-    ),
-  },
-  handler: async (ctx, { filters }) => {
-    let allContent = await ctx.db
-      .query("contentLibrary")
-      .filter((q) => q.eq(q.field("isPublished"), true))
-      .collect();
-
-    // Apply school filter
-    if (filters?.school && filters.school !== "all") {
-      allContent = allContent.filter(
-        (content) => content.school === filters.school,
-      );
-    }
-
-    // Apply search filter
-    if (filters?.searchQuery) {
-      const searchLower = filters.searchQuery.toLowerCase();
-      allContent = allContent.filter(
-        (content) =>
-          content.title.toLowerCase().includes(searchLower) ||
-          content.description.toLowerCase().includes(searchLower),
-      );
-    }
-
-    return allContent.length;
   },
 });
 
@@ -782,29 +802,29 @@ export const getAllContent = query({
  * Get individual content item with user access status
  */
 export const getContentItem = query({
-  args: { 
-    contentId: v.id("contentLibrary"), 
-    userEmail: v.optional(v.string()) 
+  args: {
+    contentId: v.id("contentLibrary"),
+    userEmail: v.optional(v.string()),
   },
   handler: async (ctx, { contentId, userEmail }) => {
     const content = await ctx.db.get(contentId);
-    
+
     if (!content || !content.isPublished) {
       return null;
     }
 
     let userAccess = null;
     let activeSubscription = null;
-    
+
     if (userEmail) {
       // Get user access
       userAccess = await ctx.db
         .query("userContentAccess")
-        .filter((q) => 
+        .filter((q) =>
           q.and(
             q.eq(q.field("userEmail"), userEmail),
-            q.eq(q.field("contentId"), contentId)
-          )
+            q.eq(q.field("contentId"), contentId),
+          ),
         )
         .first();
 
@@ -817,11 +837,14 @@ export const getContentItem = query({
     }
 
     // Check access
-    const subscriptionAccess = activeSubscription && 
+    const subscriptionAccess =
+      activeSubscription &&
       subscriptionCoversContent(activeSubscription.planType, content.school);
-    
+
     const hasAccess = !!(
-      userAccess && (!userAccess.expiresAt || new Date(userAccess.expiresAt) > new Date()) ||
+      (userAccess &&
+        (!userAccess.expiresAt ||
+          new Date(userAccess.expiresAt) > new Date())) ||
       subscriptionAccess ||
       !content.isSubscriberOnly
     );
@@ -829,7 +852,8 @@ export const getContentItem = query({
     return {
       ...content,
       hasAccess,
-      accessType: userAccess?.accessType || (subscriptionAccess ? "subscription" : null),
+      accessType:
+        userAccess?.accessType || (subscriptionAccess ? "subscription" : null),
       progress: userAccess?.progressPercentage || 0,
       lastAccessed: userAccess?.lastAccessedAt,
       completed: !!userAccess?.completedAt,

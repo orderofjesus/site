@@ -29,9 +29,15 @@ import {
   Activity,
   Search,
   Download,
+  Shield,
+  Sparkles,
+  Home,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { larken } from "@/lib/fonts";
+import { motion } from "framer-motion";
+import { Loading } from "@/components/ui/loading";
 
 interface SubscriptionAnalytics {
   totalActiveSubscriptions: number;
@@ -57,51 +63,182 @@ export default function AdminDashboard() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="space-y-2 text-center">
-          <div className="border-primary mx-auto h-8 w-8 animate-spin rounded-full border-b-2"></div>
-          <p className="text-muted-foreground">Loading admin dashboard...</p>
-        </div>
-      </div>
+      <Loading
+        message="Loading admin dashboard..."
+        submessage="Please wait while we verify your credentials"
+      />
     );
   }
 
   if (!user) {
     return (
-      <div className="flex min-h-screen items-center justify-center p-6">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <CardTitle>Admin Access Required</CardTitle>
-            <CardDescription>
-              Please sign in with an admin account
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="text-center">
-            <Link href={`/auth/login?returnTo=/admin`}>
-              <Button>Sign In</Button>
-            </Link>
-          </CardContent>
-        </Card>
+      <div className="relative min-h-screen overflow-hidden bg-white dark:bg-black">
+        {/* Decorative Background Elements */}
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute top-20 right-0 h-96 w-96 rounded-full bg-black/5 blur-3xl dark:bg-white/5"></div>
+          <div className="absolute bottom-0 left-0 h-80 w-80 rounded-full bg-black/5 blur-3xl dark:bg-white/5"></div>
+        </div>
+
+        <div className="relative z-10 flex min-h-screen items-center justify-center px-6 py-24">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="w-full max-w-2xl text-center"
+          >
+            {/* Icon */}
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="mb-8 inline-flex h-20 w-20 items-center justify-center rounded-full border-2 border-black/10 bg-black/5 dark:border-white/10 dark:bg-white/5"
+            >
+              <Shield className="h-10 w-10 text-black/60 dark:text-white/60" />
+            </motion.div>
+
+            {/* Title */}
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className={`${larken.className} mb-6 text-5xl font-bold md:text-6xl`}
+            >
+              Admin Access Required
+            </motion.h1>
+
+            {/* Description */}
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="mb-4 text-lg text-black/70 dark:text-white/70"
+            >
+              Access the admin dashboard to manage subscriptions, users, and
+              content
+            </motion.p>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              className="mb-12 text-base text-black/60 dark:text-white/60"
+            >
+              Please sign in with an admin account to continue
+            </motion.p>
+
+            {/* CTA Buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+              className="flex flex-col items-center justify-center gap-4 sm:flex-row"
+            >
+              <Link href={`/auth/login?returnTo=/admin`}>
+                <Button className="group cursor-pointer gap-x-2 rounded-none bg-black px-8 py-6 text-base font-semibold text-white transition-all duration-300 hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90">
+                  <Sparkles className="h-5 w-5 transition-transform group-hover:rotate-12" />
+                  Sign In as Admin
+                </Button>
+              </Link>
+
+              <Link href="/">
+                <Button
+                  variant="ghost"
+                  className="cursor-pointer gap-x-2 rounded-none border-2 border-black/10 px-8 py-6 text-base font-semibold transition-all duration-300 hover:border-black hover:bg-black/5 dark:border-white/10 dark:hover:border-white dark:hover:bg-white/5"
+                >
+                  <Home className="h-5 w-5" />
+                  Back to Home
+                </Button>
+              </Link>
+            </motion.div>
+          </motion.div>
+        </div>
       </div>
     );
   }
 
   if (!isAdmin) {
     return (
-      <div className="flex min-h-screen items-center justify-center p-6">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <CardTitle>Access Denied</CardTitle>
-            <CardDescription>
-              You don&apos;t have permission to access the admin dashboard
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="text-center">
-            <Button onClick={() => router.push("/dashboard")}>
-              Go to Dashboard
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="relative min-h-screen overflow-hidden bg-white dark:bg-black">
+        {/* Decorative Background Elements */}
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute top-20 right-0 h-96 w-96 rounded-full bg-red-500/5 blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 h-80 w-80 rounded-full bg-orange-500/5 blur-3xl"></div>
+        </div>
+
+        <div className="relative z-10 flex min-h-screen items-center justify-center px-6 py-24">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="w-full max-w-2xl text-center"
+          >
+            {/* Icon */}
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="mb-8 inline-flex h-20 w-20 items-center justify-center rounded-full border-2 border-red-500/20 bg-red-500/10"
+            >
+              <AlertTriangle className="h-10 w-10 text-red-600 dark:text-red-500" />
+            </motion.div>
+
+            {/* Title */}
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className={`${larken.className} mb-6 text-5xl font-bold md:text-6xl`}
+            >
+              Access Denied
+            </motion.h1>
+
+            {/* Description */}
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="mb-4 text-lg text-black/70 dark:text-white/70"
+            >
+              You don't have permission to access the admin dashboard
+            </motion.p>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              className="mb-12 text-base text-black/60 dark:text-white/60"
+            >
+              This area is restricted to administrators only. If you believe you
+              should have access, please contact support.
+            </motion.p>
+
+            {/* CTA Buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+              className="flex flex-col items-center justify-center gap-4 sm:flex-row"
+            >
+              <Button
+                onClick={() => router.push("/dashboard")}
+                className="group cursor-pointer gap-x-2 rounded-none bg-black px-8 py-6 text-base font-semibold text-white transition-all duration-300 hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+              >
+                <Users className="h-5 w-5" />
+                Go to Your Dashboard
+              </Button>
+
+              <Link href="/">
+                <Button
+                  variant="ghost"
+                  className="cursor-pointer gap-x-2 rounded-none border-2 border-black/10 px-8 py-6 text-base font-semibold transition-all duration-300 hover:border-black hover:bg-black/5 dark:border-white/10 dark:hover:border-white dark:hover:bg-white/5"
+                >
+                  <Home className="h-5 w-5" />
+                  Back to Home
+                </Button>
+              </Link>
+            </motion.div>
+          </motion.div>
+        </div>
       </div>
     );
   }

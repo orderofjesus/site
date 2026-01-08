@@ -28,6 +28,7 @@ import {
 import { useRouter, useParams } from "next/navigation";
 import { larken } from "@/lib/fonts";
 import Link from "next/link";
+import { WatchPageSkeleton } from "@/components/watch-skeleton";
 
 export default function WatchContentPage() {
   const { user, loading } = useAuth();
@@ -48,30 +49,32 @@ export default function WatchContentPage() {
   // Get content details and verify access
   const content = useQuery(api.subscriptions.getContentById, { contentId });
 
-  // Check if user has access
-  const hasAccess = useQuery(
-    api.subscriptions.canUserAccessContent,
-    user?.email ? { userEmail: user.email, contentId } : "skip",
-  );
+  // Check if user has access (works for both authenticated and unauthenticated users)
+  const hasAccess = useQuery(api.subscriptions.checkContentAccess, {
+    userEmail: user?.email,
+    contentId,
+  });
 
   // Demo video URL
   const videoUrl = "https://www.pexels.com/download/video/35443338/";
 
   useEffect(() => {
-    if (loading) {
+    if (loading || !hasAccess) {
       return;
     }
 
-    // if (!user) {
-    //   router.push(`/auth/login?returnTo=/content/${contentId}/watch`);
-    //   return;
-    // }
-
-    if (hasAccess?.canAccess === false) {
-      router.push(`/content/${contentId}`);
+    // If user doesn't have access, redirect based on the reason
+    if (hasAccess.canAccess === false) {
+      if (hasAccess.reason === "authentication_required") {
+        // Redirect to login for subscriber-only content
+        router.push(`/auth/login?returnTo=/content/${contentId}/watch`);
+      } else {
+        // Redirect to content detail page for other access issues
+        router.push(`/content/${contentId}`);
+      }
       return;
     }
-  }, [loading, user, hasAccess, contentId, router]);
+  }, [loading, hasAccess, contentId, router]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -174,23 +177,29 @@ export default function WatchContentPage() {
     }
   };
 
-  if (!user || hasAccess?.canAccess === false) {
-    return null; // Handled by useEffect redirects
+  // Show loading while checking access
+  if (loading || !hasAccess || !content) {
+    return <WatchPageSkeleton />;
   }
 
-  if (!content) {
-    return (
-      <PageWrapper className="bg-neutral-50 dark:bg-[#0a0a0a]">
-        <div className="flex min-h-screen items-center justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-black dark:border-white"></div>
-        </div>
-      </PageWrapper>
-    );
+  // If no access, return null (redirect will be handled by useEffect)
+  if (hasAccess.canAccess === false) {
+    return null;
   }
 
   return (
     <PageWrapper className="bg-black">
-      <div className="mx-auto mt-28 min-h-screen max-w-440 rounded-xl">
+      <div className="mx-auto mt-36 min-h-screen max-w-440 rounded-xl px-3">
+        <Link href={`/content/${contentId}`} className="cursor-pointer">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="mb-10 cursor-pointer gap-x-2 rounded-none bg-black px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:bg-black/90 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-white/90"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Content
+          </Button>
+        </Link>
         {/* Video Player Section */}
         <div className="relative">
           <div
@@ -207,21 +216,10 @@ export default function WatchContentPage() {
 
             {/* Video Controls Overlay */}
             <div
-              className={`absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/60 transition-opacity duration-300 ${showControls ? "opacity-100" : "opacity-0"}`}
+              className={`absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-black/60 transition-opacity duration-300 ${showControls ? "opacity-100" : "opacity-0"}`}
             >
               {/* Top Controls */}
-              <div className="absolute top-0 right-0 left-0 z-50 flex items-center justify-between p-6">
-                <Link href={`/content/${contentId}`} className="cursor-pointer">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-white hover:bg-white/20 hover:text-black"
-                  >
-                    <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Content
-                  </Button>
-                </Link>
-
+              <div className="absolute top-0 right-0 left-0 z-50 flex items-center justify-end p-6">
                 <div className="flex items-center gap-2">
                   <Button
                     variant="ghost"
@@ -425,7 +423,11 @@ export default function WatchContentPage() {
                         Status
                       </span>
                       <Badge variant="default" className="bg-green-600">
-                        Full Access
+                        {hasAccess.accessType === "free"
+                          ? "Free Access"
+                          : hasAccess.accessType === "subscription"
+                            ? "Subscription"
+                            : "Purchased"}
                       </Badge>
                     </div>
                     <div className="flex items-center justify-between">
@@ -438,7 +440,11 @@ export default function WatchContentPage() {
                       <span className="text-sm text-black/60 dark:text-white/60">
                         Download
                       </span>
-                      <span className="text-sm font-medium">Available</span>
+                      <span className="text-sm font-medium">
+                        {hasAccess.accessType === "free" && !user
+                          ? "Login Required"
+                          : "Available"}
+                      </span>
                     </div>
                   </div>
                 </motion.div>

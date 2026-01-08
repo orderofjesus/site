@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ContentImage } from "@/components/content-image";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -113,19 +114,15 @@ export function ContentPaywall({
         <CardContent className="p-0">
           {/* Content Header */}
           <div className="relative">
-            <div className="aspect-video bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-              {content.thumbnailUrl ? (
-                <img 
-                  src={content.thumbnailUrl} 
-                  alt={content.title}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="text-center space-y-2">
-                  <Lock className="h-12 w-12 text-primary/60 mx-auto" />
-                  <p className="text-sm text-muted-foreground">Preview Available</p>
-                </div>
-              )}
+            <div className="aspect-video bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center relative">
+              <ContentImage 
+                src={content.thumbnailUrl} 
+                alt={content.title}
+                school={content.school}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+              />
             </div>
             
             {/* Overlay with lock icon */}

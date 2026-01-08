@@ -31,6 +31,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { larken } from "@/lib/fonts";
 import Link from "next/link";
+import { ContentImage } from "@/components/content-image";
 import { notFound, useSearchParams } from "next/navigation";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -193,12 +194,11 @@ export default function ContentDetailPage({
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <Link
-              href="/content"
-              className="inline-flex items-center gap-2 text-black/70 transition-colors hover:text-black dark:text-white/70 dark:hover:text-white"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              <span>Back to Content Library</span>
+            <Link href="/content">
+              <Button className="mt-24 mb-6 cursor-pointer gap-x-2 rounded-none bg-black px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:bg-black/90 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-white/90">
+                <ArrowLeft className="h-4 w-4" />
+                <span>Back to Content Library</span>
+              </Button>
             </Link>
           </motion.div>
         </div>
@@ -217,17 +217,15 @@ export default function ContentDetailPage({
                 transition={{ duration: 0.6 }}
                 className="relative mb-8 aspect-video overflow-hidden rounded-lg border border-black/10 bg-gradient-to-br from-black/5 to-black/10 dark:border-white/10 dark:from-white/5 dark:to-white/10"
               >
-                {contentItem.thumbnailUrl ? (
-                  <img
-                    src={contentItem.thumbnailUrl}
-                    alt={contentItem.title}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center">
-                    {getSchoolIcon(contentItem.school)}
-                  </div>
-                )}
+                <ContentImage
+                  src={contentItem.thumbnailUrl}
+                  alt={contentItem.title}
+                  school={contentItem.school}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 66vw, 50vw"
+                  priority
+                />
 
                 {/* Play overlay */}
                 <div className="absolute inset-0 flex items-center justify-center bg-black/40">
@@ -518,7 +516,7 @@ export default function ContentDetailPage({
                         </div>
                       )}
                       <Button
-                        className="w-full bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+                        className="w-full cursor-pointer gap-x-2 rounded-none bg-black px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:bg-black/90 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-white/90"
                         onClick={handlePlayContent}
                       >
                         <Play className="mr-2 h-4 w-4" fill="currentColor" />
@@ -546,7 +544,7 @@ export default function ContentDetailPage({
 
                       <div className="space-y-4">
                         <Button
-                          className="w-full bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+                          className="w-full cursor-pointer rounded-none bg-black py-6 font-semibold text-white hover:bg-black/90 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-white/90"
                           onClick={handlePurchase}
                         >
                           {user ? (

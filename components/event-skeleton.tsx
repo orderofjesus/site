@@ -10,12 +10,12 @@ export function EventCardSkeleton() {
         <Skeleton className="mb-3 h-8 w-3/4" />
         <Skeleton className="mb-4 h-4 w-full" />
         <Skeleton className="mb-4 h-4 w-5/6" />
-        
+
         <div className="mb-4 space-y-2">
           <Skeleton className="h-3 w-32" />
           <Skeleton className="h-3 w-40" />
         </div>
-        
+
         <Skeleton className="h-10 w-full" />
       </div>
     </div>
@@ -45,13 +45,13 @@ export function EventsListSkeleton() {
                   <Skeleton className="mb-4 h-12 w-full" />
                   <Skeleton className="mb-6 h-6 w-full" />
                   <Skeleton className="mb-6 h-6 w-5/6" />
-                  
+
                   <div className="mb-8 space-y-3">
                     <Skeleton className="h-4 w-48" />
                     <Skeleton className="h-4 w-56" />
                     <Skeleton className="h-4 w-40" />
                   </div>
-                  
+
                   <Skeleton className="h-12 w-64" />
                 </div>
               </div>
@@ -116,7 +116,10 @@ export function EventDetailSkeleton() {
                 <Skeleton className="mb-6 h-10 w-48" />
                 <div className="space-y-4">
                   {[1, 2, 3].map((i) => (
-                    <div key={i} className="flex gap-6 border-l-2 border-black/10 pb-4 pl-6 dark:border-white/10">
+                    <div
+                      key={i}
+                      className="flex gap-6 border-l-2 border-black/10 pb-4 pl-6 dark:border-white/10"
+                    >
                       <Skeleton className="h-5 w-24" />
                       <Skeleton className="h-5 flex-1" />
                     </div>

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Check, Star, Crown, BookOpen } from "lucide-react";
+import { Check, Star, Crown, BookOpen, Wand2 } from "lucide-react";
 
 interface PlanFeature {
   text: string;
@@ -163,7 +163,7 @@ export function SubscriptionPlans({
       </div>
 
       {/* Plans Grid */}
-      <div className="mb-8 grid gap-6 md:grid-cols-3">
+      <div className="mb-28 grid gap-6 md:grid-cols-3">
         {plans.map((plan) => (
           <Card
             key={plan.id}
@@ -238,7 +238,7 @@ export function SubscriptionPlans({
 
             <CardFooter>
               <Button
-                className="w-full"
+                className={`w-full cursor-pointer rounded-none ${plan.popular ? "bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90" : ""}`}
                 variant={plan.popular ? "default" : "outline"}
                 onClick={() => onSelectPlan(plan.id, billingCycle)}
                 disabled={isLoading || currentPlan === plan.id}
@@ -255,10 +255,9 @@ export function SubscriptionPlans({
       </div>
 
       {/* Free Trial Notice */}
-      <div className="text-muted-foreground text-center text-sm">
-        <p>
-          ✨ Start with a 7-day free trial • Cancel anytime • No hidden fees
-        </p>
+      <div className="text-muted-foreground flex items-center justify-center text-center text-sm font-semibold">
+        <Wand2 className="mr-2" />
+        <p>Start with a 2-day free trial • Cancel anytime • No hidden fees</p>
       </div>
     </div>
   );
