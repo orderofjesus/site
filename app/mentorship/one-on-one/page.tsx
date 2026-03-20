@@ -3,6 +3,7 @@
 import { PageWrapper } from "@/components/page-wrapper";
 import { motion } from "framer-motion";
 import { larken } from "@/lib/fonts";
+import Image from "next/image";
 import {
   ArrowRight,
   Users,
@@ -202,11 +203,12 @@ export default function OneOnOneMentorshipPage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="relative"
             >
-              <div className="relative overflow-hidden rounded-2xl shadow-2xl">
-                <img
+              <div className="relative h-[500px] overflow-hidden rounded-2xl shadow-2xl lg:h-[600px]">
+                <Image
                   src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1400&auto=format&fit=crop"
                   alt="One-on-one mentorship meeting"
-                  className="h-[500px] w-full object-cover lg:h-[600px]"
+                  fill
+                  className="object-cover"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent"></div>
 
@@ -386,10 +388,12 @@ export default function OneOnOneMentorshipPage() {
                 className="rounded-2xl border-2 border-black/10 bg-neutral-50 p-8 dark:border-white/10 dark:bg-neutral-800"
               >
                 <div className="mb-6 flex items-center gap-4">
-                  <img
+                  <Image
                     src={testimonial.image}
                     alt={testimonial.name}
-                    className="h-16 w-16 rounded-full object-cover"
+                    width={64}
+                    height={64}
+                    className="rounded-full object-cover"
                   />
                   <div>
                     <div className="font-semibold">{testimonial.name}</div>

@@ -40,80 +40,84 @@ interface SubscriptionPlan {
 
 const plans: SubscriptionPlan[] = [
   {
-    id: "mystical-masterclass",
-    name: "Mystical Masterclass",
-    description: "Deep spiritual teachings and mystical practices",
+    id: "brass",
+    name: "BRASS — Foundations",
+    description: "Enter the world. Learn the language. Awaken curiosity.",
     icon: <BookOpen className="h-6 w-6" />,
     features: [
-      { text: "Access to all Mystical Masterclass content", included: true },
-      { text: "Monthly new releases", included: true },
-      { text: "Downloadable resources", included: true },
-      { text: "Community forum access", included: true },
-      { text: "Open Scroll content", included: false },
-      { text: "Live Q&A sessions", included: false },
-      { text: "Priority support", included: false },
+      { text: "Mystical Masterclass Archive", included: true },
+      { text: "Open Scroll Library Access", included: true },
+      { text: "Bonus Podcast Content", included: true },
+      { text: "Monthly New Content", included: true },
+      { text: "Downloadable Study Guides", included: true },
+      { text: "Weekly Live Q&A Calls", included: false },
+      { text: "Guided Meditations", included: false },
+      { text: "Exclusive Series", included: false },
     ],
     monthly: {
-      price: 7500, // $75 in cents
+      price: 7500,
       displayPrice: "$75",
     },
     yearly: {
-      price: 72000, // $720 in cents
+      price: 72000,
       displayPrice: "$720",
       savings: "Save $180",
     },
     cta: "Start Mystical Journey",
   },
   {
-    id: "open-scroll",
-    name: "Open Scroll",
-    description: "Prophetic insights and revelations",
-    icon: <Star className="h-6 w-6" />,
+    id: "gold",
+    name: "GOLD — Inner Circle",
+    description:
+      "Step beyond learning. Enter practice, guidance, and communion.",
+    icon: <Wand2 className="h-6 w-6" />,
     features: [
-      { text: "Access to all Open Scroll content", included: true },
-      { text: "Monthly new releases", included: true },
-      { text: "Downloadable resources", included: true },
-      { text: "Community forum access", included: true },
-      { text: "Mystical Masterclass content", included: false },
-      { text: "Live Q&A sessions", included: false },
-      { text: "Priority support", included: false },
+      { text: "Everything in Brass", included: true },
+      { text: "Weekly Live Q&A Calls", included: true },
+      { text: "Guided Meditations", included: true },
+      { text: "Live Interactive Workshops", included: true },
+      { text: "Exclusive Series", included: true },
+      { text: "Early Content Access", included: true },
+      { text: "One-Time Sessions", included: false },
+      { text: "Uncut Depth", included: false },
     ],
     monthly: {
-      price: 7500, // $75 in cents
-      displayPrice: "$75",
-    },
-    yearly: {
-      price: 72000, // $720 in cents
-      displayPrice: "$720",
-      savings: "Save $180",
-    },
-    cta: "Unlock Prophecies",
-  },
-  {
-    id: "all-access",
-    name: "All-Access Pass",
-    description: "Complete access to all spiritual content",
-    icon: <Crown className="h-6 w-6" />,
-    features: [
-      { text: "Access to ALL content", included: true },
-      { text: "Monthly new releases", included: true },
-      { text: "Downloadable resources", included: true },
-      { text: "Community forum access", included: true },
-      { text: "Exclusive subscriber content", included: true },
-      { text: "Monthly live Q&A sessions", included: true },
-      { text: "Priority email support", included: true },
-    ],
-    monthly: {
-      price: 15000, // $150 in cents
+      price: 15000,
       displayPrice: "$150",
     },
     yearly: {
-      price: 144000, // $1440 in cents
+      price: 144000,
       displayPrice: "$1,440",
       savings: "Save $360",
     },
     popular: true,
-    cta: "Get Full Access",
+    cta: "Enter the Circle",
+  },
+  {
+    id: "platinum",
+    name: "PLATINUM",
+    description: "The ultimate spiritual depth and direct engagement.",
+    icon: <Crown className="h-6 w-6" />,
+    features: [
+      { text: "Everything in Gold", included: true },
+      { text: "One-Time Private Sessions", included: true },
+      { text: "Locked Access Content", included: true },
+      { text: "Uncut Depth Archives", included: true },
+      { text: "Priority Support", included: true },
+      { text: "Direct Mentor Access", included: true },
+      { text: "Bespoke Spiritual Path", included: true },
+      { text: "VIP Event Access", included: true },
+    ],
+    monthly: {
+      price: 25000,
+      displayPrice: "$250",
+    },
+    yearly: {
+      price: 240000,
+      displayPrice: "$2,400",
+      savings: "Save $600",
+    },
+    cta: "Claim Infinite Depth",
   },
 ];
 

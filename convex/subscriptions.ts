@@ -47,9 +47,9 @@ export const createSubscription = mutation({
     userId: v.string(),
     userEmail: v.string(),
     planType: v.union(
-      v.literal("all-access"),
-      v.literal("mystical-masterclass"),
-      v.literal("open-scroll"),
+      v.literal("brass"),
+      v.literal("gold"),
+      v.literal("platinum"),
     ),
     billingCycle: v.union(v.literal("monthly"), v.literal("yearly")),
     price: v.number(),
@@ -175,45 +175,38 @@ export const canUserAccessContent = query({
     contentId: v.string(),
   },
   handler: async (ctx, { userEmail, contentId }) => {
-    // 1. Check if user has active subscription covering this content
-    const activeSubscription = await ctx.db
+    const content = await ctx.db.get(contentId as Id<"contentLibrary">);
+    if (!content || !content.isPublished) {
+      return { canAccess: false, accessType: null };
+    }
+
+    if (!content.isSubscriberOnly) {
+      return { canAccess: true, accessType: "free" as const };
+    }
+
+    // Check for active subscription
+    const subscription = await ctx.db
       .query("subscriptions")
       .withIndex("by_email", (q) => q.eq("userEmail", userEmail))
       .filter((q) => q.eq(q.field("status"), "active"))
       .first();
 
-    if (activeSubscription) {
-      const content = await ctx.db.get(contentId as Id<"contentLibrary">);
-      if (
-        content &&
-        subscriptionCoversContent(activeSubscription.planType, content.school)
-      ) {
-        return { canAccess: true, accessType: "subscription" as const };
-      }
+    if (subscription) {
+      return { canAccess: true, accessType: "subscription" as const };
     }
 
-    // 2. Check if user purchased this specific content
-    const purchase = await ctx.db
-      .query("individualPurchases")
+    // Check for individual purchase
+    const individualPurchase = await ctx.db
+      .query("userContentAccess")
       .withIndex("by_email", (q) => q.eq("userEmail", userEmail))
-      .filter((q) => q.eq(q.field("contentId"), contentId))
-      .filter((q) => q.neq(q.field("isRefunded"), true))
+      .filter((q) =>
+        q.eq(q.field("contentId"), contentId as Id<"contentLibrary">),
+      )
+      .filter((q) => q.eq(q.field("accessType"), "purchase"))
       .first();
 
-    if (purchase) {
-      const isExpired =
-        purchase.accessExpirationDate &&
-        new Date(purchase.accessExpirationDate) < new Date();
-
-      if (!isExpired) {
-        return { canAccess: true, accessType: "purchase" as const };
-      }
-    }
-
-    // 3. Check if content is free
-    const content = await ctx.db.get(contentId as Id<"contentLibrary">);
-    if (content && !content.isSubscriberOnly) {
-      return { canAccess: true, accessType: "free" as const };
+    if (individualPurchase) {
+      return { canAccess: true, accessType: "purchase" as const };
     }
 
     return { canAccess: false, accessType: null };
@@ -231,51 +224,51 @@ export const checkContentAccess = query({
   handler: async (ctx, { userEmail, contentId }) => {
     // Get the content first
     const content = await ctx.db.get(contentId as Id<"contentLibrary">);
-    
+
     if (!content || !content.isPublished) {
       return { canAccess: false, accessType: null, reason: "not_found" };
     }
 
-    // If content is free, anyone can access it
+    // If it's not subscriber only, anyone can access
     if (!content.isSubscriberOnly) {
       return { canAccess: true, accessType: "free" as const };
     }
 
-    // If no user email provided and content requires subscription
+    // If subscriber only, must be logged in and have access
     if (!userEmail) {
-      return { canAccess: false, accessType: null, reason: "authentication_required" };
+      return { canAccess: false, accessType: null, reason: "login_required" };
     }
 
-    // Check if user has active subscription covering this content
-    const activeSubscription = await ctx.db
+    // Check for active subscription
+    const subscription = await ctx.db
       .query("subscriptions")
       .withIndex("by_email", (q) => q.eq("userEmail", userEmail))
       .filter((q) => q.eq(q.field("status"), "active"))
       .first();
 
-    if (activeSubscription && subscriptionCoversContent(activeSubscription.planType, content.school)) {
+    if (subscription) {
       return { canAccess: true, accessType: "subscription" as const };
     }
 
-    // Check if user purchased this specific content
-    const purchase = await ctx.db
-      .query("individualPurchases")
+    // Check for individual purchase
+    const individualPurchase = await ctx.db
+      .query("userContentAccess")
       .withIndex("by_email", (q) => q.eq("userEmail", userEmail))
-      .filter((q) => q.eq(q.field("contentId"), contentId))
-      .filter((q) => q.neq(q.field("isRefunded"), true))
+      .filter((q) =>
+        q.eq(q.field("contentId"), contentId as Id<"contentLibrary">),
+      )
+      .filter((q) => q.eq(q.field("accessType"), "purchase"))
       .first();
 
-    if (purchase) {
-      const isExpired =
-        purchase.accessExpirationDate &&
-        new Date(purchase.accessExpirationDate) < new Date();
-
-      if (!isExpired) {
-        return { canAccess: true, accessType: "purchase" as const };
-      }
+    if (individualPurchase) {
+      return { canAccess: true, accessType: "purchase" as const };
     }
 
-    return { canAccess: false, accessType: null, reason: "no_access" };
+    return {
+      canAccess: false,
+      accessType: null,
+      reason: "subscription_required",
+    };
   },
 });
 
@@ -357,7 +350,7 @@ export const getUserContentLibrary = query({
     // Get user access data
     const userAccess = await ctx.db
       .query("userContentAccess")
-      .filter((q) => q.eq(q.field("userEmail"), userEmail))
+      .withIndex("by_email", (q) => q.eq("userEmail", userEmail))
       .collect();
 
     const activeSubscription = await ctx.db
@@ -368,30 +361,29 @@ export const getUserContentLibrary = query({
 
     // Process content items
     let processedContent = result.page.map((content) => {
-      // Check if user has access through subscription or purchase
-      const directAccess = userAccess.find(
-        (access) =>
-          access.contentId === content._id &&
-          (!access.expiresAt || new Date(access.expiresAt) > new Date()),
+      // Check if user has access
+      const accessData = userAccess.find(
+        (access) => access.contentId === content._id,
       );
 
-      const subscriptionAccess =
-        activeSubscription &&
-        subscriptionCoversContent(activeSubscription.planType, content.school);
+      // User has access if:
+      // 1. Content is not subscriber-only
+      // 2. User has an active subscription
+      // 3. User has purchased the content individually
+      const hasAccess =
+        !content.isSubscriberOnly ||
+        !!activeSubscription ||
+        accessData?.accessType === "purchase";
 
       return {
         ...content,
-        hasAccess: !!(
-          directAccess ||
-          subscriptionAccess ||
-          !content.isSubscriberOnly
-        ),
+        hasAccess,
         accessType:
-          directAccess?.accessType ||
-          (subscriptionAccess ? "subscription" : null),
-        progress: directAccess?.progressPercentage || 0,
-        lastAccessed: directAccess?.lastAccessedAt,
-        completed: !!directAccess?.completedAt,
+          accessData?.accessType ||
+          (content.isSubscriberOnly ? "subscription" : "free"),
+        progress: accessData?.progressPercentage || 0,
+        lastAccessed: accessData?.lastAccessedAt,
+        completed: !!accessData?.completedAt,
       };
     });
 
@@ -449,8 +441,8 @@ export const getPublicContentLibrary = query({
     // Process content items (no user access info since this is public)
     let processedContent = result.page.map((content) => ({
       ...content,
-      hasAccess: false, // Will be determined on individual pages with authentication
-      accessType: null,
+      hasAccess: !content.isSubscriberOnly, // Only free content is accessible publicly
+      accessType: content.isSubscriberOnly ? "subscription" : "free",
       progress: 0,
       lastAccessed: null,
       completed: false,
@@ -581,17 +573,13 @@ async function grantSubscriptionAccess(
   ctx: MutationCtx,
   userId: string,
   userEmail: string,
-  planType: "all-access" | "mystical-masterclass" | "open-scroll",
+  planType: "brass" | "gold" | "platinum",
 ) {
   const now = new Date().toISOString();
 
-  // Get content that should be accessible with this subscription
-  let schoolFilter: string[];
-  if (planType === "all-access") {
-    schoolFilter = ["mystical-masterclass", "open-scroll", "general"];
-  } else {
-    schoolFilter = [planType, "general"];
-  }
+  // Brass covers Foundations (Mystical Masterclass + Open Scroll)
+  // Gold and Platinum cover everything
+  const schoolFilter = ["mystical-masterclass", "open-scroll", "general"];
 
   const accessibleContent = await ctx.db
     .query("contentLibrary")
@@ -644,12 +632,10 @@ async function revokeSubscriptionAccess(ctx: MutationCtx, userId: string) {
  * Check if subscription plan covers specific school content
  */
 function subscriptionCoversContent(
-  planType: "all-access" | "mystical-masterclass" | "open-scroll",
+  planType: "brass" | "gold" | "platinum",
   contentSchool: "mystical-masterclass" | "open-scroll" | "general",
 ): boolean {
-  if (planType === "all-access") return true;
-  if (contentSchool === "general") return true;
-  return planType === contentSchool;
+  return true; // All tiers currently grant access to all schools, differentiation is in "Live" vs "On-demand" features
 }
 
 // Stripe Webhook Handler Types (for reference)
@@ -837,27 +823,118 @@ export const getContentItem = query({
     }
 
     // Check access
-    const subscriptionAccess =
-      activeSubscription &&
-      subscriptionCoversContent(activeSubscription.planType, content.school);
-
-    const hasAccess = !!(
-      (userAccess &&
-        (!userAccess.expiresAt ||
-          new Date(userAccess.expiresAt) > new Date())) ||
-      subscriptionAccess ||
-      !content.isSubscriberOnly
-    );
+    // User has access if:
+    // 1. Content is not subscriber-only
+    // 2. User has an active subscription
+    // 3. User has purchased the content individually
+    const hasAccess =
+      !content.isSubscriberOnly ||
+      !!activeSubscription ||
+      userAccess?.accessType === "purchase";
 
     return {
       ...content,
       hasAccess,
       accessType:
-        userAccess?.accessType || (subscriptionAccess ? "subscription" : null),
+        userAccess?.accessType ||
+        (content.isSubscriberOnly ? "subscription" : "free"),
       progress: userAccess?.progressPercentage || 0,
       lastAccessed: userAccess?.lastAccessedAt,
       completed: !!userAccess?.completedAt,
       subscription: activeSubscription,
     };
+  },
+});
+/**
+ * Create a demo subscription (bypasses Stripe)
+ */
+export const createDemoSubscription = mutation({
+  args: {
+    userId: v.string(),
+    userEmail: v.string(),
+    planType: v.union(
+      v.literal("brass"),
+      v.literal("gold"),
+      v.literal("platinum"),
+    ),
+    billingCycle: v.union(v.literal("monthly"), v.literal("yearly")),
+  },
+  handler: async (ctx, args) => {
+    const now = new Date().toISOString();
+
+    // Cancel any existing active subscriptions for this user
+    const existingSubscriptions = await ctx.db
+      .query("subscriptions")
+      .withIndex("by_email", (q) => q.eq("userEmail", args.userEmail))
+      .filter((q) => q.eq(q.field("status"), "active"))
+      .collect();
+
+    for (const sub of existingSubscriptions) {
+      await ctx.db.patch(sub._id, {
+        status: "cancelled",
+        updatedAt: now,
+        cancelAtPeriodEnd: true,
+      });
+    }
+
+    const priceMap = {
+      brass: args.billingCycle === "monthly" ? 7500 : 72000,
+      gold: args.billingCycle === "monthly" ? 15000 : 144000,
+      platinum: args.billingCycle === "monthly" ? 25000 : 240000,
+    };
+
+    // Create new demo subscription
+    const subscriptionId = await ctx.db.insert("subscriptions", {
+      ...args,
+      status: "active",
+      price: priceMap[args.planType],
+      stripeSubscriptionId: `demo_${Math.random().toString(36).substring(7)}`,
+      stripeCustomerId: `demo_cust_${Math.random().toString(36).substring(7)}`,
+      startDate: now,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    // Grant content access based on subscription type
+    await grantSubscriptionAccess(
+      ctx,
+      args.userId,
+      args.userEmail,
+      args.planType,
+    );
+
+    return subscriptionId;
+  },
+});
+
+/**
+ * Cancel a demo subscription
+ */
+export const cancelDemoSubscription = mutation({
+  args: {
+    userEmail: v.string(),
+  },
+  handler: async (ctx, { userEmail }) => {
+    const now = new Date().toISOString();
+
+    const activeSubscription = await ctx.db
+      .query("subscriptions")
+      .withIndex("by_email", (q) => q.eq("userEmail", userEmail))
+      .filter((q) => q.eq(q.field("status"), "active"))
+      .first();
+
+    if (!activeSubscription) {
+      throw new Error("No active subscription found to cancel");
+    }
+
+    await ctx.db.patch(activeSubscription._id, {
+      status: "cancelled",
+      updatedAt: now,
+    });
+
+    // Revoke access
+    await revokeSubscriptionAccess(ctx, activeSubscription.userId);
+
+    return { success: true };
   },
 });

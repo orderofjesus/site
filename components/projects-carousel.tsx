@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { larken } from "@/lib/fonts";
 
 interface Project {
@@ -81,12 +82,14 @@ export function ProjectCarousel({ projects }: ProjectCarouselProps) {
             >
               <div className="group relative overflow-hidden border-2 border-black/10 bg-white transition-all duration-500 hover:border-black hover:shadow-2xl dark:border-white/10 dark:bg-neutral-800 dark:hover:border-white">
                 <div className="relative h-80 overflow-hidden">
-                  <img
+                  <Image
                     src={project.image}
                     alt={project.title}
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
+                  {/* Overlay */}
+                  <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent opacity-60 transition-opacity duration-300 group-hover:opacity-80" />
                 </div>
                 <div className="p-8">
                   <p className="mb-3 text-xs tracking-[0.3em] text-black/60 uppercase dark:text-white/60">

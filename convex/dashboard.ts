@@ -25,7 +25,7 @@ export const getDashboardOverview = query({
       eventRegistrations.map(async (reg) => {
         const event = await ctx.db.get(reg.eventId);
         return event;
-      })
+      }),
     );
 
     // Get school enrollments
@@ -42,6 +42,13 @@ export const getDashboardOverview = query({
       .filter((q) => q.eq(q.field("status"), "active"))
       .collect();
 
+    // Get active subscription
+    const activeSubscription = await ctx.db
+      .query("subscriptions")
+      .withIndex("by_email", (q) => q.eq("userEmail", args.userEmail))
+      .filter((q) => q.eq(q.field("status"), "active"))
+      .unique();
+
     return {
       upcomingEvents: upcomingEvents.filter(Boolean),
       totalEventRegistrations: eventRegistrations.length,
@@ -49,6 +56,13 @@ export const getDashboardOverview = query({
       activeMentorships: mentorshipEnrollments.length,
       schoolEnrollments,
       mentorshipEnrollments,
+      subscription: activeSubscription
+        ? {
+            planType: activeSubscription.planType,
+            status: activeSubscription.status,
+            endDate: activeSubscription.endDate,
+          }
+        : null,
     };
   },
 });

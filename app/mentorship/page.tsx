@@ -3,6 +3,7 @@
 import { PageWrapper } from "@/components/page-wrapper";
 import { motion } from "framer-motion";
 import { larken } from "@/lib/fonts";
+import Image from "next/image";
 import {
   ArrowRight,
   Users,
@@ -235,11 +236,12 @@ export default function MentorshipPage() {
               className="relative"
             >
               <div className="sticky top-32">
-                <div className="relative overflow-hidden rounded-2xl">
-                  <img
+                <div className="relative h-[600px] overflow-hidden rounded-2xl">
+                  <Image
                     src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1400&auto=format&fit=crop"
                     alt="One-on-one mentorship"
-                    className="h-[600px] w-full object-cover"
+                    fill
+                    className="object-cover"
                   />
                   <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent"></div>
                 </div>
@@ -317,11 +319,12 @@ export default function MentorshipPage() {
               className="relative order-2 lg:order-1"
             >
               <div className="sticky top-32">
-                <div className="relative overflow-hidden rounded-2xl">
-                  <img
+                <div className="relative h-[600px] overflow-hidden rounded-2xl">
+                  <Image
                     src="https://images.unsplash.com/photo-1504052434569-70ad5836ab65?q=80&w=1400&auto=format&fit=crop"
                     alt="Elijah Network Retreat"
-                    className="h-[600px] w-full object-cover"
+                    fill
+                    className="object-cover"
                   />
                   <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent"></div>
 

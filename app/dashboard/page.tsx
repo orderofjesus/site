@@ -4,7 +4,6 @@ import { useAuth } from "@workos-inc/authkit-nextjs/components";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { AuthGuard } from "@/components/auth-guard";
-import { SubscriptionManagement } from "@/components/subscriptions/subscription-management";
 import { motion } from "framer-motion";
 import * as React from "react";
 import { useMutation } from "convex/react";
@@ -15,6 +14,7 @@ import {
   School,
   Users,
   CheckCircle2,
+  CheckCircle,
   ArrowRight,
   TrendingUp,
   MapPin,
@@ -24,6 +24,7 @@ import {
   GraduationCap,
   User,
   ArrowLeft,
+  Crown,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -98,7 +99,7 @@ function OverviewSection({
 }: {
   upcomingRegistrations: Registration[];
   userRegistrations: Registration[] | undefined;
-  dashboardData: DashboardData | undefined;
+  dashboardData: (DashboardData & { subscription?: any }) | undefined;
 }) {
   const stats = [
     {
@@ -132,6 +133,20 @@ function OverviewSection({
       description: "Mentorship programs active",
       color: "text-orange-600 dark:text-orange-400",
       href: "/dashboard?view=mentorships",
+    },
+    {
+      label: "Membership",
+      value: dashboardData?.subscription
+        ? dashboardData.subscription.planType === "all-access"
+          ? "All"
+          : "Pro"
+        : "None",
+      icon: Crown,
+      description: dashboardData?.subscription
+        ? "Active Member"
+        : "Join the Inner Circle",
+      color: "text-yellow-600 dark:text-yellow-400",
+      href: "/dashboard?view=membership",
     },
   ];
 
@@ -567,6 +582,200 @@ function MentorshipsSection() {
             </motion.div>
           ))}
         </div>
+      )}
+    </div>
+  );
+}
+
+// Membership Section
+function MembershipSection({
+  subscription,
+}: {
+  subscription: any | undefined;
+}) {
+  const { user } = useAuth();
+  const [isCancelling, setIsCancelling] = React.useState(false);
+  const [showConfirm, setShowConfirm] = React.useState(false);
+  const cancelSubscription = useMutation(
+    api.subscriptions.cancelDemoSubscription,
+  );
+
+  const handleCancel = async () => {
+    if (!user?.email) return;
+
+    setIsCancelling(true);
+    try {
+      await cancelSubscription({ userEmail: user.email });
+      toast.success("Subscription cancelled successfully");
+      setShowConfirm(false);
+    } catch (error) {
+      console.error("Failed to cancel subscription:", error);
+      toast.error("Failed to cancel subscription. Please try again.");
+    } finally {
+      setIsCancelling(false);
+    }
+  };
+
+  return (
+    <div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="mb-12"
+      >
+        <Button variant="outline" className="mb-16 rounded-none" asChild>
+          <Link href="/dashboard">
+            <ArrowLeft className="h-4 w-4" />
+            Back to Overview
+          </Link>
+        </Button>
+        <h2 className={`${larken.className} mb-2 text-4xl font-bold`}>
+          My Membership
+        </h2>
+        <p className="text-black/70 dark:text-white/70">
+          Manage your subscription and premium access
+        </p>
+      </motion.div>
+
+      {!subscription ? (
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="border border-black/10 bg-white p-12 text-center dark:border-white/10 dark:bg-neutral-900"
+        >
+          <Crown className="mx-auto mb-4 h-12 w-12 text-black/20 dark:text-white/20" />
+          <p className={`${larken.className} mb-2 text-xl font-bold`}>
+            No Active Membership
+          </p>
+          <p className="mb-6 text-sm text-black/60 dark:text-white/60">
+            Join the Inner Circle to unlock all premium content and
+            masterclasses
+          </p>
+          <Link href="/subscribe">
+            <Button className="cursor-pointer rounded-none bg-black px-8 py-6 text-base font-semibold text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90">
+              View Plans
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </Link>
+        </motion.div>
+      ) : (
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="overflow-hidden border border-black/10 bg-white dark:border-white/10 dark:bg-neutral-900"
+        >
+          <div className="bg-black p-8 text-white dark:bg-white dark:text-black">
+            <div className="mb-4 flex items-center gap-3">
+              <Crown className="h-8 w-8 text-yellow-500" />
+              <Badge
+                variant="outline"
+                className="border-white/20 text-white dark:border-black/20 dark:text-black"
+              >
+                Active
+              </Badge>
+            </div>
+            <h3
+              className={`${larken.className} mb-2 text-3xl font-bold capitalize`}
+            >
+              {subscription.planType === "brass"
+                ? "Brass — Foundations"
+                : subscription.planType === "gold"
+                  ? "Gold — Inner Circle"
+                  : subscription.planType === "platinum"
+                    ? "Platinum"
+                    : subscription.planType.replaceAll("-", " ")}
+            </h3>
+            <p className="opacity-70">
+              You have full access to all premium content, schools, and
+              masterclasses.
+            </p>
+          </div>
+          <div className="p-8">
+            <div className="grid gap-6 md:grid-cols-2">
+              <div className="space-y-4">
+                <h4 className="text-sm font-semibold tracking-wider text-black/40 uppercase dark:text-white/40">
+                  Plan Details
+                </h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-black/60 dark:text-white/60">
+                      Status
+                    </span>
+                    <span className="font-medium text-green-600">Active</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-black/60 dark:text-white/60">
+                      Billing Cycle
+                    </span>
+                    <span className="font-medium">Monthly</span>
+                  </div>
+                  {subscription.endDate && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-black/60 dark:text-white/60">
+                        Next Renewal
+                      </span>
+                      <span className="font-medium">
+                        {new Date(subscription.endDate).toLocaleDateString()}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="flex flex-col justify-end gap-3">
+                <Button
+                  variant="outline"
+                  className="rounded-none border-black/10 dark:border-white/10"
+                  asChild
+                >
+                  <Link href="/subscribe">Change Plan</Link>
+                </Button>
+
+                {showConfirm ? (
+                  <div className="flex flex-col gap-2 rounded-none bg-red-50 p-4 dark:bg-red-900/10">
+                    <p className="text-xs font-bold text-red-600">
+                      Are you sure you want to cancel?
+                    </p>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="flex-1 rounded-none"
+                        onClick={handleCancel}
+                        disabled={isCancelling}
+                      >
+                        {isCancelling ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          "Yes, Cancel"
+                        )}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 rounded-none border-black/10 bg-white"
+                        onClick={() => setShowConfirm(false)}
+                        disabled={isCancelling}
+                      >
+                        No, Stay
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    className="rounded-none text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-900/10"
+                    onClick={() => setShowConfirm(true)}
+                  >
+                    Cancel Subscription
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+        </motion.div>
       )}
     </div>
   );
@@ -1021,21 +1230,8 @@ function DashboardContent() {
                 <MentorshipDetail id={viewId as string} />
               )}
 
-              {currentView === "subscription" && user?.email && (
-                <div className="space-y-6">
-                  <div className="flex items-center gap-3">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => window.history.back()}
-                      className="p-0 h-auto"
-                    >
-                      <ArrowLeft className="h-4 w-4 mr-1" />
-                      Back
-                    </Button>
-                  </div>
-                  <SubscriptionManagement userEmail={user.email} />
-                </div>
+              {currentView === "membership" && (
+                <MembershipSection subscription={dashboardData?.subscription} />
               )}
             </div>
           </div>

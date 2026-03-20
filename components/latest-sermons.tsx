@@ -8,6 +8,7 @@ const garamond = EB_Garamond({
   weight: ["400", "700"],
 });
 
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { larken } from "@/lib/fonts";
 
@@ -113,18 +114,25 @@ const LatestSermons = ({
           <p className="text-muted-foreground">{description}</p>
         </div>
         <div className="grid gap-7 lg:grid-cols-3">
-          <img
-            src={mainImage.src}
-            alt={mainImage.alt}
-            className="size-full max-h-[620px] rounded-xl object-cover lg:col-span-2"
-          />
+          <div className="relative aspect-video overflow-hidden rounded-xl lg:col-span-2 lg:aspect-auto lg:h-full lg:max-h-[620px]">
+            <Image
+              src={mainImage.src}
+              alt={mainImage.alt}
+              fill
+              className="object-cover transition-transform duration-700 hover:scale-105"
+              priority
+            />
+          </div>
           <div className="flex flex-col gap-7 md:flex-row lg:flex-col">
             <div className="bg-muted flex flex-col justify-between gap-6 rounded-xl p-7 md:w-1/2 lg:w-auto">
-              <img
-                src={breakout.src}
-                alt={breakout.alt}
-                className="mr-auto h-12"
-              />
+              <div className="relative mr-auto h-12 w-32">
+                <Image
+                  src={breakout.src}
+                  alt={breakout.alt}
+                  fill
+                  className="object-contain object-left"
+                />
+              </div>
               <div>
                 <p className="mb-2 text-lg font-semibold">{breakout.title}</p>
                 <p className={`${larken.className} text-muted-foreground`}>
@@ -137,11 +145,14 @@ const LatestSermons = ({
                 </a>
               </Button>
             </div>
-            <img
-              src={secondaryImage.src}
-              alt={secondaryImage.alt}
-              className="grow basis-0 rounded-xl object-cover md:w-1/2 lg:min-h-0 lg:w-auto"
-            />
+            <div className="relative min-h-[300px] grow basis-0 overflow-hidden rounded-xl md:w-1/2 lg:min-h-0 lg:w-auto">
+              <Image
+                src={secondaryImage.src}
+                alt={secondaryImage.alt}
+                fill
+                className="object-cover"
+              />
+            </div>
           </div>
         </div>
       </div>

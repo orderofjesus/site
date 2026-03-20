@@ -65,7 +65,7 @@ export default function WatchContentPage() {
 
     // If user doesn't have access, redirect based on the reason
     if (hasAccess.canAccess === false) {
-      if (hasAccess.reason === "authentication_required") {
+      if (hasAccess.reason === "login_required") {
         // Redirect to login for subscriber-only content
         router.push(`/auth/login?returnTo=/content/${contentId}/watch`);
       } else {

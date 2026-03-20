@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Play, Calendar, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { larken } from "@/lib/fonts";
+import Image from "next/image";
 
 const sermons = [
   {
@@ -108,7 +109,6 @@ export default function SermonsPage() {
 
   return (
     <PageWrapper className="bg-neutral-50 dark:bg-[#0a0a0a]">
-
       {/* Hero Section */}
       <section className="px-6 pt-32 pb-16 lg:px-8">
         <div className="mx-auto max-w-7xl">
@@ -146,10 +146,11 @@ export default function SermonsPage() {
               <div className="grid gap-0 lg:grid-cols-2">
                 {/* Image Section */}
                 <div className="relative h-80 overflow-hidden lg:h-auto">
-                  <img
+                  <Image
                     src={latestSermon.image}
                     alt={latestSermon.title}
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/30 to-transparent lg:bg-linear-to-r"></div>
                   <div className="absolute top-6 left-6 bg-white px-4 py-2 text-sm font-semibold text-black">
@@ -207,10 +208,11 @@ export default function SermonsPage() {
                   className="group overflow-hidden border border-black/10 bg-white transition-all duration-500 hover:border-black hover:shadow-2xl dark:border-white/10 dark:bg-neutral-900 dark:hover:border-white"
                 >
                   <div className="relative h-64 overflow-hidden">
-                    <img
+                    <Image
                       src={sermon.image}
                       alt={sermon.title}
-                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-black/20 transition-colors duration-500 group-hover:bg-black/40"></div>
                     <div className="absolute top-4 right-4 bg-white px-3 py-1 text-xs font-semibold text-black">

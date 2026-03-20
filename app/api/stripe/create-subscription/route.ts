@@ -12,17 +12,17 @@ const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 // Price ID mappings
 const PRICE_IDS = {
-  "all-access": {
-    monthly: process.env.NEXT_PUBLIC_STRIPE_ALL_ACCESS_MONTHLY_PRICE_ID!,
-    yearly: process.env.NEXT_PUBLIC_STRIPE_ALL_ACCESS_YEARLY_PRICE_ID!,
+  brass: {
+    monthly: process.env.NEXT_PUBLIC_STRIPE_BRASS_MONTHLY_PRICE_ID!,
+    yearly: process.env.NEXT_PUBLIC_STRIPE_BRASS_YEARLY_PRICE_ID!,
   },
-  "mystical-masterclass": {
-    monthly: process.env.NEXT_PUBLIC_STRIPE_MYSTICAL_MONTHLY_PRICE_ID!,
-    yearly: process.env.NEXT_PUBLIC_STRIPE_MYSTICAL_YEARLY_PRICE_ID!,
+  gold: {
+    monthly: process.env.NEXT_PUBLIC_STRIPE_GOLD_MONTHLY_PRICE_ID!,
+    yearly: process.env.NEXT_PUBLIC_STRIPE_GOLD_YEARLY_PRICE_ID!,
   },
-  "open-scroll": {
-    monthly: process.env.NEXT_PUBLIC_STRIPE_OPEN_SCROLL_MONTHLY_PRICE_ID!,
-    yearly: process.env.NEXT_PUBLIC_STRIPE_OPEN_SCROLL_YEARLY_PRICE_ID!,
+  platinum: {
+    monthly: process.env.NEXT_PUBLIC_STRIPE_PLATINUM_MONTHLY_PRICE_ID!,
+    yearly: process.env.NEXT_PUBLIC_STRIPE_PLATINUM_YEARLY_PRICE_ID!,
   },
 } as const;
 

@@ -5,7 +5,6 @@ import { useQuery, usePaginatedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useAuth } from "@workos-inc/authkit-nextjs/components";
 import { PageWrapper } from "@/components/page-wrapper";
-import { SubscriptionPlans } from "@/components/subscriptions/subscription-plans";
 import { ContentSkeleton } from "@/components/content-skeleton";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -42,7 +41,6 @@ export default function ContentPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeSearchQuery, setActiveSearchQuery] = useState("");
   const [selectedSchool, setSelectedSchool] = useState<string>("all");
-  const [showSubscriptionPlans, setShowSubscriptionPlans] = useState(false);
 
   // Memoize filters to prevent unnecessary re-renders
   const filters = useMemo(
@@ -76,25 +74,6 @@ export default function ContentPage() {
     user?.email ? { userEmail: user.email, filters } : { filters },
     { initialNumItems: 10 },
   );
-
-  // Get user's active subscription
-  const activeSubscription = useQuery(
-    api.subscriptions.getUserActiveSubscription,
-    user?.email ? { userEmail: user.email } : "skip",
-  );
-
-  const handleSubscribe = (planType: string) => {
-    router.push(`/subscribe?plan=${planType}`);
-  };
-
-  const handlePurchase = (contentId: string) => {
-    // Handle individual content purchase
-    router.push(`/content/${contentId}/purchase`);
-  };
-
-  const handleStartTrial = () => {
-    router.push("/subscribe");
-  };
 
   // Content is already filtered by the backend
   const filteredContent = contentLibrary || [];
@@ -147,23 +126,11 @@ export default function ContentPage() {
   //   );
   // }
 
-  if (showSubscriptionPlans) {
+  if (isInitialLoading) {
     return (
-      <PageWrapper>
-        <div className="mx-auto max-w-7xl py-8">
-          <Button
-            variant="default"
-            onClick={() => setShowSubscriptionPlans(false)}
-            className="mt-24 mb-6 cursor-pointer gap-x-2 rounded-none bg-black px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:bg-black/90 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-white/90"
-          >
-            ← Back to Content
-          </Button>
-          <SubscriptionPlans
-            onSelectPlan={(planType, billingCycle) => {
-              router.push(`/subscribe?plan=${planType}&cycle=${billingCycle}`);
-            }}
-            currentPlan={activeSubscription?.planType}
-          />
+      <PageWrapper className="bg-neutral-50 dark:bg-[#0a0a0a]">
+        <div className="mx-auto max-w-7xl px-6 pt-32 pb-20">
+          <ContentSkeleton count={6} />
         </div>
       </PageWrapper>
     );
@@ -198,64 +165,6 @@ export default function ContentPage() {
               Discover transformative spiritual content tailored to your
               journey. From mystical masterclasses to prophetic insights.
             </p>
-          </motion.div>
-
-          {/* Subscription Status */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="mb-12 text-center"
-          >
-            {isInitialLoading ? (
-              /* Skeleton loading for subscription status */
-              <div className="mx-auto max-w-sm rounded-md border-2 border-black/10 bg-white p-4 dark:border-white/10 dark:bg-neutral-900">
-                <div className="flex items-start gap-3">
-                  <Skeleton className="mt-0.5 h-5 w-5 shrink-0 rounded" />
-                  <div className="flex-1 space-y-3">
-                    <Skeleton className="h-5 w-32" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-3/4" />
-                    <Skeleton className="mt-2 h-10 w-full" />
-                  </div>
-                </div>
-              </div>
-            ) : activeSubscription ? (
-              <div className="flex items-center justify-center gap-2">
-                <Badge variant="default" className="bg-green-600">
-                  <Crown className="mr-1 h-3 w-3" />
-                  {activeSubscription.planType === "all-access"
-                    ? "All-Access"
-                    : getSchoolName(activeSubscription.planType)}{" "}
-                  Active
-                </Badge>
-                {activeSubscription.status === "trial" && (
-                  <Badge variant="outline">Free Trial</Badge>
-                )}
-              </div>
-            ) : (
-              <div className="mx-auto max-w-sm rounded-md border-2 border-cyan-500 bg-cyan-50 p-4 text-left dark:bg-cyan-900/20">
-                <div className="flex items-start gap-3">
-                  <CrownIcon className="mt-0.5 h-5 w-5 shrink-0 text-cyan-700 dark:text-cyan-400" />
-                  <div className="flex-1 gap-y-3">
-                    <h4 className="font-semibold text-cyan-900 dark:text-cyan-200">
-                      Access Premium
-                    </h4>
-                    <p className="my-2 text-sm font-semibold text-cyan-800 dark:text-cyan-300">
-                      Subscribe to unlock premium content and get access to our
-                      whole library of deep mystical and biblical truths
-                    </p>
-                    <Button
-                      onClick={() => setShowSubscriptionPlans(true)}
-                      className="w-full cursor-pointer rounded-none bg-cyan-900 font-semibold text-white hover:bg-black/90 hover:bg-cyan-950 dark:bg-white dark:text-black dark:hover:bg-white/90"
-                    >
-                      View Plans
-                      <ArrowRight className="ml-1 h-[20px] w-[20px]" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            )}
           </motion.div>
 
           {/* Search and Filters */}
@@ -459,29 +368,22 @@ export default function ContentPage() {
                       )}
                       <div className="absolute inset-0 bg-black/20 transition-colors duration-200 group-hover:bg-black/30"></div>
 
-                      {/* School indicator and Premium/Purchased badge */}
+                      {/* Access indicator */}
                       <div className="absolute top-4 right-4 left-4 flex items-center justify-between gap-2">
-                        <div className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-black">
+                        <div className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-black/80">
                           {getSchoolName(content.school)}
                         </div>
-                        {content.hasAccess &&
-                        content.accessType === "purchase" ? (
-                          <div className="flex items-center gap-1 rounded-full bg-green-600 px-3 py-1 text-xs font-semibold text-white">
+                        {content.hasAccess ? (
+                          <div className="flex items-center gap-1 rounded-full bg-green-500/90 px-3 py-1 text-xs font-semibold text-white">
                             <CheckCircle className="h-3 w-3" />
-                            Purchased
+                            Accessible
                           </div>
-                        ) : content.hasAccess &&
-                          content.accessType === "subscription" ? (
-                          <div className="flex items-center gap-1 rounded-full bg-blue-600 px-3 py-1 text-xs font-semibold text-white">
-                            <Crown className="h-3 w-3" />
-                            Included
-                          </div>
-                        ) : content.isSubscriberOnly ? (
-                          <div className="flex items-center gap-1 rounded-full bg-black/70 px-3 py-1 text-xs font-semibold text-white">
+                        ) : (
+                          <div className="flex items-center gap-1 rounded-full bg-black/70 px-3 py-1 text-xs font-semibold text-white backdrop-blur-sm">
                             <Lock className="h-3 w-3" />
                             Premium
                           </div>
-                        ) : null}
+                        )}
                       </div>
 
                       {/* Duration */}
@@ -511,39 +413,8 @@ export default function ContentPage() {
 
                       {/* Progress bar - will be shown on individual content pages with auth */}
 
-                      {/* Price and Action - always at bottom */}
+                      {/* Action - always at bottom */}
                       <div className="mt-auto space-y-4">
-                        {content.isSubscriberOnly ? (
-                          <div className="flex items-center justify-between rounded-lg border border-black/10 bg-black/5 p-4 dark:border-white/10 dark:bg-white/5">
-                            <div className="flex items-center gap-2 text-xl font-bold">
-                              <DollarSign className="h-5 w-5" />
-                              {content.hasAccess &&
-                              content.accessType === "purchase"
-                                ? "0"
-                                : (content.price / 100).toFixed(0)}
-                            </div>
-                            <span className="text-xs font-semibold text-black/60 dark:text-white/60">
-                              {content.hasAccess &&
-                              content.accessType === "purchase"
-                                ? "Purchased"
-                                : content.hasAccess &&
-                                    content.accessType === "subscription"
-                                  ? "Included in subscription"
-                                  : "One-time purchase"}
-                            </span>
-                          </div>
-                        ) : (
-                          <div className="flex items-center justify-between rounded-lg border border-black/10 bg-black/5 p-4 dark:border-white/10 dark:bg-white/5">
-                            <div className="flex items-center gap-2 text-xl font-bold">
-                              <DollarSign className="h-5 w-5" />
-                              <span>0</span>
-                            </div>
-                            <span className="text-xs font-semibold text-black/60 dark:text-white/60">
-                              Free
-                            </span>
-                          </div>
-                        )}
-
                         <Link
                           href={`/content/${content._id}`}
                           className="cursor-pointer"
@@ -557,18 +428,10 @@ export default function ContentPage() {
                                 />
                                 Watch Now
                               </>
-                            ) : content.isSubscriberOnly ? (
-                              <>
-                                <ShoppingCart className="mr-2 h-4 w-4" />
-                                View Details
-                              </>
                             ) : (
                               <>
-                                <Play
-                                  className="mr-2 h-4 w-4"
-                                  fill="currentColor"
-                                />
-                                Watch Free
+                                <Lock className="mr-2 h-4 w-4" />
+                                Unlock Content
                               </>
                             )}
                             <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover/btn:translate-x-1" />

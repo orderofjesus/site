@@ -13,6 +13,7 @@ import {
   ArrowRight,
   Quote,
 } from "lucide-react";
+import Image from "next/image";
 import { hellix, larken } from "@/lib/fonts";
 
 const features = [
@@ -195,11 +196,12 @@ export function AboutSection() {
             className="relative"
           >
             {/* Main Image */}
-            <div className="relative overflow-hidden">
-              <img
+            <div className="relative aspect-16/10 overflow-hidden rounded-xl">
+              <Image
                 src="https://images.unsplash.com/photo-1529070538774-1843cb3265df?q=80&w=1400&auto=format&fit=crop"
                 alt="Community worship"
-                className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
+                fill
+                className="object-cover transition-transform duration-700 hover:scale-105"
               />
 
               {/* Play Button Overlay for Video */}
@@ -247,18 +249,20 @@ export function AboutSection() {
 
             {/* Secondary Images */}
             <div className="mt-4 grid grid-cols-2 gap-4">
-              <div className="aspect-video overflow-hidden">
-                <img
+              <div className="relative aspect-video overflow-hidden rounded-lg">
+                <Image
                   src="https://images.unsplash.com/photo-1438232992991-995b7058bbb3?q=80&w=800&auto=format&fit=crop"
                   alt="Community serving"
-                  className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
+                  fill
+                  className="object-cover transition-transform duration-700 hover:scale-105"
                 />
               </div>
-              <div className="aspect-video overflow-hidden">
-                <img
+              <div className="relative aspect-video overflow-hidden rounded-lg">
+                <Image
                   src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=800&auto=format&fit=crop"
                   alt="Worship team"
-                  className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
+                  fill
+                  className="object-cover transition-transform duration-700 hover:scale-105"
                 />
               </div>
             </div>
@@ -396,11 +400,12 @@ export function AboutSection() {
                         transition={{ duration: 0.4, delay: index * 0.1 }}
                         className="flex gap-6 border border-black/10 bg-white p-6 transition-all duration-300 hover:border-black hover:shadow-lg dark:border-white/10 dark:bg-neutral-900 dark:hover:border-white"
                       >
-                        <div className="h-24 w-24 shrink-0 overflow-hidden">
-                          <img
+                        <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full">
+                          <Image
                             src={leader.image}
                             alt={leader.name}
-                            className="h-full w-full object-cover grayscale transition-all duration-300 hover:grayscale-0"
+                            fill
+                            className="object-cover grayscale transition-all duration-300 hover:grayscale-0"
                           />
                         </div>
                         <div className="flex-1">

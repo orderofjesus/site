@@ -2,6 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { ChevronRight, Play, Calendar } from "lucide-react";
 import Link from "next/link";
 import { hellix, larken } from "@/lib/fonts";
@@ -22,30 +23,38 @@ interface SermonsGridProps {
 
 export function SermonsGrid({ sermons }: SermonsGridProps) {
   return (
-    <section id="sermons" className="py-32 bg-neutral-50 dark:bg-neutral-800 transition-colors duration-300">
+    <section
+      id="sermons"
+      className="bg-neutral-50 py-32 transition-colors duration-300 dark:bg-neutral-800"
+    >
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="flex items-end justify-between mb-16"
+          className="mb-16 flex items-end justify-between"
         >
           <div>
-            <p className="text-xs tracking-[0.4em] uppercase text-black/60 dark:text-white/60 mb-4">
+            <p className="mb-4 text-xs tracking-[0.4em] text-black/60 uppercase dark:text-white/60">
               Teaching Archive
             </p>
-            <h2 className={`${larken.className} text-5xl md:text-6xl font-bold`}>
+            <h2
+              className={`${larken.className} text-5xl font-bold md:text-6xl`}
+            >
               Recent Sermons
             </h2>
           </div>
-          <Link href="/sermons" className="hidden md:flex items-center gap-2 text-sm font-semibold hover:gap-3 transition-all">
+          <Link
+            href="/sermons"
+            className="hidden items-center gap-2 text-sm font-semibold transition-all hover:gap-3 md:flex"
+          >
             View All Sermons
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="h-4 w-4" />
           </Link>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {sermons.map((sermon, index) => (
             <motion.article
               key={sermon.id}
@@ -53,38 +62,39 @@ export function SermonsGrid({ sermons }: SermonsGridProps) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="group bg-white dark:bg-neutral-900 border border-black/10 dark:border-white/10 overflow-hidden hover:shadow-2xl hover:border-black dark:hover:border-white transition-all duration-500"
+              className="group overflow-hidden border border-black/10 bg-white transition-all duration-500 hover:border-black hover:shadow-2xl dark:border-white/10 dark:bg-neutral-900 dark:hover:border-white"
             >
               <div className="relative h-64 overflow-hidden">
-                <img
+                <Image
                   src={sermon.image}
                   alt={sermon.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-500"></div>
-                <button className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 bg-white text-black flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <Play className="w-5 h-5 ml-1" fill="currentColor" />
+                <div className="absolute inset-0 bg-black/20 transition-colors duration-500 group-hover:bg-black/40"></div>
+                <button className="absolute top-1/2 left-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center bg-white text-black opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                  <Play className="ml-1 h-5 w-5" fill="currentColor" />
                 </button>
-                <div className="absolute top-4 right-4 px-3 py-1 bg-white text-black text-xs font-semibold">
+                <div className="absolute top-4 right-4 bg-white px-3 py-1 text-xs font-semibold text-black">
                   {sermon.series}
                 </div>
               </div>
               <div className="p-6">
-                <p className="text-xs tracking-[0.2em] uppercase text-black/60 dark:text-white/60 mb-2">
+                <p className="mb-2 text-xs tracking-[0.2em] text-black/60 uppercase dark:text-white/60">
                   {sermon.speaker}
                 </p>
                 <h3
-                  className={`${larken.className} text-2xl font-bold mb-3 group-hover:underline`}
+                  className={`${larken.className} mb-3 text-2xl font-bold group-hover:underline`}
                 >
                   {sermon.title}
                 </h3>
                 <div className="flex items-center gap-4 text-sm text-black/60 dark:text-white/60">
                   <div className="flex items-center gap-1">
-                    <Calendar className="w-4 h-4" />
+                    <Calendar className="h-4 w-4" />
                     {sermon.date}
                   </div>
                   <div className="flex items-center gap-1">
-                    <Play className="w-4 h-4" />
+                    <Play className="h-4 w-4" />
                     {sermon.duration}
                   </div>
                 </div>
@@ -100,9 +110,12 @@ export function SermonsGrid({ sermons }: SermonsGridProps) {
           transition={{ duration: 0.6 }}
           className="mt-12 text-center md:hidden"
         >
-          <Link href="/sermons" className="inline-flex items-center gap-2 px-8 py-4 text-sm font-semibold bg-black dark:bg-white text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90 transition-all">
+          <Link
+            href="/sermons"
+            className="inline-flex items-center gap-2 bg-black px-8 py-4 text-sm font-semibold text-white transition-all hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+          >
             View All Sermons
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="h-4 w-4" />
           </Link>
         </motion.div>
       </div>

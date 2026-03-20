@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { ChevronLeft, ChevronRight, Play } from "lucide-react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { hellix, larken } from "@/lib/fonts";
 
 interface Sermon {
@@ -81,12 +82,13 @@ export function SermonCarousel({ sermons }: SermonCarouselProps) {
             >
               <div className="group relative overflow-hidden border border-white/10 bg-white/5 transition-all duration-500 hover:border-white dark:border-white/10 dark:bg-white/5 dark:hover:border-white">
                 <div className="relative h-80 overflow-hidden">
-                  <img
+                  <Image
                     src={sermon.image}
                     alt={sermon.title}
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
+                  <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent opacity-60 transition-opacity duration-300 group-hover:opacity-80" />
                   <button className="absolute top-1/2 left-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center bg-white text-black transition-transform duration-300 group-hover:scale-110 dark:bg-white dark:text-black">
                     <Play className="ml-1 h-6 w-6" fill="currentColor" />
                   </button>

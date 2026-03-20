@@ -110,9 +110,10 @@ export default function EventsPage() {
                 <div className="grid gap-0 lg:grid-cols-2">
                   {/* Image Section */}
                   <div className="relative h-80 overflow-hidden lg:h-auto">
-                    <img
+                    <ContentImage
                       src={upcomingEvent.image}
                       alt={upcomingEvent.title}
+                      fill
                       className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/30 to-transparent lg:bg-linear-to-r"></div>

@@ -85,36 +85,10 @@ export default function ContentDetailPage({
   const { id } = use(params);
   const router = useRouter();
   const { user } = useAuth();
-  const searchParams = useSearchParams();
-  const [expandedPaymentMethod, setExpandedPaymentMethod] = useState<
-    string | null
-  >(null);
+  // Handle ID conversion
+  const contentId = id as Id<"contentLibrary">;
 
-  // Handle purchase status from URL params
-  useEffect(() => {
-    const purchaseStatus = searchParams.get("purchase");
-    if (purchaseStatus === "success") {
-      toast.success(
-        "Purchase successful! You now have access to this content.",
-      );
-      // Remove the query param from URL
-      const newUrl = window.location.pathname;
-      window.history.replaceState({}, "", newUrl);
-    } else if (purchaseStatus === "cancelled") {
-      toast.error("Purchase was cancelled. You can try again anytime.");
-      // Remove the query param from URL
-      const newUrl = window.location.pathname;
-      window.history.replaceState({}, "", newUrl);
-    }
-  }, [searchParams]);
-
-  // Validate ID format
-  let contentId: Id<"contentLibrary"> | null = null;
-  try {
-    contentId = id as Id<"contentLibrary">;
-  } catch {
-    notFound();
-  }
+  // Content item will be fetched below
 
   // Get content item with user access status
   const contentItem = useQuery(
@@ -135,53 +109,8 @@ export default function ContentDetailPage({
     return <ContentDetailSkeleton />;
   }
 
-  const handlePurchase = async () => {
-    if (!user) {
-      router.push(`/auth/login?returnTo=/content/${id}`);
-      return;
-    }
-
-    try {
-      const response = await fetch("/api/stripe/purchase-content", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          contentId: contentId,
-          successUrl: `${window.location.origin}/content/${contentId}?purchase=success`,
-          cancelUrl: `${window.location.origin}/content/${contentId}?purchase=cancelled`,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to create checkout session");
-      }
-
-      // Redirect to Stripe Checkout
-      if (data.url) {
-        window.location.href = data.url;
-      }
-    } catch (error) {
-      console.error("Purchase error:", error);
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Failed to start purchase process",
-      );
-    }
-  };
-
   const handlePlayContent = () => {
-    if (contentItem.hasAccess) {
-      // Navigate to content player or show content
-      router.push(`/content/${contentId}/watch`);
-    } else {
-      // Show purchase options
-      handlePurchase();
-    }
+    router.push(`/content/${contentId}/watch`);
   };
 
   return (
@@ -215,7 +144,7 @@ export default function ContentDetailPage({
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
-                className="relative mb-8 aspect-video overflow-hidden rounded-lg border border-black/10 bg-gradient-to-br from-black/5 to-black/10 dark:border-white/10 dark:from-white/5 dark:to-white/10"
+                className="relative mb-8 aspect-video overflow-hidden rounded-lg border border-black/10 bg-linear-to-br from-black/5 to-black/10 dark:border-white/10 dark:from-white/5 dark:to-white/10"
               >
                 <ContentImage
                   src={contentItem.thumbnailUrl}
@@ -234,7 +163,11 @@ export default function ContentDetailPage({
                     onClick={handlePlayContent}
                     className="h-16 w-16 rounded-full bg-white/90 p-0 text-black transition-all duration-300 hover:scale-105 hover:bg-white"
                   >
-                    <Play className="ml-1 h-8 w-8" fill="currentColor" />
+                    {contentItem.hasAccess ? (
+                      <Play className="ml-1 h-8 w-8" fill="currentColor" />
+                    ) : (
+                      <Lock className="h-8 w-8" />
+                    )}
                   </Button>
                 </div>
 
@@ -253,10 +186,10 @@ export default function ContentDetailPage({
                   {contentItem.hasAccess ? (
                     <Badge className="bg-green-500 text-white">
                       <CheckCircle className="mr-1 h-3 w-3" />
-                      You have access
+                      Accessible
                     </Badge>
                   ) : (
-                    <Badge className="bg-black/70 text-white">
+                    <Badge className="bg-black/70 text-white backdrop-blur-sm">
                       <Lock className="mr-1 h-3 w-3" />
                       Premium Content
                     </Badge>
@@ -362,41 +295,7 @@ export default function ContentDetailPage({
                 </div>
               </motion.div>
 
-              {/* Content Preview */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.25 }}
-                className="mb-8"
-              >
-                <h2 className={`${larken.className} mb-6 text-3xl font-bold`}>
-                  Content Preview
-                </h2>
-                <div className="rounded-lg border border-black/10 bg-gradient-to-r from-black/5 to-black/10 p-6 dark:border-white/10 dark:from-white/5 dark:to-white/10">
-                  <div className="mb-4 flex items-center gap-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-black/10 dark:bg-white/10">
-                      <Play className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">Free Preview Available</h3>
-                      <p className="text-sm text-black/60 dark:text-white/60">
-                        Get a taste of what&apos;s inside before you purchase
-                      </p>
-                    </div>
-                  </div>
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => {
-                      // Handle preview functionality
-                      toast.info("Preview feature coming soon!");
-                    }}
-                  >
-                    <Play className="mr-2 h-4 w-4" />
-                    Watch Preview (5 min)
-                  </Button>
-                </div>
-              </motion.div>
+              {/* Content sections below */}
 
               {/* Course Content */}
               {contentItem.contentType === "course" && (
@@ -454,7 +353,7 @@ export default function ContentDetailPage({
                   <h3 className="mb-4 font-semibold">Content Details</h3>
                   <div className="space-y-3 text-sm">
                     <div className="flex items-start gap-3">
-                      <Clock className="mt-0.5 h-4 w-4 flex-shrink-0 text-black/60 dark:text-white/60" />
+                      <Clock className="mt-0.5 h-4 w-4 shrink-0 text-black/60 dark:text-white/60" />
                       <div>
                         <p className="font-medium">Duration</p>
                         <p className="text-black/60 dark:text-white/60">
@@ -465,7 +364,7 @@ export default function ContentDetailPage({
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
-                      <Target className="mt-0.5 h-4 w-4 flex-shrink-0 text-black/60 dark:text-white/60" />
+                      <Target className="mt-0.5 h-4 w-4 shrink-0 text-black/60 dark:text-white/60" />
                       <div>
                         <p className="font-medium">Difficulty Level</p>
                         <p className="text-black/60 dark:text-white/60">
@@ -474,7 +373,7 @@ export default function ContentDetailPage({
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
-                      <Award className="mt-0.5 h-4 w-4 flex-shrink-0 text-black/60 dark:text-white/60" />
+                      <Award className="mt-0.5 h-4 w-4 shrink-0 text-black/60 dark:text-white/60" />
                       <div>
                         <p className="font-medium">School</p>
                         <p className="text-black/60 dark:text-white/60">
@@ -487,228 +386,74 @@ export default function ContentDetailPage({
 
                 {/* Pricing & Access Card */}
                 <div className="border border-black/10 bg-white p-6 dark:border-white/10 dark:bg-neutral-900">
-                  {contentItem.hasAccess ? (
-                    // User has access
-                    <div className="text-center">
-                      <div className="mb-4">
-                        <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
-                      </div>
-                      <h3 className="mb-2 text-lg font-semibold">
-                        You have access!
-                      </h3>
-                      <p className="mb-4 text-sm text-black/60 dark:text-white/60">
-                        {contentItem.accessType === "subscription"
-                          ? "Included in your subscription"
-                          : "Purchased content"}
-                      </p>
-                      {contentItem.progress > 0 && (
+                  <div className="text-center">
+                    {contentItem.hasAccess ? (
+                      <>
                         <div className="mb-4">
-                          <div className="mb-1 flex justify-between text-xs">
-                            <span>Progress</span>
-                            <span>{contentItem.progress}%</span>
-                          </div>
-                          <div className="h-2 w-full rounded-full bg-black/10 dark:bg-white/10">
-                            <div
-                              className="h-2 rounded-full bg-black transition-all dark:bg-white"
-                              style={{ width: `${contentItem.progress}%` }}
-                            />
-                          </div>
+                          <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
                         </div>
-                      )}
-                      <Button
-                        className="w-full cursor-pointer gap-x-2 rounded-none bg-black px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:bg-black/90 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-white/90"
-                        onClick={handlePlayContent}
-                      >
-                        <Play className="mr-2 h-4 w-4" fill="currentColor" />
-                        {contentItem.completed
-                          ? "Watch Again"
-                          : contentItem.progress > 0
-                            ? "Continue Watching"
-                            : "Start Watching"}
-                      </Button>
-                    </div>
-                  ) : (
-                    // User needs to purchase
-                    <div>
-                      <div className="mb-6 text-center">
-                        <div className="mb-4 flex items-center justify-center gap-2">
-                          <DollarSign className="h-8 w-8" />
-                          <span className="text-3xl font-bold">
-                            {(contentItem.price / 100).toFixed(0)}
-                          </span>
-                        </div>
-                        <p className="text-sm text-black/60 dark:text-white/60">
-                          One-time purchase • Lifetime access
+                        <h3 className="mb-2 text-lg font-semibold">
+                          You have access
+                        </h3>
+                        <p className="mb-6 text-sm text-black/60 dark:text-white/70">
+                          {contentItem.accessType === "subscription"
+                            ? "Included with your active membership."
+                            : contentItem.accessType === "purchase"
+                              ? "You've purchased this item individually."
+                              : "This content is free for all members."}
                         </p>
-                      </div>
-
-                      <div className="space-y-4">
                         <Button
-                          className="w-full cursor-pointer rounded-none bg-black py-6 font-semibold text-white hover:bg-black/90 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-white/90"
-                          onClick={handlePurchase}
+                          className="w-full cursor-pointer gap-x-2 rounded-none bg-black px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+                          onClick={handlePlayContent}
                         >
-                          {user ? (
-                            <>
-                              <ShoppingCart className="mr-2 h-4 w-4" />
-                              Purchase Now
-                            </>
-                          ) : (
-                            <>
-                              <Lock className="mr-2 h-4 w-4" />
-                              Login to Purchase
-                            </>
-                          )}
+                          <Play className="mr-2 h-4 w-4" fill="currentColor" />
+                          Start Watching
                         </Button>
-
-                        {/* Payment Methods / Login Message */}
-                        {user ? (
-                          <>
-                            <div className="space-y-3">
-                              <p className="text-center text-sm font-medium text-black/60 dark:text-white/60">
-                                Payment Methods
-                              </p>
-
-                              {/* Stripe Payment */}
-                              <div className="rounded-lg border border-black/10 p-4 dark:border-white/10">
-                                <button
-                                  onClick={() =>
-                                    setExpandedPaymentMethod(
-                                      expandedPaymentMethod === "stripe"
-                                        ? null
-                                        : "stripe",
-                                    )
-                                  }
-                                  className="flex w-full items-center justify-between"
-                                >
-                                  <div className="flex items-center gap-3">
-                                    <CreditCard className="h-5 w-5" />
-                                    <span className="font-medium">
-                                      Credit/Debit Card
-                                    </span>
-                                  </div>
-                                  <Badge variant="outline">Recommended</Badge>
-                                </button>
-                                {expandedPaymentMethod === "stripe" && (
-                                  <div className="mt-3 space-y-2 text-sm text-black/60 dark:text-white/60">
-                                    <p>• Secure payment via Stripe</p>
-                                    <p>• Instant access after payment</p>
-                                    <p>• Supports all major cards</p>
-                                  </div>
-                                )}
-                              </div>
-
-                              {/* Bank Transfer */}
-                              <div className="rounded-lg border border-black/10 p-4 dark:border-white/10">
-                                <button
-                                  onClick={() =>
-                                    setExpandedPaymentMethod(
-                                      expandedPaymentMethod === "bank"
-                                        ? null
-                                        : "bank",
-                                    )
-                                  }
-                                  className="flex w-full items-center justify-between"
-                                >
-                                  <div className="flex items-center gap-3">
-                                    <Building2 className="h-5 w-5" />
-                                    <span className="font-medium">
-                                      Bank Transfer
-                                    </span>
-                                  </div>
-                                </button>
-                                {expandedPaymentMethod === "bank" && (
-                                  <div className="mt-3 space-y-2 text-sm text-black/60 dark:text-white/60">
-                                    <div className="space-y-1">
-                                      <p className="font-medium">
-                                        Bank Details:
-                                      </p>
-                                      <div className="rounded bg-black/5 p-3 dark:bg-white/5">
-                                        <p>Account: 1234567890</p>
-                                        <p>Routing: 987654321</p>
-                                        <p>Bank: First National Bank</p>
-                                      </div>
-                                    </div>
-                                    <p>• Include your email in transfer memo</p>
-                                    <p>• Access granted within 24 hours</p>
-                                  </div>
-                                )}
-                              </div>
-
-                              {/* Mobile Money */}
-                              <div className="rounded-lg border border-black/10 p-4 dark:border-white/10">
-                                <button
-                                  onClick={() =>
-                                    setExpandedPaymentMethod(
-                                      expandedPaymentMethod === "mobile"
-                                        ? null
-                                        : "mobile",
-                                    )
-                                  }
-                                  className="flex w-full items-center justify-between"
-                                >
-                                  <div className="flex items-center gap-3">
-                                    <Smartphone className="h-5 w-5" />
-                                    <span className="font-medium">
-                                      Mobile Money
-                                    </span>
-                                  </div>
-                                </button>
-                                {expandedPaymentMethod === "mobile" && (
-                                  <div className="mt-3 space-y-2 text-sm text-black/60 dark:text-white/60">
-                                    <div className="space-y-1">
-                                      <p className="font-medium">
-                                        MTN Mobile Money:
-                                      </p>
-                                      <div className="flex items-center justify-between rounded bg-black/5 p-3 dark:bg-white/5">
-                                        <span>+256 700 123 456</span>
-                                        <Button
-                                          size="sm"
-                                          variant="outline"
-                                          onClick={() => {
-                                            navigator.clipboard.writeText(
-                                              "+256700123456",
-                                            );
-                                            toast.success(
-                                              "Phone number copied!",
-                                            );
-                                          }}
-                                        >
-                                          <Copy className="h-3 w-3" />
-                                        </Button>
-                                      </div>
-                                    </div>
-                                    <p>
-                                      • Send $
-                                      {(contentItem.price / 100).toFixed(0)} to
-                                      the number above
-                                    </p>
-                                    <p>
-                                      • Include your email in transaction note
-                                    </p>
-                                    <p>• Access granted within 2 hours</p>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-
-                            <div className="text-center">
-                              <p className="text-xs text-black/40 dark:text-white/40">
-                                Need help? Contact support@yoursite.com
-                              </p>
-                            </div>
-                          </>
-                        ) : (
-                          <div className="rounded-lg border border-black/10 bg-black/5 p-4 text-center dark:border-white/10 dark:bg-white/5">
-                            <AlertCircle className="mx-auto mb-2 h-5 w-5 text-black/60 dark:text-white/60" />
-                            <p className="text-sm text-black/70 dark:text-white/70">
-                              Please log in to view payment options and complete
-                              your purchase.
-                            </p>
+                      </>
+                    ) : (
+                      <>
+                        <div className="mb-4">
+                          <Lock className="mx-auto h-12 w-12 text-black/40 dark:text-white/40" />
+                        </div>
+                        <h3 className="mb-2 text-lg font-semibold">
+                          Membership Required
+                        </h3>
+                        <p className="mb-6 text-sm text-black/60 dark:text-white/70">
+                          This content is exclusive to our members. Join today
+                          to unlock this and hundreds of other transformative
+                          videos.
+                        </p>
+                        <div className="space-y-3">
+                          <Button
+                            className="w-full cursor-pointer gap-x-2 rounded-none bg-black px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+                            onClick={() => router.push("/subscribe")}
+                          >
+                            <Crown className="mr-2 h-4 w-4" />
+                            View Membership Plans
+                          </Button>
+                          <div className="flex items-center gap-2">
+                            <div className="h-px flex-1 bg-black/10 dark:bg-white/10"></div>
+                            <span className="text-xs text-black/40 dark:text-white/40">
+                              OR
+                            </span>
+                            <div className="h-px flex-1 bg-black/10 dark:bg-white/10"></div>
                           </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
+                          <Button
+                            variant="outline"
+                            className="w-full cursor-pointer rounded-none border-black/20 text-black hover:bg-black/5 dark:border-white/20 dark:text-white dark:hover:bg-white/5"
+                            onClick={() =>
+                              toast.info(
+                                "Individual purchases are coming soon!",
+                              )
+                            }
+                          >
+                            <ShoppingCart className="mr-2 h-4 w-4" />
+                            Buy for ${(contentItem.price / 100).toFixed(2)}
+                          </Button>
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
 
                 {/* Share & Actions */}

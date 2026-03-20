@@ -3,6 +3,7 @@
 import { PageWrapper } from "@/components/page-wrapper";
 import { motion } from "framer-motion";
 import { larken } from "@/lib/fonts";
+import Image from "next/image";
 import {
   ArrowRight,
   Mountain,
@@ -242,11 +243,12 @@ export default function ElijahNetworkPage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="relative"
             >
-              <div className="relative overflow-hidden rounded-2xl shadow-2xl">
-                <img
+              <div className="relative h-[500px] overflow-hidden rounded-2xl shadow-2xl lg:h-[600px]">
+                <Image
                   src="https://images.unsplash.com/photo-1504052434569-70ad5836ab65?q=80&w=1400&auto=format&fit=crop"
                   alt="Elijah Network retreat"
-                  className="h-[500px] w-full object-cover lg:h-[600px]"
+                  fill
+                  className="object-cover"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent"></div>
 
@@ -433,10 +435,11 @@ export default function ElijahNetworkPage() {
                 className="group overflow-hidden rounded-2xl border-2 border-black/10 bg-neutral-50 transition-all hover:shadow-2xl dark:border-white/10 dark:bg-neutral-800"
               >
                 <div className="relative h-64 overflow-hidden">
-                  <img
+                  <Image
                     src={retreat.image}
                     alt={retreat.title}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent"></div>
                   <div className="absolute bottom-4 left-4">
@@ -534,10 +537,12 @@ export default function ElijahNetworkPage() {
                 className="rounded-2xl border-2 border-black/10 bg-white p-8 dark:border-white/10 dark:bg-neutral-900"
               >
                 <div className="mb-6 flex items-center gap-4">
-                  <img
+                  <Image
                     src={testimonial.image}
                     alt={testimonial.name}
-                    className="h-16 w-16 rounded-full object-cover"
+                    width={64}
+                    height={64}
+                    className="rounded-full object-cover"
                   />
                   <div>
                     <div className="font-semibold">{testimonial.name}</div>

@@ -80,7 +80,7 @@ const schema = defineSchema({
     status: v.union(
       v.literal("active"),
       v.literal("completed"),
-      v.literal("cancelled")
+      v.literal("cancelled"),
     ),
     progress: v.optional(v.number()), // 0-100
     notes: v.optional(v.string()),
@@ -97,11 +97,31 @@ const schema = defineSchema({
       v.literal("active"),
       v.literal("completed"),
       v.literal("on-hold"),
-      v.literal("cancelled")
+      v.literal("cancelled"),
     ),
     mentorEmail: v.optional(v.string()),
     startDate: v.optional(v.string()),
+    endDate: v.optional(v.string()),
     notes: v.optional(v.string()),
+    completedSessions: v.optional(v.number()),
+    totalSessions: v.optional(v.number()),
+    graceTokensRemaining: v.optional(v.number()),
+    graceTokensUsed: v.optional(
+      v.object({
+        month1: v.number(),
+        month2: v.number(),
+      }),
+    ),
+    paymentStatus: v.optional(
+      v.union(
+        v.literal("pending"),
+        v.literal("completed"),
+        v.literal("refunded"),
+      ),
+    ),
+    stripePaymentIntentId: v.optional(v.string()),
+    eventId: v.optional(v.id("events")),
+    eventRegistrationId: v.optional(v.id("eventRegistrations")),
   })
     .index("by_user", ["userEmail"])
     .index("by_program", ["programType"])
@@ -112,16 +132,16 @@ const schema = defineSchema({
     userId: v.string(),
     userEmail: v.string(), // For easy lookup
     planType: v.union(
-      v.literal("all-access"),
-      v.literal("mystical-masterclass"), 
-      v.literal("open-scroll")
+      v.literal("brass"),
+      v.literal("gold"),
+      v.literal("platinum"),
     ),
     status: v.union(
       v.literal("active"),
       v.literal("cancelled"),
       v.literal("expired"),
       v.literal("trial"),
-      v.literal("past_due")
+      v.literal("past_due"),
     ),
     startDate: v.string(), // ISO date string
     endDate: v.optional(v.string()), // ISO date string, null for ongoing
@@ -147,7 +167,7 @@ const schema = defineSchema({
     contentType: v.union(
       v.literal("video"),
       v.literal("course"),
-      v.literal("bundle")
+      v.literal("bundle"),
     ),
     contentTitle: v.string(),
     purchaseDate: v.string(),
@@ -168,12 +188,12 @@ const schema = defineSchema({
     contentType: v.union(
       v.literal("video"),
       v.literal("course"),
-      v.literal("bundle")
+      v.literal("bundle"),
     ),
     school: v.union(
       v.literal("mystical-masterclass"),
       v.literal("open-scroll"),
-      v.literal("general")
+      v.literal("general"),
     ),
     videoUrl: v.optional(v.string()),
     thumbnailUrl: v.optional(v.string()),
@@ -183,11 +203,15 @@ const schema = defineSchema({
     isSubscriberOnly: v.boolean(), // Requires subscription
     orderIndex: v.optional(v.number()), // For course ordering
     parentCourseId: v.optional(v.id("contentLibrary")), // For videos in courses
-    resources: v.optional(v.array(v.object({
-      name: v.string(),
-      url: v.string(),
-      type: v.string() // "pdf", "audio", "worksheet", etc.
-    }))),
+    resources: v.optional(
+      v.array(
+        v.object({
+          name: v.string(),
+          url: v.string(),
+          type: v.string(), // "pdf", "audio", "worksheet", etc.
+        }),
+      ),
+    ),
     tags: v.optional(v.array(v.string())),
     isPublished: v.boolean(),
     publishedAt: v.optional(v.string()),
@@ -206,7 +230,8 @@ const schema = defineSchema({
     accessType: v.union(
       v.literal("subscription"),
       v.literal("purchase"),
-      v.literal("trial")
+      v.literal("trial"),
+      v.literal("free"),
     ),
     grantedAt: v.string(),
     expiresAt: v.optional(v.string()), // null for permanent access
@@ -216,6 +241,7 @@ const schema = defineSchema({
   })
     .index("by_user", ["userId"])
     .index("by_content", ["contentId"])
+    .index("by_email", ["userEmail"])
     .index("by_access_type", ["accessType"])
     .index("by_user_and_content", ["userId", "contentId"]),
 

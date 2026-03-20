@@ -3,6 +3,7 @@
 import { use, useEffect, useState } from "react";
 import { PageWrapper } from "@/components/page-wrapper";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import {
   Calendar,
   MapPin,
@@ -223,10 +224,12 @@ export default function EventDetailPage({
       {/* Hero Section */}
       <section className="relative">
         <div className="relative h-[60vh] min-h-[500px] overflow-hidden">
-          <img
+          <Image
             src={event.image}
             alt={event.title}
-            className="h-full w-full object-cover"
+            fill
+            className="object-cover"
+            priority
           />
           <div className="absolute inset-0 bg-linear-to-t from-black via-black/60 to-black/30"></div>
 
@@ -385,7 +388,7 @@ export default function EventDetailPage({
                 <ul className="grid gap-3 sm:grid-cols-2">
                   {event.whatToExpect.map((item, index) => (
                     <li key={index} className="flex items-start gap-3">
-                      <Check className="mt-0.5 h-5 w-5 flex-shrink-0 text-black dark:text-white" />
+                      <Check className="mt-0.5 h-5 w-5 shrink-0 text-black dark:text-white" />
                       <span className="text-base text-black/80 dark:text-white/80">
                         {item}
                       </span>
@@ -406,7 +409,7 @@ export default function EventDetailPage({
                 <ul className="space-y-3">
                   {event.whatToBring.map((item, index) => (
                     <li key={index} className="flex items-start gap-3">
-                      <Check className="mt-0.5 h-5 w-5 flex-shrink-0 text-black dark:text-white" />
+                      <Check className="mt-0.5 h-5 w-5 shrink-0 text-black dark:text-white" />
                       <span className="text-base text-black/80 dark:text-white/80">
                         {item}
                       </span>
@@ -429,7 +432,7 @@ export default function EventDetailPage({
                   <h3 className="mb-4 font-semibold">Quick Info</h3>
                   <div className="space-y-3 text-sm">
                     <div className="flex items-start gap-3">
-                      <Calendar className="mt-0.5 h-4 w-4 flex-shrink-0 text-black/60 dark:text-white/60" />
+                      <Calendar className="mt-0.5 h-4 w-4 shrink-0 text-black/60 dark:text-white/60" />
                       <div>
                         <p className="font-medium">{event.date}</p>
                         <p className="text-black/60 dark:text-white/60">
@@ -438,7 +441,7 @@ export default function EventDetailPage({
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
-                      <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0 text-black/60 dark:text-white/60" />
+                      <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-black/60 dark:text-white/60" />
                       <div>
                         <p className="font-medium">{event.location}</p>
                         <p className="text-black/60 dark:text-white/60">
@@ -447,7 +450,7 @@ export default function EventDetailPage({
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
-                      <Users className="mt-0.5 h-4 w-4 flex-shrink-0 text-black/60 dark:text-white/60" />
+                      <Users className="mt-0.5 h-4 w-4 shrink-0 text-black/60 dark:text-white/60" />
                       <div>
                         <p className="font-medium">{event.attendees}</p>
                         <p className="text-black/60 dark:text-white/60">
@@ -661,7 +664,7 @@ export default function EventDetailPage({
                         {hasPaymentPending && (
                           <div className="rounded-md border-2 border-yellow-500 bg-yellow-50 p-4 dark:bg-yellow-900/20">
                             <div className="flex items-start gap-3">
-                              <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-yellow-700 dark:text-yellow-400" />
+                              <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-yellow-700 dark:text-yellow-400" />
                               <div className="flex-1">
                                 <h4 className="mb-1 font-semibold text-yellow-900 dark:text-yellow-200">
                                   Payment Required

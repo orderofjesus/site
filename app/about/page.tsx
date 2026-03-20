@@ -2,6 +2,7 @@
 
 import { PageWrapper } from "@/components/page-wrapper";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import {
   Heart,
   Users,
@@ -63,22 +64,26 @@ const coreValues = [
   {
     icon: Book,
     title: "Scripture",
-    description: "The Bible is our final authority for faith and practice. We believe God's Word is living, active, and sufficient for all of life.",
+    description:
+      "The Bible is our final authority for faith and practice. We believe God's Word is living, active, and sufficient for all of life.",
   },
   {
     icon: Heart,
     title: "Prayer",
-    description: "We depend on God through consistent, fervent prayer. Every ministry flows from a foundation of seeking God's presence.",
+    description:
+      "We depend on God through consistent, fervent prayer. Every ministry flows from a foundation of seeking God's presence.",
   },
   {
     icon: Users,
     title: "Unity",
-    description: "We pursue unity in Christ across all barriers. Our diversity strengthens us as we love one another in Jesus' name.",
+    description:
+      "We pursue unity in Christ across all barriers. Our diversity strengthens us as we love one another in Jesus' name.",
   },
   {
     icon: Target,
     title: "Excellence",
-    description: "We do all things with excellence for God's glory. Our service reflects the character of the One we serve.",
+    description:
+      "We do all things with excellence for God's glory. Our service reflects the character of the One we serve.",
   },
 ];
 
@@ -113,43 +118,51 @@ const timeline = [
   {
     year: "1999",
     title: "Church Founded",
-    description: "Started with 30 believers gathering in a home, united by a vision to reach our city for Christ.",
+    description:
+      "Started with 30 believers gathering in a home, united by a vision to reach our city for Christ.",
   },
   {
     year: "2005",
     title: "First Building Acquired",
-    description: "Moved into our first worship facility, expanding ministry capacity and community impact.",
+    description:
+      "Moved into our first worship facility, expanding ministry capacity and community impact.",
   },
   {
     year: "2012",
     title: "Global Missions Launch",
-    description: "Sent our first missionary family overseas, beginning a legacy of worldwide gospel partnership.",
+    description:
+      "Sent our first missionary family overseas, beginning a legacy of worldwide gospel partnership.",
   },
   {
     year: "2018",
     title: "Community Center Opens",
-    description: "Opened our outreach center serving over 1,000 families monthly through food, counseling, and care.",
+    description:
+      "Opened our outreach center serving over 1,000 families monthly through food, counseling, and care.",
   },
   {
     year: "2024",
     title: "Multi-Site Expansion",
-    description: "Launching new locations to reach more communities with the message of Jesus.",
+    description:
+      "Launching new locations to reach more communities with the message of Jesus.",
   },
 ];
 
 const testimonials = [
   {
-    quote: "This church changed my life. I found not just a place to worship, but a family that truly lives out the love of Christ.",
+    quote:
+      "This church changed my life. I found not just a place to worship, but a family that truly lives out the love of Christ.",
     author: "Sarah M.",
     role: "Member since 2018",
   },
   {
-    quote: "The biblical teaching here has equipped me to grow in my faith and serve God's kingdom with confidence and purpose.",
+    quote:
+      "The biblical teaching here has equipped me to grow in my faith and serve God's kingdom with confidence and purpose.",
     author: "David K.",
     role: "Small Group Leader",
   },
   {
-    quote: "I've witnessed God's transforming power here. This community welcomed me with open arms and helped me discover my calling.",
+    quote:
+      "I've witnessed God's transforming power here. This community welcomed me with open arms and helped me discover my calling.",
     author: "Jennifer L.",
     role: "Volunteer Coordinator",
   },
@@ -167,17 +180,20 @@ export default function AboutPage() {
             transition={{ duration: 0.6 }}
             className="mb-16 text-center"
           >
-            <p className="mb-4 text-xs tracking-[0.4em] uppercase text-black/60 dark:text-white/60">
+            <p className="mb-4 text-xs tracking-[0.4em] text-black/60 uppercase dark:text-white/60">
               About Melchizedek
             </p>
-            <h1 className={`${larken.className} mb-6 text-5xl font-bold md:text-7xl`}>
+            <h1
+              className={`${larken.className} mb-6 text-5xl font-bold md:text-7xl`}
+            >
               Know Jesus,
               <br />
               Make Him Known
             </h1>
             <p className="mx-auto max-w-3xl text-xl leading-relaxed text-black/70 dark:text-white/70">
-              We are a Christ-centered community dedicated to worship, discipleship, and service.
-              Our mission is to glorify God by making disciples who love Jesus and transform the world.
+              We are a Christ-centered community dedicated to worship,
+              discipleship, and service. Our mission is to glorify God by making
+              disciples who love Jesus and transform the world.
             </p>
           </motion.div>
 
@@ -193,9 +209,13 @@ export default function AboutPage() {
                 key={index}
                 className="border border-black/10 bg-white p-6 text-center transition-all duration-300 hover:border-black hover:shadow-lg dark:border-white/10 dark:bg-neutral-900 dark:hover:border-white"
               >
-                <p className={`${larken.className} mb-2 text-4xl font-bold`}>{stat.number}</p>
+                <p className={`${larken.className} mb-2 text-4xl font-bold`}>
+                  {stat.number}
+                </p>
                 <p className="mb-1 text-sm font-semibold">{stat.label}</p>
-                <p className="text-xs text-black/60 dark:text-white/60">{stat.sublabel}</p>
+                <p className="text-xs text-black/60 dark:text-white/60">
+                  {stat.sublabel}
+                </p>
               </div>
             ))}
           </motion.div>
@@ -203,7 +223,7 @@ export default function AboutPage() {
       </section>
 
       {/* Mission, Vision, Values Section */}
-      <section className="bg-neutral-50 px-6 py-20 dark:bg-neutral-900 lg:px-8">
+      <section className="bg-neutral-50 px-6 py-20 lg:px-8 dark:bg-neutral-900">
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-12 lg:grid-cols-3">
             {/* Mission */}
@@ -215,10 +235,13 @@ export default function AboutPage() {
               className="border-l-4 border-black bg-white p-8 dark:border-white dark:bg-neutral-800"
             >
               <Target className="mb-4 h-8 w-8" />
-              <h3 className={`${larken.className} mb-4 text-2xl font-bold`}>Our Mission</h3>
+              <h3 className={`${larken.className} mb-4 text-2xl font-bold`}>
+                Our Mission
+              </h3>
               <p className="leading-relaxed text-black/70 dark:text-white/70">
-                To glorify God by making disciples who love Jesus and transform the world through
-                authentic worship, biblical teaching, and Spirit-led ministry.
+                To glorify God by making disciples who love Jesus and transform
+                the world through authentic worship, biblical teaching, and
+                Spirit-led ministry.
               </p>
             </motion.div>
 
@@ -231,10 +254,13 @@ export default function AboutPage() {
               className="border-l-4 border-black bg-white p-8 dark:border-white dark:bg-neutral-800"
             >
               <Eye className="mb-4 h-8 w-8" />
-              <h3 className={`${larken.className} mb-4 text-2xl font-bold`}>Our Vision</h3>
+              <h3 className={`${larken.className} mb-4 text-2xl font-bold`}>
+                Our Vision
+              </h3>
               <p className="leading-relaxed text-black/70 dark:text-white/70">
-                A city and world where people experience genuine encounters with Christ, growing in
-                faith and serving with compassion as agents of transformation.
+                A city and world where people experience genuine encounters with
+                Christ, growing in faith and serving with compassion as agents
+                of transformation.
               </p>
             </motion.div>
 
@@ -247,10 +273,13 @@ export default function AboutPage() {
               className="border-l-4 border-black bg-white p-8 dark:border-white dark:bg-neutral-800"
             >
               <Compass className="mb-4 h-8 w-8" />
-              <h3 className={`${larken.className} mb-4 text-2xl font-bold`}>Our Purpose</h3>
+              <h3 className={`${larken.className} mb-4 text-2xl font-bold`}>
+                Our Purpose
+              </h3>
               <p className="leading-relaxed text-black/70 dark:text-white/70">
-                To create a community where people know Jesus deeply and make Him known boldly,
-                equipping believers to live out their faith with excellence and grace.
+                To create a community where people know Jesus deeply and make
+                Him known boldly, equipping believers to live out their faith
+                with excellence and grace.
               </p>
             </motion.div>
           </div>
@@ -267,12 +296,14 @@ export default function AboutPage() {
             transition={{ duration: 0.5 }}
             className="mb-12 text-center"
           >
-            <h2 className={`${larken.className} mb-6 text-4xl font-bold md:text-5xl`}>
+            <h2
+              className={`${larken.className} mb-6 text-4xl font-bold md:text-5xl`}
+            >
               What We Believe
             </h2>
             <p className="mx-auto max-w-2xl text-lg text-black/70 dark:text-white/70">
-              Our faith is anchored in the timeless truths of Scripture and expressed through
-              authentic community and passionate service.
+              Our faith is anchored in the timeless truths of Scripture and
+              expressed through authentic community and passionate service.
             </p>
           </motion.div>
 
@@ -287,7 +318,9 @@ export default function AboutPage() {
                 className="group border border-black/10 bg-white p-8 transition-all duration-300 hover:border-black hover:shadow-xl dark:border-white/10 dark:bg-neutral-900 dark:hover:border-white"
               >
                 <feature.icon className="mb-4 h-10 w-10 transition-transform group-hover:scale-110" />
-                <h3 className={`${larken.className} mb-3 text-xl font-bold`}>{feature.title}</h3>
+                <h3 className={`${larken.className} mb-3 text-xl font-bold`}>
+                  {feature.title}
+                </h3>
                 <p className="text-sm leading-relaxed text-black/70 dark:text-white/70">
                   {feature.desc}
                 </p>
@@ -298,7 +331,7 @@ export default function AboutPage() {
       </section>
 
       {/* Core Values Section */}
-      <section className="bg-neutral-50 px-6 py-20 dark:bg-neutral-900 lg:px-8">
+      <section className="bg-neutral-50 px-6 py-20 lg:px-8 dark:bg-neutral-900">
         <div className="mx-auto max-w-7xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -307,12 +340,14 @@ export default function AboutPage() {
             transition={{ duration: 0.5 }}
             className="mb-12 text-center"
           >
-            <h2 className={`${larken.className} mb-6 text-4xl font-bold md:text-5xl`}>
+            <h2
+              className={`${larken.className} mb-6 text-4xl font-bold md:text-5xl`}
+            >
               Our Core Values
             </h2>
             <p className="mx-auto max-w-2xl text-lg text-black/70 dark:text-white/70">
-              These principles guide everything we do as a church community, shaping our worship,
-              ministry, and mission.
+              These principles guide everything we do as a church community,
+              shaping our worship, ministry, and mission.
             </p>
           </motion.div>
 
@@ -326,13 +361,15 @@ export default function AboutPage() {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className="flex gap-6 border-2 border-black bg-white p-8 transition-all duration-300 hover:shadow-xl dark:border-white dark:bg-neutral-800"
               >
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <div className="flex h-12 w-12 items-center justify-center bg-black dark:bg-white">
                     <value.icon className="h-6 w-6 text-white dark:text-black" />
                   </div>
                 </div>
                 <div>
-                  <h3 className={`${larken.className} mb-3 text-2xl font-bold`}>{value.title}</h3>
+                  <h3 className={`${larken.className} mb-3 text-2xl font-bold`}>
+                    {value.title}
+                  </h3>
                   <p className="leading-relaxed text-black/70 dark:text-white/70">
                     {value.description}
                   </p>
@@ -353,12 +390,14 @@ export default function AboutPage() {
             transition={{ duration: 0.5 }}
             className="mb-12 text-center"
           >
-            <h2 className={`${larken.className} mb-6 text-4xl font-bold md:text-5xl`}>
+            <h2
+              className={`${larken.className} mb-6 text-4xl font-bold md:text-5xl`}
+            >
               Our Leadership
             </h2>
             <p className="mx-auto max-w-2xl text-lg text-black/70 dark:text-white/70">
-              Our pastoral team is committed to serving Christ and shepherding our congregation with
-              wisdom, compassion, and biblical integrity.
+              Our pastoral team is committed to serving Christ and shepherding
+              our congregation with wisdom, compassion, and biblical integrity.
             </p>
           </motion.div>
 
@@ -372,15 +411,18 @@ export default function AboutPage() {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className="group overflow-hidden border border-black/10 bg-white transition-all duration-300 hover:border-black hover:shadow-xl dark:border-white/10 dark:bg-neutral-900 dark:hover:border-white"
               >
-                <div className="aspect-square overflow-hidden">
-                  <img
+                <div className="relative aspect-square overflow-hidden">
+                  <Image
                     src={leader.image}
                     alt={leader.name}
-                    className="h-full w-full object-cover grayscale transition-all duration-500 group-hover:scale-105 group-hover:grayscale-0"
+                    fill
+                    className="object-cover grayscale transition-all duration-500 group-hover:scale-105 group-hover:grayscale-0"
                   />
                 </div>
                 <div className="p-6">
-                  <h3 className={`${larken.className} mb-1 text-2xl font-bold`}>{leader.name}</h3>
+                  <h3 className={`${larken.className} mb-1 text-2xl font-bold`}>
+                    {leader.name}
+                  </h3>
                   <p className="mb-4 text-sm font-semibold text-black/60 dark:text-white/60">
                     {leader.role}
                   </p>
@@ -395,7 +437,7 @@ export default function AboutPage() {
       </section>
 
       {/* Timeline Section */}
-      <section className="bg-neutral-50 px-6 py-20 dark:bg-neutral-900 lg:px-8">
+      <section className="bg-neutral-50 px-6 py-20 lg:px-8 dark:bg-neutral-900">
         <div className="mx-auto max-w-5xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -404,12 +446,14 @@ export default function AboutPage() {
             transition={{ duration: 0.5 }}
             className="mb-12 text-center"
           >
-            <h2 className={`${larken.className} mb-6 text-4xl font-bold md:text-5xl`}>
+            <h2
+              className={`${larken.className} mb-6 text-4xl font-bold md:text-5xl`}
+            >
               Our Story
             </h2>
             <p className="mx-auto max-w-2xl text-lg text-black/70 dark:text-white/70">
-              From humble beginnings to a thriving community, God has been faithful through every
-              season of our church's journey.
+              From humble beginnings to a thriving community, God has been
+              faithful through every season of our church's journey.
             </p>
           </motion.div>
 
@@ -427,8 +471,12 @@ export default function AboutPage() {
                   <div className="h-4 w-4 bg-black dark:bg-white" />
                 </div>
                 <div className="border border-black/10 bg-white p-8 transition-all duration-300 hover:border-black hover:shadow-lg dark:border-white/10 dark:bg-neutral-800 dark:hover:border-white">
-                  <p className={`${larken.className} mb-2 text-4xl font-bold`}>{item.year}</p>
-                  <h3 className={`${larken.className} mb-3 text-2xl font-bold`}>{item.title}</h3>
+                  <p className={`${larken.className} mb-2 text-4xl font-bold`}>
+                    {item.year}
+                  </p>
+                  <h3 className={`${larken.className} mb-3 text-2xl font-bold`}>
+                    {item.title}
+                  </h3>
                   <p className="leading-relaxed text-black/70 dark:text-white/70">
                     {item.description}
                   </p>
@@ -449,12 +497,14 @@ export default function AboutPage() {
             transition={{ duration: 0.5 }}
             className="mb-12 text-center"
           >
-            <h2 className={`${larken.className} mb-6 text-4xl font-bold md:text-5xl`}>
+            <h2
+              className={`${larken.className} mb-6 text-4xl font-bold md:text-5xl`}
+            >
               What People Say
             </h2>
             <p className="mx-auto max-w-2xl text-lg text-black/70 dark:text-white/70">
-              Hear from members of our community about how God is working in and through
-              Melchizedek.
+              Hear from members of our community about how God is working in and
+              through Melchizedek.
             </p>
           </motion.div>
 
@@ -474,7 +524,9 @@ export default function AboutPage() {
                 </p>
                 <div>
                   <p className="font-semibold">{testimonial.author}</p>
-                  <p className="text-sm text-black/60 dark:text-white/60">{testimonial.role}</p>
+                  <p className="text-sm text-black/60 dark:text-white/60">
+                    {testimonial.role}
+                  </p>
                 </div>
               </motion.div>
             ))}
@@ -483,7 +535,7 @@ export default function AboutPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-black px-6 py-20 text-white dark:bg-white dark:text-black lg:px-8">
+      <section className="bg-black px-6 py-20 text-white lg:px-8 dark:bg-white dark:text-black">
         <div className="mx-auto max-w-4xl text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -491,13 +543,15 @@ export default function AboutPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <h2 className={`${larken.className} mb-6 text-4xl font-bold md:text-5xl`}>
+            <h2
+              className={`${larken.className} mb-6 text-4xl font-bold md:text-5xl`}
+            >
               Join Our Community
             </h2>
             <p className="mb-8 text-lg leading-relaxed opacity-80">
-              Whether you're exploring faith for the first time or looking for a church home, we'd
-              love to welcome you. Come experience authentic worship, biblical teaching, and genuine
-              community.
+              Whether you're exploring faith for the first time or looking for a
+              church home, we'd love to welcome you. Come experience authentic
+              worship, biblical teaching, and genuine community.
             </p>
             <div className="flex flex-col justify-center gap-4 sm:flex-row">
               <Link href="/#connect">
